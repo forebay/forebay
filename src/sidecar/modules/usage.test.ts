@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AppDescriptor } from "@intisy-ai/basekit";
 
-const stubHandlerPath = fileURLToPath(new URL("../../../../../providers/stub-auth/dist/handler.js", import.meta.url));
+const stubHandlerPath = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth/dist/handler.js", import.meta.url));
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
 const ENV_KEYS = [

@@ -5,13 +5,13 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { materializeLibraries } from "@intisy-ai/basekit";
 
-const stubHandlerPath = fileURLToPath(new URL("../../../../../providers/stub-auth/dist/handler.js", import.meta.url));
+const stubHandlerPath = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth/dist/handler.js", import.meta.url));
 
 beforeEach(() => {
   process.env.HUB_CONFIG_DIR = mkdtempSync(join(tmpdir(), "dash-accounts-"));
 });
 
-const stubCloneDir = fileURLToPath(new URL("../../../../../providers/stub-auth", import.meta.url));
+const stubCloneDir = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth", import.meta.url));
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
 // Stands in for `npm install --prefix <home>`, copying out of the sibling checkouts this
