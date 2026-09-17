@@ -1,4 +1,4 @@
-name: Promote to Experimental
+name: Promote to Development
 on:
   workflow_dispatch:
   push:
@@ -12,4 +12,4 @@ jobs:
     uses: intisy/workflows/.github/workflows/merge.yml@main
     with:
       source: ${{ github.sha }}
-      target: experimental
+      target: development

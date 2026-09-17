@@ -10,6 +10,6 @@ jobs:
   promote:
     uses: intisy/workflows/.github/workflows/merge.yml@main
     with:
-      source: experimental
+      source: development
       target: main
       sync_back: true
