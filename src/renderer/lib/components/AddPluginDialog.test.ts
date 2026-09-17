@@ -12,7 +12,7 @@ describe("AddPluginDialog", () => {
     const { getByPlaceholderText, getByText, getByRole } = render(TestWrapper, { props: { home: "cairn" } });
 
     await fireEvent.input(getByPlaceholderText("owner/repo or GitHub URL"), {
-      target: { value: "https://github.com/intisy-ai/some-proxy" },
+      target: { value: "https://github.com/forebay/some-proxy" },
     });
 
     expect(getByText("some-proxy")).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe("AddPluginDialog", () => {
 
     await fireEvent.click(getByRole("button", { name: /install/i }));
 
-    await waitFor(() => expect(pluginsInstall).toHaveBeenCalledWith("cairn", "some-proxy", "https://github.com/intisy-ai/some-proxy"));
+    await waitFor(() => expect(pluginsInstall).toHaveBeenCalledWith("cairn", "some-proxy", "https://github.com/forebay/some-proxy"));
   });
 
   it("disables install for a malformed reference", async () => {

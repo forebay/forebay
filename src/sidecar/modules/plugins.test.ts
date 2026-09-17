@@ -129,8 +129,8 @@ const fromSeed = {
 
 describe("plugins sidecar module", () => {
   it("lists plugins per home, tagging each section with its home", async () => {
-    seedPlugins(cairnDir, [{ name: "claude-code-proxy", url: "https://github.com/intisy-ai/claude-code-proxy", enabled: true }]);
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(cairnDir, [{ name: "claude-code-proxy", url: "https://github.com/forebay/claude-code-proxy", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { pluginsList } = await import("./plugins.js");
     const result = await pluginsList({ ...fromSeed, homes: fakeHomes });
@@ -159,8 +159,8 @@ describe("plugins sidecar module", () => {
 
   it("merges git + npm plugins with the update-state cache for a given home", async () => {
     seedPlugins(claudeDir, [
-      { name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true },
-      { name: "plugin-b", url: "https://github.com/intisy-ai/plugin-b", enabled: false },
+      { name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true },
+      { name: "plugin-b", url: "https://github.com/forebay/plugin-b", enabled: false },
     ]);
     seedNpmPlugins(claudeDir, ["npm-plugin-x"]);
     seedCache(claudeDir, {
@@ -185,11 +185,11 @@ describe("plugins sidecar module", () => {
     const claudeSection = result.data.find((s) => s.home.id === "claude")!;
     const byName = new Map(claudeSection.rows.map((row) => [row.name, row]));
     expect(byName.get("plugin-a")).toEqual({
-      name: "plugin-a", pluginId: "plugin-a", kind: "git", enabled: true, url: "https://github.com/intisy-ai/plugin-a",
+      name: "plugin-a", pluginId: "plugin-a", kind: "git", enabled: true, url: "https://github.com/forebay/plugin-a",
       installedVersion: null, updateAvailable: true, description: "", missingArtifacts: [], present: false,
     });
     expect(byName.get("plugin-b")).toEqual({
-      name: "plugin-b", pluginId: "plugin-b", kind: "git", enabled: false, url: "https://github.com/intisy-ai/plugin-b",
+      name: "plugin-b", pluginId: "plugin-b", kind: "git", enabled: false, url: "https://github.com/forebay/plugin-b",
       installedVersion: null, updateAvailable: false, description: "", missingArtifacts: [], present: false,
     });
     expect(byName.get("npm-plugin-x")).toEqual({
@@ -202,7 +202,7 @@ describe("plugins sidecar module", () => {
   // entry / clone directory name (see providers.ts's pluginIdFromClone). The developer tab joins
   // on this, not on the row's `name`.
   it("carries the clone's own declared plugin id when it differs from the entry name", async () => {
-    seedPlugins(claudeDir, [{ name: "vendor-clone-dir", url: "https://github.com/intisy-ai/vendor-clone-dir", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "vendor-clone-dir", url: "https://github.com/forebay/vendor-clone-dir", enabled: true }]);
     mkdirSync(join(claudeDir, "repos", "vendor-clone-dir"), { recursive: true });
     writeFileSync(join(claudeDir, "repos", "vendor-clone-dir", "plugin.json"), JSON.stringify({ id: "vendor-host-id" }));
 
@@ -216,7 +216,7 @@ describe("plugins sidecar module", () => {
   // A clone whose build half-landed loads with pieces of itself missing, which is what the
   // Repair action keys off. Only a git clone has a build that can be incomplete.
   it("reports the build outputs a clone declares but does not have", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     seedNpmPlugins(claudeDir, ["npm-plugin-x"]);
     const { pluginsList } = await import("./plugins.js");
     const result = await pluginsList({
@@ -237,7 +237,7 @@ describe("plugins sidecar module", () => {
     };
 
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "plugin-b", "https://github.com/intisy-ai/plugin-b", {
+    const result = await pluginsInstall("claude", "plugin-b", "https://github.com/forebay/plugin-b", {
       installPlugin: fakeUpdate,
       ...fromSeed,
       homes: fakeHomes,
@@ -253,7 +253,7 @@ describe("plugins sidecar module", () => {
     const syncPluginsAcrossApps = vi.fn().mockResolvedValue(undefined);
     const { pluginsInstall } = await import("./plugins.js");
 
-    await pluginsInstall("claude", "plugin-b", "https://github.com/intisy-ai/plugin-b", {
+    await pluginsInstall("claude", "plugin-b", "https://github.com/forebay/plugin-b", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -263,7 +263,7 @@ describe("plugins sidecar module", () => {
     expect(syncPluginsAcrossApps).toHaveBeenCalledWith(claudeDir, "claude");
 
     syncPluginsAcrossApps.mockClear();
-    await pluginsInstall("cairn", "plugin-c", "https://github.com/intisy-ai/plugin-c", {
+    await pluginsInstall("cairn", "plugin-c", "https://github.com/forebay/plugin-c", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -274,8 +274,8 @@ describe("plugins sidecar module", () => {
   });
 
   it("setEnabled writes the target home's plugins.json, not another home's", async () => {
-    seedPlugins(cairnDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(cairnDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { pluginsSetEnabled } = await import("./plugins.js");
     const result = await pluginsSetEnabled("claude", "plugin-a", false, { ...fromSeed, homes: fakeHomes });
@@ -289,7 +289,7 @@ describe("plugins sidecar module", () => {
   });
 
   it("setAutoUpdate writes the target home's plugins.json entry", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true, autoUpdate: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true, autoUpdate: true }]);
     const { pluginsSetAutoUpdate } = await import("./plugins.js");
     const result = await pluginsSetAutoUpdate("claude", "plugin-a", false, { ...fromSeed, homes: fakeHomes });
     expect(result.ok).toBe(true);
@@ -324,14 +324,14 @@ describe("plugins sidecar module", () => {
   });
 
   it("setEnabled returns ok:false for an unknown plugin", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     const { pluginsSetEnabled } = await import("./plugins.js");
     const result = await pluginsSetEnabled("claude", "nonexistent", true, { ...fromSeed, homes: fakeHomes });
     expect(result.ok).toBe(false);
   });
 
   it("downgrade looks up the plugin in the requested home and calls the injected downgrade fn, no network", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", branch: "main", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", branch: "main", enabled: true }]);
     const downgrade = vi.fn().mockResolvedValue({ ok: true });
 
     const { pluginsDowngrade } = await import("./plugins.js");
@@ -352,7 +352,7 @@ describe("plugins sidecar module", () => {
   });
 
   it("downgrade returns ok:false when the injected downgrade fn reports an error", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     const downgrade = vi.fn().mockReturnValue("checkout failed");
     const { pluginsDowngrade } = await import("./plugins.js");
     const result = await pluginsDowngrade("claude", "plugin-a", "deadbeef", { downgrade, homes: fakeHomes });
@@ -361,7 +361,7 @@ describe("plugins sidecar module", () => {
 
   it("install registers a new plugin in plugins.json when none exists yet", async () => {
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "plugin-new", "https://github.com/intisy-ai/plugin-new", {
+    const result = await pluginsInstall("claude", "plugin-new", "https://github.com/forebay/plugin-new", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -372,14 +372,14 @@ describe("plugins sidecar module", () => {
 
     const entries = JSON.parse(readFileSync(join(claudeDir, "config", "plugins.json"), "utf8")) as Plugin[];
     expect(entries).toEqual([
-      { name: "plugin-new", url: "https://github.com/intisy-ai/plugin-new", enabled: true, autoUpdate: true },
+      { name: "plugin-new", url: "https://github.com/forebay/plugin-new", enabled: true, autoUpdate: true },
     ]);
   });
 
   it("reports install phases in order through the report hook", async () => {
     const steps: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    await pluginsInstall("claude", "plugin-p", "https://github.com/intisy-ai/plugin-p", {
+    await pluginsInstall("claude", "plugin-p", "https://github.com/forebay/plugin-p", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -393,7 +393,7 @@ describe("plugins sidecar module", () => {
   it("reports the app-registration phase when the manager is installed into an app home", async () => {
     const steps: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "plugin-updater", "https://github.com/intisy-ai/plugin-updater", {
+    const result = await pluginsInstall("claude", "plugin-updater", "https://github.com/forebay/plugin-updater", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -410,7 +410,7 @@ describe("plugins sidecar module", () => {
     const order: string[] = [];
     const steps: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/intisy-ai/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
       installPlugin: async (_dir, name) => { order.push("install:" + name); },
       ...fromSeed,
       homes: fakeHomes,
@@ -426,7 +426,7 @@ describe("plugins sidecar module", () => {
 
   it("stops at a failed bootstrap instead of installing into a home that cannot manage it", async () => {
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/intisy-ai/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
       installPlugin: async () => { throw new Error("must not run"); },
       ...fromSeed,
       homes: fakeHomes,
@@ -441,7 +441,7 @@ describe("plugins sidecar module", () => {
   it("does not bootstrap when the plugin being installed is the updater itself", async () => {
     let bootstraps = 0;
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/intisy-ai/plugin-updater", {
+    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/forebay/plugin-updater", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -453,10 +453,10 @@ describe("plugins sidecar module", () => {
   });
 
   it("install does not duplicate an existing entry and preserves its other fields", async () => {
-    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: false, autoUpdate: false }]);
+    seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: false, autoUpdate: false }]);
 
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "plugin-a", "https://github.com/intisy-ai/plugin-a-fork", {
+    const result = await pluginsInstall("claude", "plugin-a", "https://github.com/forebay/plugin-a-fork", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -467,12 +467,12 @@ describe("plugins sidecar module", () => {
 
     const entries = JSON.parse(readFileSync(join(claudeDir, "config", "plugins.json"), "utf8")) as Plugin[];
     expect(entries).toHaveLength(1);
-    expect(entries[0]).toEqual({ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a-fork", enabled: false, autoUpdate: false });
+    expect(entries[0]).toEqual({ name: "plugin-a", url: "https://github.com/forebay/plugin-a-fork", enabled: false, autoUpdate: false });
   });
 
   it("install leaves plugins.json unwritten when the download fails", async () => {
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "plugin-fail", "https://github.com/intisy-ai/plugin-fail", {
+    const result = await pluginsInstall("claude", "plugin-fail", "https://github.com/forebay/plugin-fail", {
       installPlugin: async () => { throw new Error("clone failed"); },
       ...fromSeed,
       homes: fakeHomes,
@@ -523,8 +523,8 @@ describe("plugins sidecar module", () => {
 
   it("disables and uninstalls any plugin now that nothing is locked, including the engine", async () => {
     seedPlugins(claudeDir, [
-      { name: "wakatime-sync", url: "https://github.com/intisy-ai/wakatime-sync", enabled: true },
-      { name: "plugin-updater", url: "https://github.com/intisy-ai/plugin-updater", enabled: true },
+      { name: "wakatime-sync", url: "https://github.com/forebay/wakatime-sync", enabled: true },
+      { name: "plugin-updater", url: "https://github.com/forebay/plugin-updater", enabled: true },
     ]);
     const { pluginsSetEnabled, pluginsUninstall } = await import("./plugins.js");
     expect((await pluginsSetEnabled("claude", "wakatime-sync", false, { ...fromSeed, homes: fakeHomes })).ok).toBe(true);
@@ -542,7 +542,7 @@ describe("plugins sidecar module", () => {
     const registrations: string[] = [];
     const installed: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/intisy-ai/plugin-updater", {
+    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/forebay/plugin-updater", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => false,
@@ -577,7 +577,7 @@ describe("plugins sidecar module", () => {
     writeFileSync(join(cairnDir, "config", "cairn.json"), JSON.stringify({ autoUpdateDefault: false }, null, 2), "utf8");
     process.env.HUB_CONFIG_DIR = cairnDir;
 
-    const result = await pluginsInstall("claude", "plugin-new", "https://github.com/intisy-ai/plugin-new", {
+    const result = await pluginsInstall("claude", "plugin-new", "https://github.com/forebay/plugin-new", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -590,7 +590,7 @@ describe("plugins sidecar module", () => {
     expect(entries).toHaveLength(1);
     expect(entries[0]).toEqual({
       name: "plugin-new",
-      url: "https://github.com/intisy-ai/plugin-new",
+      url: "https://github.com/forebay/plugin-new",
       enabled: true,
       autoUpdate: false,
     });
@@ -958,7 +958,7 @@ describe("pluginsInstall when the marketplace catalog is unreachable", () => {
     repoProvidingCapabilityMock.current = async () => { throw new Error("catalog unreachable"); };
 
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/intisy-ai/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => true,

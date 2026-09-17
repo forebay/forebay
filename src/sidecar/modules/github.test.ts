@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigValue, setConfigValue } from "@intisy-ai/basekit";
+import { ECOSYSTEM_ORG, getConfigValue, setConfigValue } from "@intisy-ai/basekit";
 import { resetOrgScanCache, resolveToken } from "../lib/orgScan.js";
 import { githubStatus, githubAddAccount, githubSwitchAccount, githubRemoveAccount, githubConnectGhCli, githubSetStar, githubStarCairn, githubDeviceStart, githubDevicePoll, resetDeviceFlowState } from "./github.js";
 
@@ -57,7 +57,7 @@ describe("githubStatus", () => {
         ghCli: null,
         accounts: [],
         activeLogin: null,
-        cairnRepoUrl: "https://github.com/intisy-ai/cairn",
+        cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`,
         cairnStarred: null,
       },
     });
@@ -71,7 +71,7 @@ describe("githubStatus", () => {
     });
     expect(result).toEqual({
       ok: true,
-      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: "https://github.com/intisy-ai/cairn", cairnStarred: null },
+      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`, cairnStarred: null },
     });
   });
 
@@ -102,7 +102,7 @@ describe("githubStatus", () => {
     const result = await githubStatus({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: failFetch(401) });
     expect(result).toEqual({
       ok: true,
-      data: { source: "env", connected: true, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: "https://github.com/intisy-ai/cairn", cairnStarred: null },
+      data: { source: "env", connected: true, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`, cairnStarred: null },
     });
   });
 
@@ -178,7 +178,7 @@ describe("githubAddAccount", () => {
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
     const result = await githubAddAccount("token", true, { fetchFn: spyFetch("octocat", calls) });
     expect(result.ok).toBe(true);
-    const starCall = calls.find((c) => c.url === "https://api.github.com/user/starred/intisy-ai/cairn");
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
     expect(starCall).toBeDefined();
     expect(starCall?.init?.method).toBe("PUT");
     expect(starCall?.init?.headers?.Authorization).toBe("Bearer token");
@@ -245,7 +245,7 @@ describe("githubConnectGhCli", () => {
       fetchFn: spyFetch("clidev", calls),
     });
     expect(result.ok).toBe(true);
-    const starCall = calls.find((c) => c.url === "https://api.github.com/user/starred/intisy-ai/cairn");
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
     expect(starCall).toBeDefined();
     expect(starCall?.init?.method).toBe("PUT");
   });
@@ -387,7 +387,7 @@ describe("githubStatus cairn star state", () => {
         : { ok: true, status: 200, json: async () => ({ login: "octocat" }) }) as unknown as typeof fetch;
     const result = await githubStatus({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: notStarred });
     expect(result.ok && result.data.cairnStarred).toBe(false);
-    if (result.ok) expect(result.data.cairnRepoUrl).toBe("https://github.com/intisy-ai/cairn");
+    if (result.ok) expect(result.data.cairnRepoUrl).toBe(`https://github.com/${ECOSYSTEM_ORG}/cairn`);
   });
 });
 
@@ -398,7 +398,7 @@ describe("githubStarCairn", () => {
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
     const result = await githubStarCairn({ fetchFn: spyFetch("bob", calls) });
     expect(result).toEqual({ ok: true, data: undefined });
-    const starCalls = calls.filter((c) => c.url === "https://api.github.com/user/starred/intisy-ai/cairn" && c.init?.method === "PUT");
+    const starCalls = calls.filter((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn` && c.init?.method === "PUT");
     expect(starCalls.length).toBe(2);
     expect(starCalls.map((c) => c.init?.headers?.Authorization)).toEqual(
       expect.arrayContaining(["Bearer token-a", "Bearer token-b"]),
@@ -409,7 +409,7 @@ describe("githubStarCairn", () => {
     const calls: { url: string; init?: { method?: string } }[] = [];
     const result = await githubStarCairn({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: spyFetch("octocat", calls) });
     expect(result).toEqual({ ok: true, data: undefined });
-    expect(calls.some((c) => c.url.includes("/user/starred/intisy-ai/cairn") && c.init?.method === "PUT")).toBe(true);
+    expect(calls.some((c) => c.url.includes(`/user/starred/${ECOSYSTEM_ORG}/cairn`) && c.init?.method === "PUT")).toBe(true);
   });
 
   it("errors when there is no token at all", async () => {
@@ -488,7 +488,7 @@ describe("githubDevicePoll", () => {
       return (deviceCodeFetch("success") as unknown as (u: string, i?: unknown) => Promise<unknown>)(url, init);
     }) as unknown as typeof fetch;
     await githubDevicePoll(true, { fetchFn });
-    const starCall = calls.find((c) => c.url === "https://api.github.com/user/starred/intisy-ai/cairn");
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
     expect(starCall?.init?.method).toBe("PUT");
     expect(starCall?.init?.headers?.Authorization).toBe("Bearer device-token");
   });

@@ -235,7 +235,7 @@ describe("Plugins screen", () => {
     stubCairn({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
-      githubStatus: async () => ({ ok: true, data: { source: "config", connected: true, login: "octocat", name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [{ login: "octocat", name: null, avatarUrl: null }], activeLogin: "octocat", cairnRepoUrl: "https://github.com/intisy-ai/cairn", cairnStarred: null } }),
+      githubStatus: async () => ({ ok: true, data: { source: "config", connected: true, login: "octocat", name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [{ login: "octocat", name: null, avatarUrl: null }], activeLogin: "octocat", cairnRepoUrl: "https://github.com/forebay/cairn", cairnStarred: null } }),
       favoritesToggle,
       githubSetStar,
     });
@@ -358,12 +358,12 @@ describe("Plugins screen", () => {
     await fireEvent.click(await screen.findByRole("button", { name: "+ Add from URL" }));
     const dialog = within(screen.getByRole("dialog"));
     await fireEvent.input(dialog.getByPlaceholderText("owner/repo or GitHub URL"), {
-      target: { value: "https://github.com/intisy-ai/some-plugin" },
+      target: { value: "https://github.com/forebay/some-plugin" },
     });
     await fireEvent.click(dialog.getByRole("button", { name: "Install" }));
 
     await waitFor(() =>
-      expect(jobsEnqueue).toHaveBeenCalledWith("install", "some-plugin", "https://github.com/intisy-ai/some-plugin", "claude"),
+      expect(jobsEnqueue).toHaveBeenCalledWith("install", "some-plugin", "https://github.com/forebay/some-plugin", "claude"),
     );
   });
 
@@ -398,11 +398,11 @@ describe("Plugins screen", () => {
   it("renders repo topic chips on a plugin row", async () => {
     stubCairn({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
-      catalogList: async () => ({ ok: true, data: { entries: [{ name: "wakatime-sync", url: "u", kind: "plugin", description: "Tracks time", deprecated: false, topics: ["intisy-ai", "plugin", "typescript"] }], source: "gh" } }),
+      catalogList: async () => ({ ok: true, data: { entries: [{ name: "wakatime-sync", url: "u", kind: "plugin", description: "Tracks time", deprecated: false, topics: ["forebay", "plugin", "typescript"] }], source: "gh" } }),
     });
     const { findAllByTestId } = render(Plugins);
     const chips = await findAllByTestId("topic");
-    expect(chips.map((c) => c.textContent)).toEqual(expect.arrayContaining(["intisy-ai", "plugin", "typescript"]));
+    expect(chips.map((c) => c.textContent)).toEqual(expect.arrayContaining(["forebay", "plugin", "typescript"]));
   });
 
   it("offers install into every home, including one with no updater yet", async () => {
@@ -425,7 +425,7 @@ describe("Plugins screen", () => {
           source: "gh" as const,
         },
       }),
-      enginesList: async () => ({ ok: true, data: [{ id: "plugin-updater", capability: "plugin-management", url: "https://github.com/intisy-ai/plugin-updater", homes: {} }] }),
+      enginesList: async () => ({ ok: true, data: [{ id: "plugin-updater", capability: "plugin-management", url: "https://github.com/forebay/plugin-updater", homes: {} }] }),
     });
     render(Plugins);
 
@@ -445,7 +445,7 @@ describe("Plugins screen", () => {
         { name: "wakatime-sync", url: "u", kind: "plugin", description: "normal", deprecated: false, topics: [] },
       ], source: "anonymous" } }),
       enginesList: async () => ({ ok: true, data: [
-        { id: "plugin-updater", capability: "plugin-management", url: "https://github.com/intisy-ai/plugin-updater", homes: { claude: { installed: true, enabled: true } } },
+        { id: "plugin-updater", capability: "plugin-management", url: "https://github.com/forebay/plugin-updater", homes: { claude: { installed: true, enabled: true } } },
       ] }),
     });
     const { getByRole, getByText, queryByText, container } = render(Plugins);
@@ -738,7 +738,7 @@ describe("Plugins screen", () => {
         { name: "wakatime-sync", url: "u", kind: "plugin", description: "normal", deprecated: false, topics: [] },
       ], source: "anonymous" } }),
       enginesList: async () => ({ ok: true, data: [
-        { id: "plugin-updater", capability: "plugin-management", url: "https://github.com/intisy-ai/plugin-updater", homes: { claude: { installed: true, enabled: true } } },
+        { id: "plugin-updater", capability: "plugin-management", url: "https://github.com/forebay/plugin-updater", homes: { claude: { installed: true, enabled: true } } },
       ] }),
       getConfig: async () => ({ ok: true, data: "grid" }),
     });
@@ -871,7 +871,7 @@ describe("Plugins screen", () => {
       pluginsListCached: async () => ({ ok: true, data: [
         { home: CLAUDE, rows: [{ name: "from-cache", kind: "git" as const, enabled: true, updateAvailable: false, description: "cached" }] },
       ] }),
-      catalogListCached: async () => ({ ok: true, data: { entries: [], source: "gh" as const, org: "intisy-ai", rateLimited: false } }),
+      catalogListCached: async () => ({ ok: true, data: { entries: [], source: "gh" as const, org: "forebay", rateLimited: false } }),
       pluginsList: () => live,
       catalogList: async () => ({ ok: true, data: { entries: [], source: "gh" as const } }),
     });
@@ -956,11 +956,11 @@ describe("Plugins screen", () => {
     return {
       ...baseCatalog(),
       entries: [
-        { name: "wakatime-sync", url: "uw", kind: "plugin" as const, description: "from the org", deprecated: false, sourceId: "intisy-ai" },
+        { name: "wakatime-sync", url: "uw", kind: "plugin" as const, description: "from the org", deprecated: false, sourceId: "forebay" },
         { name: "demo-plugin", url: "ud", kind: "plugin" as const, description: "from the demo marketplace", deprecated: false, sourceId: "demo" },
       ],
       sources: [
-        { id: "intisy-ai", label: "intisy-ai", type: "github-org" as const, ok: true, entryCount: 1 },
+        { id: "forebay", label: "forebay", type: "github-org" as const, ok: true, entryCount: 1 },
         { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1 },
       ],
     };
@@ -995,7 +995,7 @@ describe("Plugins screen", () => {
       ...multiSourceCatalog(),
       entries: [multiSourceCatalog().entries[0]],
       sources: [
-        { id: "intisy-ai", label: "intisy-ai", type: "github-org" as const, ok: true, entryCount: 1 },
+        { id: "forebay", label: "forebay", type: "github-org" as const, ok: true, entryCount: 1 },
         { id: "acme", label: "Acme", type: "manifest" as const, ok: false, entryCount: 0, error: "http 404" },
       ],
     };
@@ -1011,15 +1011,15 @@ describe("Plugins screen", () => {
     const withShadow = {
       ...multiSourceCatalog(),
       sources: [
-        { id: "intisy-ai", label: "intisy-ai", type: "github-org" as const, ok: true, entryCount: 1 },
-        { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1, shadowed: [{ name: "wakatime-sync", by: "intisy-ai" }] },
+        { id: "forebay", label: "forebay", type: "github-org" as const, ok: true, entryCount: 1 },
+        { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1, shadowed: [{ name: "wakatime-sync", by: "forebay" }] },
       ],
     };
     stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withShadow }) });
     render(Plugins);
 
     const warning = await screen.findByTestId("source-shadowed");
-    expect(warning.textContent).toContain("Demo also publishes wakatime-sync (listed by intisy-ai)");
+    expect(warning.textContent).toContain("Demo also publishes wakatime-sync (listed by forebay)");
     expect(warning.textContent).toContain("copy is hidden");
   });
 

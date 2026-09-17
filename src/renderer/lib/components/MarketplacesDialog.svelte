@@ -8,7 +8,7 @@
   let { onClose, onSaved }: { onClose: () => void; onSaved?: () => void } = $props();
 
   const TYPES: { id: MarketplaceSourceType; label: string; field: string; hint: string }[] = [
-    { id: "github-org", label: "GitHub org", field: "org", hint: "intisy-ai" },
+    { id: "github-org", label: "GitHub org", field: "org", hint: "forebay" },
     { id: "manifest", label: "Manifest URL", field: "url", hint: "https://example.com/marketplace.json" },
     { id: "local", label: "Local folder", field: "path", hint: "an absolute path holding marketplace.json" },
   ];

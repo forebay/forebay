@@ -9,7 +9,7 @@ const PLUGIN: UnifiedPlugin = {
   name: "wakatime-sync",
   kind: "plugin",
   description: "Tracks time",
-  url: "https://github.com/intisy-ai/wakatime-sync",
+  url: "https://github.com/forebay/wakatime-sync",
   updateAvailable: false,
   homes: { claude: { installed: true } },
   topics: [],

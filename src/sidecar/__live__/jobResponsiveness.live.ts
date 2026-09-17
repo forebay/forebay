@@ -11,7 +11,7 @@ import { INSTALLER_PATH_ENV } from "../jobs/runner.js";
 import type { PluginHome } from "../../../packages/shared/src/domain.js";
 import { reposDir, pluginDir } from "../lib/storagePaths.js";
 
-const MANAGER_URL = "https://github.com/intisy-ai/plugin-updater";
+const MANAGER_URL = "https://github.com/forebay/plugin-updater";
 
 let root: string;
 let homes: PluginHome[];
@@ -106,7 +106,7 @@ describe("a running job and the sidecar", () => {
   it("reports real byte throughput read from git during a clone", async () => {
     const { jobsEnqueue, jobsList } = await import("../modules/jobs.js");
     const target = homes[1];
-    const queued = await jobsEnqueue("install", "stub-auth", "https://github.com/intisy-ai/stub-auth", target.id, { homes });
+    const queued = await jobsEnqueue("install", "stub-auth", "https://github.com/forebay/stub-auth", target.id, { homes });
     expect(queued.ok).toBe(true);
     if (!queued.ok) return;
 

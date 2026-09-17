@@ -13,7 +13,7 @@ beforeEach(() => {
 
 const repo = (name: string, topics: string[] = ["plugin"], archived = false) => ({
   name,
-  html_url: `https://github.com/intisy-ai/${name}`,
+  html_url: `https://github.com/forebay/${name}`,
   description: `${name} desc`,
   archived,
   topics,
@@ -24,10 +24,10 @@ describe("scanOrg", () => {
   it("lists only repos carrying an installable category topic, mapping the topic to a kind", async () => {
     const result = await scanOrg({
       fetchFn: okFetch([
-        repo("stub-auth", ["intisy-ai", "ai-provider"]),
-        repo("core-ir", ["intisy-ai", "core-library"]),
+        repo("stub-auth", ["forebay", "ai-provider"]),
+        repo("core-ir", ["forebay", "core-library"]),
         repo("agentbox", []),
-        repo("opencode-proxy", ["intisy-ai", "app-proxy"]),
+        repo("opencode-proxy", ["forebay", "app-proxy"]),
       ]),
       env: { GITHUB_TOKEN: "t" },
       execFn: async () => "",
@@ -69,8 +69,8 @@ describe("scanOrg", () => {
   });
 
   it("carries repo topics onto the catalog entry", async () => {
-    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["intisy-ai", "ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
-    expect(result.entries.find((e) => e.name === "stub-auth")?.topics).toEqual(["intisy-ai", "ai-provider"]);
+    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["forebay", "ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    expect(result.entries.find((e) => e.name === "stub-auth")?.topics).toEqual(["forebay", "ai-provider"]);
   });
 
   it("enriches an entry with displayName + icon from its manifest", async () => {

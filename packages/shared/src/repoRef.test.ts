@@ -3,17 +3,17 @@ import { parseRepoRef, classifyRepoName, classifyRepoTopics } from "./repoRef.js
 
 describe("parseRepoRef", () => {
   it("parses a full github url", () => {
-    expect(parseRepoRef("https://github.com/intisy-ai/claude-code-auth")).toEqual({
-      owner: "intisy-ai",
+    expect(parseRepoRef("https://github.com/forebay/claude-code-auth")).toEqual({
+      owner: "forebay",
       repo: "claude-code-auth",
-      url: "https://github.com/intisy-ai/claude-code-auth",
+      url: "https://github.com/forebay/claude-code-auth",
     });
   });
   it("parses an owner/repo short ref", () => {
-    expect(parseRepoRef("intisy-ai/some-proxy")).toEqual({
-      owner: "intisy-ai",
+    expect(parseRepoRef("forebay/some-proxy")).toEqual({
+      owner: "forebay",
       repo: "some-proxy",
-      url: "https://github.com/intisy-ai/some-proxy",
+      url: "https://github.com/forebay/some-proxy",
     });
   });
   it("strips a trailing .git and slash", () => {
@@ -51,7 +51,7 @@ describe("classifyRepoName", () => {
 
 describe("classifyRepoTopics", () => {
   it("maps an installable category topic to its kind", () => {
-    expect(classifyRepoTopics(["intisy-ai", "ai-provider"])).toBe("provider");
+    expect(classifyRepoTopics(["forebay", "ai-provider"])).toBe("provider");
     expect(classifyRepoTopics(["app-proxy"])).toBe("proxy");
     expect(classifyRepoTopics(["app-loader"])).toBe("loader");
     expect(classifyRepoTopics(["plugin", "typescript"])).toBe("plugin");

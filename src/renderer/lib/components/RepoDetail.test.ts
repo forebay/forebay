@@ -6,7 +6,7 @@ import RepoDetail from "./RepoDetail.svelte";
 
 const repo = {
   name: "plugin-updater",
-  url: "https://github.com/intisy-ai/plugin-updater",
+  url: "https://github.com/forebay/plugin-updater",
   kind: "plugin",
   displayName: "Plugin Updater",
   description: "catalog desc",
@@ -19,9 +19,9 @@ describe("RepoDetail", () => {
       repoMeta: async () => ({
         ok: true,
         data: {
-          owner: "intisy-ai",
+          owner: "forebay",
           repo: "plugin-updater",
-          htmlUrl: "https://github.com/intisy-ai/plugin-updater",
+          htmlUrl: "https://github.com/forebay/plugin-updater",
           stars: 42,
           description: "live desc",
           topics: ["x", "y"],
@@ -32,7 +32,7 @@ describe("RepoDetail", () => {
     render(RepoDetail, { props: { repo, onClose: () => {} } });
 
     expect(await screen.findByText("Plugin Updater")).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText("intisy-ai/plugin-updater")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("forebay/plugin-updater")).toBeInTheDocument());
     expect(screen.getByText(/★\s*42/)).toBeInTheDocument();
     expect(screen.getByText("live desc")).toBeInTheDocument();
     expect(screen.getByText("x")).toBeInTheDocument();

@@ -41,13 +41,13 @@ const SECTIONS: HomePlugins[] = [
 ];
 
 const CATALOG = [
-  { name: "wakatime-sync", url: "https://example/wakatime-sync", kind: "plugin" as const, description: "Reports coding activity to WakaTime.", deprecated: false, topics: ["plugin", "metrics"], sourceId: "intisy-ai" },
-  { name: "config-ledger", url: "https://example/config-ledger", kind: "plugin" as const, description: "Keeps every home's config in one git repo.", deprecated: false, topics: ["plugin", "git"], sourceId: "intisy-ai" },
-  { name: "antigravity-auth", url: "https://example/antigravity-auth", kind: "provider" as const, description: LOREM, deprecated: false, topics: ["provider", "gemini"], sourceId: "intisy-ai" },
-  { name: LONG_NAME, url: "https://example/long", kind: "plugin" as const, description: LOREM, deprecated: true, topics: ["plugin"], sourceId: "intisy-ai" },
+  { name: "wakatime-sync", url: "https://example/wakatime-sync", kind: "plugin" as const, description: "Reports coding activity to WakaTime.", deprecated: false, topics: ["plugin", "metrics"], sourceId: "forebay" },
+  { name: "config-ledger", url: "https://example/config-ledger", kind: "plugin" as const, description: "Keeps every home's config in one git repo.", deprecated: false, topics: ["plugin", "git"], sourceId: "forebay" },
+  { name: "antigravity-auth", url: "https://example/antigravity-auth", kind: "provider" as const, description: LOREM, deprecated: false, topics: ["provider", "gemini"], sourceId: "forebay" },
+  { name: LONG_NAME, url: "https://example/long", kind: "plugin" as const, description: LOREM, deprecated: true, topics: ["plugin"], sourceId: "forebay" },
   { name: "demo-provider", url: "https://example/demo-provider", kind: "provider" as const, description: "A provider from a second marketplace.", deprecated: false, topics: ["ai-provider"], sourceId: "demo" },
-  { name: "openai-translator", url: "https://example/openai-translator", kind: "translator" as const, description: "Translates the OpenAI wire format to the canonical IR.", deprecated: false, topics: ["vendor-translator", "openai"], sourceId: "intisy-ai" },
-  { name: "gemini-translator", url: "https://example/gemini-translator", kind: "translator" as const, description: "Translates the Gemini wire format to the canonical IR.", deprecated: false, topics: ["vendor-translator", "gemini"], sourceId: "intisy-ai" },
+  { name: "openai-translator", url: "https://example/openai-translator", kind: "translator" as const, description: "Translates the OpenAI wire format to the canonical IR.", deprecated: false, topics: ["vendor-translator", "openai"], sourceId: "forebay" },
+  { name: "gemini-translator", url: "https://example/gemini-translator", kind: "translator" as const, description: "Translates the Gemini wire format to the canonical IR.", deprecated: false, topics: ["vendor-translator", "gemini"], sourceId: "forebay" },
 ];
 
 // What custom-auth's manifest declares: a category selected by TOPIC, so a translator
@@ -59,8 +59,8 @@ const CONTRIBUTIONS = [
 // One healthy source and one that failed, which is the state the screen has to render
 // without losing the entries the healthy one returned.
 const CATALOG_SOURCES = [
-  { id: "intisy-ai", label: "intisy-ai", type: "github-org" as const, ok: true, entryCount: 4 },
-  { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1, shadowed: [{ name: "wakatime-sync", by: "intisy-ai" }] },
+  { id: "forebay", label: "forebay", type: "github-org" as const, ok: true, entryCount: 4 },
+  { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1, shadowed: [{ name: "wakatime-sync", by: "forebay" }] },
   { id: "acme", label: "Acme", type: "manifest" as const, ok: false, entryCount: 0, error: "http 404" },
 ];
 
@@ -175,7 +175,7 @@ export const PLUGIN_DETAIL: UnifiedPlugin = {
   name: "wakatime-sync",
   kind: "plugin",
   description: "Reports coding activity to WakaTime.",
-  url: "https://github.com/intisy-ai/wakatime-sync",
+  url: "https://github.com/forebay/wakatime-sync",
   updateAvailable: true,
   homes: { alpha: { installed: true, version: "1.4.0" }, beta: { installed: true, version: "1.3.0" } },
   topics: ["plugin", "metrics"],
@@ -197,7 +197,7 @@ export function screenFixtures(): Partial<CairnAPI> {
     marketplaceSourcesList: async () => ({
       ok: true,
       data: [
-        { id: "intisy-ai", label: "intisy-ai", type: "github-org" as const, org: "intisy-ai" },
+        { id: "forebay", label: "forebay", type: "github-org" as const, org: "forebay" },
         { id: "demo", label: "Demo", type: "local" as const, path: "/home/me/marketplace-demo" },
         { id: "acme", label: "Acme", type: "manifest" as const, url: "https://acme.example/marketplace.json", enabled: false },
       ],
@@ -221,7 +221,7 @@ export function screenFixtures(): Partial<CairnAPI> {
     pluginsList: async () => ({ ok: true, data: SECTIONS }),
     pluginsListCached: async () => ({ ok: true, data: SECTIONS }),
     pluginLedger: async () => ({ ok: true, data: [] }),
-    catalogList: async () => ({ ok: true, data: { entries: CATALOG, source: "anonymous", org: "intisy-ai", rateLimited: false, sources: CATALOG_SOURCES, contributions: CONTRIBUTIONS } }),
+    catalogList: async () => ({ ok: true, data: { entries: CATALOG, source: "anonymous", org: "forebay", rateLimited: false, sources: CATALOG_SOURCES, contributions: CONTRIBUTIONS } }),
     // The Settings screen applies the stored theme on mount; without this it would answer
     // "system" and repaint the gallery in whatever the host prefers, ruining the light shot.
     getConfig: async (name: string, key: string) => ({

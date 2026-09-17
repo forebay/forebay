@@ -4,7 +4,7 @@ import { catalogList } from "./catalog.js";
 describe("catalogList", () => {
   it("wraps scanOrg into Result", async () => {
     const result = await catalogList({
-      fetchFn: (async () => ({ ok: true, status: 200, json: async () => [{ name: "stub-auth", html_url: "https://github.com/intisy-ai/stub-auth", description: "desc", archived: false, topics: ["ai-provider"] }] })) as unknown as typeof fetch,
+      fetchFn: (async () => ({ ok: true, status: 200, json: async () => [{ name: "stub-auth", html_url: "https://github.com/forebay/stub-auth", description: "desc", archived: false, topics: ["ai-provider"] }] })) as unknown as typeof fetch,
       env: {},
       execFn: async () => "",
     });

@@ -8,7 +8,7 @@ import type { MarketplaceSource } from "@cairn/shared";
 const noop = (): void => {};
 
 const configured: MarketplaceSource[] = [
-  { id: "intisy-ai", label: "intisy-ai", type: "github-org", org: "intisy-ai" },
+  { id: "forebay", label: "forebay", type: "github-org", org: "forebay" },
   { id: "demo", label: "Demo", type: "local", path: "/tmp/demo" },
 ];
 
@@ -25,7 +25,7 @@ describe("MarketplacesDialog", () => {
     stub();
     render(MarketplacesDialog, { props: { onClose: noop } });
 
-    const first = await screen.findByTestId("source-intisy-ai");
+    const first = await screen.findByTestId("source-forebay");
     expect(first).toHaveTextContent("1");
     expect(first).toHaveTextContent("GitHub org");
     expect(await screen.findByTestId("source-demo")).toHaveTextContent("/tmp/demo");
@@ -41,7 +41,7 @@ describe("MarketplacesDialog", () => {
     await fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(save).toHaveBeenCalled());
-    expect(save.mock.calls[0][0].map((s: MarketplaceSource) => s.id)).toEqual(["demo", "intisy-ai"]);
+    expect(save.mock.calls[0][0].map((s: MarketplaceSource) => s.id)).toEqual(["demo", "forebay"]);
   });
 
   it("adds a marketplace with the location field its type asks for", async () => {
@@ -81,7 +81,7 @@ describe("MarketplacesDialog", () => {
     await fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(save).toHaveBeenCalled());
-    expect(save.mock.calls[0][0].map((s: MarketplaceSource) => s.id)).toEqual(["intisy-ai"]);
+    expect(save.mock.calls[0][0].map((s: MarketplaceSource) => s.id)).toEqual(["forebay"]);
   });
 
   // Switched off keeps it configured, so it can be turned back on without retyping it.

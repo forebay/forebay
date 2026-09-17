@@ -194,7 +194,7 @@ describe("appConfig sidecar module", () => {
 
   it("configWrite creates config/<plugin>.json when it does not exist yet", async () => {
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { configWrite } = await import("./appConfig.js");
     const result = await configWrite("claude", "plugin-a", "logging", false, { homes: [home], listPlugins: listedFromSeed(home.dir) });
@@ -206,7 +206,7 @@ describe("appConfig sidecar module", () => {
 
   it("configWrite records the change, with the before and after values and the affected home", async () => {
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     writeFileSync(join(dir, "config", "plugin-a.json"), JSON.stringify({ logging: true }), "utf8");
     const cairnHome = mkdtempSync(join(tmpdir(), "dash-appconfig-own-"));
     vi.stubEnv("HUB_CONFIG_DIR", cairnHome);
@@ -228,7 +228,7 @@ describe("appConfig sidecar module", () => {
 
   it("configWrite merges into an existing file, preserving unrelated keys", async () => {
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     writeFileSync(join(dir, "config", "plugin-a.json"), JSON.stringify({ logging: true, otherKey: "keep-me" }, null, 2), "utf8");
 
     const { configWrite } = await import("./appConfig.js");
@@ -249,7 +249,7 @@ describe("appConfig sidecar module", () => {
 
   it("configWrite rejects path traversal attempts and does not create files outside the home", async () => {
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { configWrite } = await import("./appConfig.js");
     const result = await configWrite("claude", "../escape", "logging", false, { homes: [home], listPlugins: listedFromSeed(home.dir), managed: async () => true });
@@ -264,7 +264,7 @@ describe("appConfig sidecar module", () => {
     // getPlugins never validates the name field, so this seeds the one case that
     // reaches the containment assertion (the plugin-list guard alone would let it through).
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "../escape", url: "https://github.com/intisy-ai/escape", enabled: true }]);
+    seedPlugins(dir, [{ name: "../escape", url: "https://github.com/forebay/escape", enabled: true }]);
 
     const { configWrite } = await import("./appConfig.js");
     const result = await configWrite("claude", "../escape", "logging", false, { homes: [home], listPlugins: listedFromSeed(home.dir), managed: async () => true });
@@ -277,7 +277,7 @@ describe("appConfig sidecar module", () => {
 
   it("configWrite rejects prototype pollution keys", async () => {
     const { dir, home } = makeHome("claude", "Claude Code");
-    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/intisy-ai/plugin-a", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { configWrite } = await import("./appConfig.js");
     const result = await configWrite("claude", "plugin-a", "__proto__", { malicious: true }, { homes: [home], listPlugins: listedFromSeed(home.dir) });
@@ -450,8 +450,8 @@ describe("what each schema declares it provides", () => {
     writeFileSync(join(dir, "plugin", "manager.json"), JSON.stringify({ id: "manager", api: 1, entry: "dist/plugin.js", capabilities: ["plugin-management", "settings"] }));
     writeFileSync(join(dir, "plugin", "other.js"), "// bundle placeholder", "utf8");
     seedPlugins(dir, [
-      { name: "manager", url: "https://github.com/intisy-ai/manager", enabled: true },
-      { name: "other", url: "https://github.com/intisy-ai/other", enabled: true },
+      { name: "manager", url: "https://github.com/forebay/manager", enabled: true },
+      { name: "other", url: "https://github.com/forebay/other", enabled: true },
     ]);
 
     const { configSchemas } = await import("./appConfig.js");
@@ -476,7 +476,7 @@ describe("engine-contributed settings", () => {
   it("reads the values that home has on disk, not another home's", async () => {
     const { dir, home } = makeHome("cairn", "Cairn");
     writeFileSync(join(dir, "plugin", "manager.js"), "// bundle placeholder", "utf8");
-    seedPlugins(dir, [{ name: "manager", url: "https://github.com/intisy-ai/manager", enabled: true }]);
+    seedPlugins(dir, [{ name: "manager", url: "https://github.com/forebay/manager", enabled: true }]);
     writeFileSync(join(dir, "config", "manager.json"), JSON.stringify({ auto_update_mode: "check" }), "utf8");
 
     const { configSchemas } = await import("./appConfig.js");
@@ -536,7 +536,7 @@ describe("engine-contributed settings", () => {
     writeFileSync(join(dir, "config", "plugin-updater.json"), JSON.stringify({ auto_update_triggers: { loader: true, app: true, cairn: true } }), "utf8");
 
     writeFileSync(join(dir, "plugin", "plugin-updater.js"), "// bundle placeholder", "utf8");
-    seedPlugins(dir, [{ name: "plugin-updater", url: "https://github.com/intisy-ai/plugin-updater", enabled: true }]);
+    seedPlugins(dir, [{ name: "plugin-updater", url: "https://github.com/forebay/plugin-updater", enabled: true }]);
 
     const { configWrite, configSchemas } = await import("./appConfig.js");
     expect((await configWrite("cairn", "plugin-updater", "auto_update_triggers.app", false, { homes: [home], listPlugins: listedFromSeed(home.dir) })).ok).toBe(true);
