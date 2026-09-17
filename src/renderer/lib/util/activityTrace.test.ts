@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { groupByTrace } from "./activityTrace.js";
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 
 function rec(id: string, ts: number, traceId: string, causedBy?: string): ActivityRecord {
   return {

@@ -5,7 +5,7 @@ const quarantinedIn = vi.fn();
 vi.mock("../lib/pluginHost.js", () => ({ ledgerFor, quarantinedIn }));
 
 const homes = [
-  { id: "cairn", label: "Cairn", dir: "/homes/cairn", present: true, managesPlugins: true },
+  { id: "forebay", label: "Forebay", dir: "/homes/forebay", present: true, managesPlugins: true },
   { id: "app-a", label: "App A", dir: "/homes/a", present: true, managesPlugins: true },
 ];
 
@@ -21,14 +21,14 @@ describe("pluginLedger", () => {
     const result = await pluginLedger({ homes });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.data.map((group) => group.home.id)).toEqual(["cairn", "app-a"]);
+    expect(result.data.map((group) => group.home.id)).toEqual(["forebay", "app-a"]);
     expect(result.data[1].rows[0]).toEqual({
       pluginId: "historian", status: "active",
       capabilitiesDeclared: ["screens", "config-history", "extra-widget"], capabilities: ["screens", "config-history"],
       provides: ["historian:history"], consumes: ["accounts-store"], unresolved: ["accounts-store"],
       topics: ["config.changed"], permissions: ["network"],
     });
-    expect(ledgerFor).toHaveBeenCalledWith("/homes/cairn", "cairn");
+    expect(ledgerFor).toHaveBeenCalledWith("/homes/forebay", "forebay");
     expect(ledgerFor).toHaveBeenCalledWith("/homes/a", "app-a");
   });
 
@@ -57,7 +57,7 @@ describe("pluginQuarantine", () => {
     expect(result).toEqual({ ok: true, data: [
       { homeId: "app-a", homeLabel: "App A", pluginId: "bad", detail: "is in a dependency cycle: bad -> bad", fix: "break the cycle" },
     ] });
-    expect(quarantinedIn).toHaveBeenCalledWith("/homes/cairn", "cairn");
+    expect(quarantinedIn).toHaveBeenCalledWith("/homes/forebay", "forebay");
     expect(quarantinedIn).toHaveBeenCalledWith("/homes/a", "app-a");
   });
 

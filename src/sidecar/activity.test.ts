@@ -6,24 +6,24 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { PluginHome } from "../../packages/shared/src/domain.js";
 
-function home(id: "cairn" | "claude", dir: string): PluginHome {
+function home(id: "forebay" | "claude", dir: string): PluginHome {
   return { id, label: id, dir, present: true, managesPlugins: true };
 }
 
-function homes(): { cairnHome: string; appHome: string; list: PluginHome[] } {
-  const cairnHome = mkdtempSync(join(tmpdir(), "dash-activity-own-"));
+function homes(): { forebayHome: string; appHome: string; list: PluginHome[] } {
+  const forebayHome = mkdtempSync(join(tmpdir(), "dash-activity-own-"));
   const appHome = mkdtempSync(join(tmpdir(), "dash-activity-app-"));
   mkdirSync(join(appHome, "config"), { recursive: true });
-  return { cairnHome, appHome, list: [home("cairn", cairnHome), home("claude", appHome)] };
+  return { forebayHome, appHome, list: [home("forebay", forebayHome), home("claude", appHome)] };
 }
 
 describe("dashboard activity", () => {
   it("records an action against the home it affected, not the home it ran in", async () => {
-    const { cairnHome, appHome, list } = homes();
-    vi.stubEnv("HUB_CONFIG_DIR", cairnHome);
+    const { forebayHome, appHome, list } = homes();
+    vi.stubEnv("HUB_CONFIG_DIR", forebayHome);
     try {
-      const { emitCairnAction } = await import("./activity.js");
-      await emitCairnAction({
+      const { emitForebayAction } = await import("./activity.js");
+      await emitForebayAction({
         action: "plugin_enabled",
         subject: { kind: "plugin", id: "plugin-a" },
         homeId: "claude",
@@ -31,9 +31,9 @@ describe("dashboard activity", () => {
       }, list);
 
       const { readActivity } = await import("@intisy-ai/basekit");
-      const { records } = readActivity([cairnHome]);
+      const { records } = readActivity([forebayHome]);
       expect(records).toHaveLength(1);
-      expect(records[0].source).toBe("cairn");
+      expect(records[0].source).toBe("forebay");
       expect(records[0].action).toBe("plugin_enabled");
       expect(records[0].actor).toBe("user");
       expect(records[0].outcome).toBe("ok");
@@ -41,42 +41,42 @@ describe("dashboard activity", () => {
       expect(readActivity([appHome]).records).toHaveLength(0);
     } finally {
       vi.unstubAllEnvs();
-      rmSync(cairnHome, { recursive: true, force: true });
+      rmSync(forebayHome, { recursive: true, force: true });
       rmSync(appHome, { recursive: true, force: true });
     }
   });
 
   it("omits the target when the action affected the dashboard's own home", async () => {
-    const { cairnHome, appHome, list } = homes();
-    vi.stubEnv("HUB_CONFIG_DIR", cairnHome);
+    const { forebayHome, appHome, list } = homes();
+    vi.stubEnv("HUB_CONFIG_DIR", forebayHome);
     try {
-      const { emitCairnAction } = await import("./activity.js");
-      await emitCairnAction({ action: "plugin_enabled", subject: { kind: "plugin", id: "x" }, homeId: "cairn" }, list);
+      const { emitForebayAction } = await import("./activity.js");
+      await emitForebayAction({ action: "plugin_enabled", subject: { kind: "plugin", id: "x" }, homeId: "forebay" }, list);
 
       const { readActivity } = await import("@intisy-ai/basekit");
-      const [rec] = readActivity([cairnHome]).records;
+      const [rec] = readActivity([forebayHome]).records;
       expect(rec.target).toBeUndefined();
     } finally {
       vi.unstubAllEnvs();
-      rmSync(cairnHome, { recursive: true, force: true });
+      rmSync(forebayHome, { recursive: true, force: true });
       rmSync(appHome, { recursive: true, force: true });
     }
   });
 
   it("records nothing and throws nothing when the affected home cannot be resolved", async () => {
-    const { cairnHome, appHome, list } = homes();
-    vi.stubEnv("HUB_CONFIG_DIR", cairnHome);
+    const { forebayHome, appHome, list } = homes();
+    vi.stubEnv("HUB_CONFIG_DIR", forebayHome);
     try {
-      const { emitCairnAction } = await import("./activity.js");
-      await expect(emitCairnAction({ action: "plugin_enabled", subject: { kind: "plugin", id: "x" }, homeId: "nope" }, list))
+      const { emitForebayAction } = await import("./activity.js");
+      await expect(emitForebayAction({ action: "plugin_enabled", subject: { kind: "plugin", id: "x" }, homeId: "nope" }, list))
         .resolves.toBeUndefined();
 
       const { readActivity } = await import("@intisy-ai/basekit");
-      const [rec] = readActivity([cairnHome]).records;
+      const [rec] = readActivity([forebayHome]).records;
       expect(rec.target).toBeUndefined();
     } finally {
       vi.unstubAllEnvs();
-      rmSync(cairnHome, { recursive: true, force: true });
+      rmSync(forebayHome, { recursive: true, force: true });
       rmSync(appHome, { recursive: true, force: true });
     }
   });

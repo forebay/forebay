@@ -167,20 +167,20 @@ describe("appsUninstallCli", () => {
 
 describe("appsSummary", () => {
   let tempHome: string;
-  let tempCairnDir: string;
+  let tempForebayDir: string;
   let savedHubConfigDir: string | undefined;
 
   beforeEach(() => {
     tempHome = mkdtempSync(join(tmpdir(), "apps-summary-home-"));
     mkdirSync(join(tempHome, "config"), { recursive: true });
-    tempCairnDir = mkdtempSync(join(tmpdir(), "apps-summary-cairn-"));
+    tempForebayDir = mkdtempSync(join(tmpdir(), "apps-summary-forebay-"));
     savedHubConfigDir = process.env.HUB_CONFIG_DIR;
-    process.env.HUB_CONFIG_DIR = tempCairnDir;
+    process.env.HUB_CONFIG_DIR = tempForebayDir;
   });
 
   afterEach(() => {
     rmSync(tempHome, { recursive: true, force: true });
-    rmSync(tempCairnDir, { recursive: true, force: true });
+    rmSync(tempForebayDir, { recursive: true, force: true });
     if (savedHubConfigDir === undefined) delete process.env.HUB_CONFIG_DIR;
     else process.env.HUB_CONFIG_DIR = savedHubConfigDir;
   });

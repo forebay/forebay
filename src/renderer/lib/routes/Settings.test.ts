@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor, screen } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
-import type { HomePlugins, PluginConfigSchema } from "@cairn/shared";
+import { stubForebay } from "../testing.js";
+import type { HomePlugins, PluginConfigSchema } from "@forebay/shared";
 
 vi.mock("../theme.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../theme.js")>();
@@ -12,8 +12,8 @@ vi.mock("../theme.js", async (importOriginal) => {
 import { applyThemeSetting } from "../theme.js";
 import Settings from "./Settings.svelte";
 
-function cairnHome(): HomePlugins {
-  return { home: { id: "cairn", label: "Cairn", dir: "/store", present: true, managesPlugins: true }, rows: [] };
+function forebayHome(): HomePlugins {
+  return { home: { id: "forebay", label: "Forebay", dir: "/store", present: true, managesPlugins: true }, rows: [] };
 }
 
 // A plugin declaring one contributed section plus a setting it left to its own group. The
@@ -38,21 +38,21 @@ const CONTRIBUTED_SCHEMA: PluginConfigSchema = {
 };
 
 describe("Settings screen", () => {
-  it("loads and saves the four Cairn settings, asserting exact setConfig triples", async () => {
+  it("loads and saves the four Forebay settings, asserting exact setConfig triples", async () => {
     const setConfigCalls: unknown[][] = [];
-    stubCairn({
+    stubForebay({
       getConfig: async (name: string, key: string) => {
-        if (name === "cairn" && key === "theme") return { ok: true, data: "dark" };
-        if (name === "cairn" && key === "showDeprecated") return { ok: true, data: false };
-        if (name === "cairn" && key === "autoUpdateDefault") return { ok: true, data: false };
-        if (name === "cairn" && key === "proxyAutostart") return { ok: true, data: true };
+        if (name === "forebay" && key === "theme") return { ok: true, data: "dark" };
+        if (name === "forebay" && key === "showDeprecated") return { ok: true, data: false };
+        if (name === "forebay" && key === "autoUpdateDefault") return { ok: true, data: false };
+        if (name === "forebay" && key === "proxyAutostart") return { ok: true, data: true };
         return { ok: true, data: undefined };
       },
       setConfig: async (...args: unknown[]) => {
         setConfigCalls.push(args);
         return { ok: true, data: undefined };
       },
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
     });
 
     render(Settings);
@@ -74,15 +74,15 @@ describe("Settings screen", () => {
     await fireEvent.click(autoUpdateSwitch);
     await fireEvent.click(proxyAutostartSwitch);
 
-    await waitFor(() => expect(setConfigCalls).toContainEqual(["cairn", "theme", "light"]));
-    expect(setConfigCalls).toContainEqual(["cairn", "showDeprecated", true]);
-    expect(setConfigCalls).toContainEqual(["cairn", "autoUpdateDefault", true]);
-    expect(setConfigCalls).toContainEqual(["cairn", "proxyAutostart", false]);
+    await waitFor(() => expect(setConfigCalls).toContainEqual(["forebay", "theme", "light"]));
+    expect(setConfigCalls).toContainEqual(["forebay", "showDeprecated", true]);
+    expect(setConfigCalls).toContainEqual(["forebay", "autoUpdateDefault", true]);
+    expect(setConfigCalls).toContainEqual(["forebay", "proxyAutostart", false]);
   });
 
   it("renders the shared settings from the schema, not from a hardcoded key list", async () => {
-    stubCairn({
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
+    stubForebay({
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
       globalSettingsRead: async () => ({
         ok: true,
         data: {
@@ -99,7 +99,7 @@ describe("Settings screen", () => {
   });
 
   it("applies the theme via applyThemeSetting on load and on change", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: true, data: [cairnHome()] }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: [forebayHome()] }) });
     render(Settings);
 
     const themeSelect = (await screen.findByLabelText("Theme")) as HTMLSelectElement;
@@ -112,9 +112,9 @@ describe("Settings screen", () => {
   it("renders a per-app group's boolean field and writes via configWrite on toggle", async () => {
     const writeCalls: unknown[][] = [];
     const schema: PluginConfigSchema = { plugin: "wakatime-sync", defaults: { enabled: true }, current: {} };
-    stubCairn({
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
-      configSchemas: async (home: string) => ({ ok: true, data: home === "cairn" ? [schema] : [] }),
+    stubForebay({
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
+      configSchemas: async (home: string) => ({ ok: true, data: home === "forebay" ? [schema] : [] }),
       configWrite: async (...args: unknown[]) => {
         writeCalls.push(args);
         return { ok: true, data: undefined };
@@ -127,11 +127,11 @@ describe("Settings screen", () => {
     expect(fieldSwitch.getAttribute("aria-checked")).toBe("true");
 
     await fireEvent.click(fieldSwitch);
-    await waitFor(() => expect(writeCalls).toContainEqual(["cairn", "wakatime-sync", "enabled", false]));
+    await waitFor(() => expect(writeCalls).toContainEqual(["forebay", "wakatime-sync", "enabled", false]));
   });
 
-  it("shows an inline error when pluginsList fails, without blocking the Cairn settings", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: false, error: "list boom" }) });
+  it("shows an inline error when pluginsList fails, without blocking the Forebay settings", async () => {
+    stubForebay({ pluginsList: async () => ({ ok: false, error: "list boom" }) });
     render(Settings);
     await waitFor(() => expect(screen.getByText(/list boom/i)).toBeTruthy());
     expect(await screen.findByLabelText("Theme")).toBeInTheDocument();
@@ -142,11 +142,11 @@ describe("Settings screen", () => {
   it("renders a contributed section with its attribution, controls and action", async () => {
     const writeCalls: unknown[][] = [];
     const runAction = vi.fn(async () => ({ ok: true, data: { stdout: "done", stderr: "" } }) as const);
-    stubCairn({
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
+    stubForebay({
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
       settingsSections: async () => ({
         ok: true,
-        data: [{ plugin: "a-plugin", id: "feature", label: "Feature", description: "What it does.", homes: ["cairn"] }],
+        data: [{ plugin: "a-plugin", id: "feature", label: "Feature", description: "What it does.", homes: ["forebay"] }],
       }),
       configSchemas: async () => ({ ok: true, data: [CONTRIBUTED_SCHEMA] }),
       configWrite: async (...args: unknown[]) => { writeCalls.push(args); return { ok: true, data: undefined }; },
@@ -160,18 +160,18 @@ describe("Settings screen", () => {
     expect(screen.getByText("What it does.")).toBeInTheDocument();
 
     await fireEvent.click(screen.getByRole("switch", { name: "a-plugin On" }));
-    await waitFor(() => expect(writeCalls).toContainEqual(["cairn", "a-plugin", "on", false]));
+    await waitFor(() => expect(writeCalls).toContainEqual(["forebay", "a-plugin", "on", false]));
 
     await fireEvent.click(screen.getByRole("button", { name: "Do it" }));
-    await waitFor(() => expect(runAction).toHaveBeenCalledWith("cairn", "a-plugin", "doIt", undefined));
+    await waitFor(() => expect(runAction).toHaveBeenCalledWith("forebay", "a-plugin", "doIt", undefined));
   });
 
   it("keeps a control a section claimed out of the plugin's own per-app group", async () => {
-    stubCairn({
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
+    stubForebay({
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
       settingsSections: async () => ({
         ok: true,
-        data: [{ plugin: "a-plugin", id: "feature", label: "Feature", homes: ["cairn"] }],
+        data: [{ plugin: "a-plugin", id: "feature", label: "Feature", homes: ["forebay"] }],
       }),
       configSchemas: async () => ({ ok: true, data: [CONTRIBUTED_SCHEMA] }),
     });
@@ -184,8 +184,8 @@ describe("Settings screen", () => {
 
   it("writes to every home a section declared as spanning them", async () => {
     const writeCalls: unknown[][] = [];
-    stubCairn({
-      pluginsList: async () => ({ ok: true, data: [cairnHome()] }),
+    stubForebay({
+      pluginsList: async () => ({ ok: true, data: [forebayHome()] }),
       settingsSections: async () => ({
         ok: true,
         data: [{ plugin: "a-plugin", id: "feature", label: "Feature", scope: "allHomes", homes: ["claude", "opencode"] }],
@@ -208,7 +208,7 @@ describe("Settings screen", () => {
 describe("per-app settings loading", () => {
   function homes() {
     return [
-      { home: { id: "cairn", label: "Cairn", dir: "/c", present: true, managesPlugins: false }, rows: [] },
+      { home: { id: "forebay", label: "Forebay", dir: "/c", present: true, managesPlugins: false }, rows: [] },
       { home: { id: "claude", label: "Claude Code", dir: "/cc", present: true, managesPlugins: false }, rows: [] },
       { home: { id: "opencode", label: "OpenCode", dir: "/oc", present: true, managesPlugins: false }, rows: [] },
     ];
@@ -216,45 +216,45 @@ describe("per-app settings loading", () => {
 
   it("fetches only the first app's schemas on mount", async () => {
     const asked: string[] = [];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: homes() }),
       configSchemas: async (home: string) => { asked.push(home); return { ok: true, data: [] }; },
     });
     render(Settings);
 
-    await waitFor(() => expect(asked).toEqual(["cairn"]));
+    await waitFor(() => expect(asked).toEqual(["forebay"]));
     await new Promise((r) => setTimeout(r, 20));
-    expect(asked).toEqual(["cairn"]);
+    expect(asked).toEqual(["forebay"]);
   });
 
   it("fetches an app's schemas when its section is opened", async () => {
     const asked: string[] = [];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: homes() }),
       configSchemas: async (home: string) => { asked.push(home); return { ok: true, data: [] }; },
     });
     render(Settings);
-    await waitFor(() => expect(asked).toEqual(["cairn"]));
+    await waitFor(() => expect(asked).toEqual(["forebay"]));
 
     await fireEvent.click(screen.getByRole("button", { name: "Toggle Claude Code section" }));
-    await waitFor(() => expect(asked).toEqual(["cairn", "claude"]));
+    await waitFor(() => expect(asked).toEqual(["forebay", "claude"]));
   });
 
   it("does not refetch a section that was already opened", async () => {
     const asked: string[] = [];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: homes() }),
       configSchemas: async (home: string) => { asked.push(home); return { ok: true, data: [] }; },
     });
     render(Settings);
-    await waitFor(() => expect(asked).toEqual(["cairn"]));
+    await waitFor(() => expect(asked).toEqual(["forebay"]));
 
     const toggle = screen.getByRole("button", { name: "Toggle OpenCode section" });
     await fireEvent.click(toggle);
-    await waitFor(() => expect(asked).toEqual(["cairn", "opencode"]));
+    await waitFor(() => expect(asked).toEqual(["forebay", "opencode"]));
     await fireEvent.click(toggle);
     await fireEvent.click(toggle);
     await new Promise((r) => setTimeout(r, 20));
-    expect(asked).toEqual(["cairn", "opencode"]);
+    expect(asked).toEqual(["forebay", "opencode"]);
   });
 });

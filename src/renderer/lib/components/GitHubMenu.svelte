@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { GithubStatus } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { GithubStatus } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { githubChanged } from "../githubStore.js";
   import GitHubAccounts from "./GitHubAccounts.svelte";
 
@@ -9,7 +9,7 @@
   let open = $state(false);
 
   let root = $state<HTMLElement | null>(null);
-  // A one-way button (e.g. Star Cairn) can remove itself from the DOM the instant
+  // A one-way button (e.g. Star Forebay) can remove itself from the DOM the instant
   // it's clicked, so by the time this handler runs e.target is already detached
   // and root.contains(target) would be false. Only close for a click that landed
   // on something still in the document but outside root.
@@ -22,7 +22,7 @@
   }
 
   async function refresh(): Promise<void> {
-    const result = await cairn.githubStatus();
+    const result = await forebay.githubStatus();
     if (result.ok) status = result.data;
   }
 

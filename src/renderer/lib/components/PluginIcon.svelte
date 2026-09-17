@@ -8,12 +8,12 @@
   // markup. Both are accepted here because they are not interchangeable downstream: markup
   // inlined into the page resolves the theme's CSS variables, while the same markup behind an
   // <img> is an isolated document where those variables resolve to nothing and the mark comes
-  // out blank. Cairn's own theme-aware mark is markup for exactly that reason.
+  // out blank. Forebay's own theme-aware mark is markup for exactly that reason.
   export const LOGO_SIZE = { list: 34, detail: 56, compact: 26 } as const;
 </script>
 
 <script lang="ts">
-  import type { CatalogKind } from "@cairn/shared";
+  import type { CatalogKind } from "@forebay/shared";
   let { icon = "", name, kind, size = LOGO_SIZE.list }: { icon?: string; name: string; kind?: CatalogKind; size?: number } = $props();
 
   // Deterministic hue from the name so each lettermark is stable and distinct.

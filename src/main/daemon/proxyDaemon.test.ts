@@ -52,7 +52,7 @@ describe("status", () => {
     vi.unstubAllGlobals();
   });
 
-  it("reports not running when there is no Cairn daemon handle, even if a probe would find the port held by something else", async () => {
+  it("reports not running when there is no Forebay daemon handle, even if a probe would find the port held by something else", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 200 })));
     const result = await status();
     expect(result.running).toBe(false);

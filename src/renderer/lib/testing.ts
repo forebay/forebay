@@ -1,8 +1,8 @@
-import type { CairnAPI } from "@cairn/shared";
+import type { ForebayAPI } from "@forebay/shared";
 import { bustCacheForTests } from "./cache.js";
 import { resetViewModeForTests } from "./viewMode.js";
 
-export function defaultCairn(): CairnAPI {
+export function defaultForebay(): ForebayAPI {
   return {
     getConfig: async () => ({ ok: true, data: undefined }),
     setConfig: async () => ({ ok: true, data: undefined }),
@@ -113,14 +113,14 @@ export function defaultCairn(): CairnAPI {
     catalogListCached: async () => ({ ok: true, data: null }),
     githubStatus: async () => ({
       ok: true,
-      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: "https://github.com/forebay/cairn", cairnStarred: null },
+      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, forebayRepoUrl: "https://github.com/forebay/forebay", forebayStarred: null },
     }),
     githubAddAccount: async (_token: string, _star: boolean) => ({ ok: true, data: { login: "octocat" } }),
     githubSwitchAccount: async () => ({ ok: true, data: undefined }),
     githubRemoveAccount: async () => ({ ok: true, data: undefined }),
     githubConnectGhCli: async (_star: boolean) => ({ ok: true, data: { login: "octocat" } }),
     githubSetStar: async (_url: string, _starred: boolean) => ({ ok: true, data: undefined }),
-    githubStarCairn: async () => ({ ok: true, data: undefined }),
+    githubStarForebay: async () => ({ ok: true, data: undefined }),
     githubDeviceStart: async () => ({ ok: true, data: { userCode: "ABCD-1234", verificationUri: "https://github.com/login/device", intervalSeconds: 5 } }),
     githubDevicePoll: async (_star: boolean) => ({ ok: true, data: { status: "authorized", login: "octocat" } }),
     favoritesList: async () => ({ ok: true, data: [] }),
@@ -143,8 +143,8 @@ export function defaultCairn(): CairnAPI {
   };
 }
 
-export function stubCairn(overrides: Partial<CairnAPI> = {}): void {
+export function stubForebay(overrides: Partial<ForebayAPI> = {}): void {
   bustCacheForTests();
   resetViewModeForTests();
-  (globalThis as { window: Window }).window.cairn = { ...defaultCairn(), ...overrides };
+  (globalThis as { window: Window }).window.forebay = { ...defaultForebay(), ...overrides };
 }

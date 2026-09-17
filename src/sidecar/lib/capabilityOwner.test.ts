@@ -13,12 +13,12 @@ import {
 
 // Pinned so the registry lookup behind pluginDir() cannot read the developer's real apps.json.
 // HUB_APPS_FILE is the one that matters here; it is read live per call, so no reimport is needed.
-const registryHome = mkdtempSync(join(tmpdir(), "cairn-caps-registry-"));
+const registryHome = mkdtempSync(join(tmpdir(), "forebay-caps-registry-"));
 process.env.HUB_CONFIG_DIR = registryHome;
 process.env.HUB_APPS_FILE = join(registryHome, "apps.json");
 
 function homeWith(sidecars: Record<string, unknown>): string {
-  const home = mkdtempSync(join(tmpdir(), "cairn-caps-"));
+  const home = mkdtempSync(join(tmpdir(), "forebay-caps-"));
   const dir = join(home, "plugin");
   mkdirSync(dir, { recursive: true });
   for (const [id, manifest] of Object.entries(sidecars)) {
@@ -31,7 +31,7 @@ function homeWith(sidecars: Record<string, unknown>): string {
 
 // A bundle deployed with no sidecar beside it, the shape a pre-sidecar deploy left behind.
 function homeWithBundleOnly(name: string): string {
-  const home = mkdtempSync(join(tmpdir(), "cairn-caps-bundle-"));
+  const home = mkdtempSync(join(tmpdir(), "forebay-caps-bundle-"));
   mkdirSync(join(home, "plugin"), { recursive: true });
   writeFileSync(join(home, "plugin", `${name}.js`), "export default {};");
   return home;
@@ -81,8 +81,8 @@ describe("capability ownership from the deployed sidecars", () => {
 
   it("answers null for a capability nothing declares and for an unreadable home", () => {
     expect(ownerOfCapability(homeWith({}), "screens")).toBeNull();
-    expect(ownerOfCapability(join(tmpdir(), "cairn-caps-absent"), "screens")).toBeNull();
-    expect(deployedManifests(join(tmpdir(), "cairn-caps-absent"))).toEqual([]);
+    expect(ownerOfCapability(join(tmpdir(), "forebay-caps-absent"), "screens")).toBeNull();
+    expect(deployedManifests(join(tmpdir(), "forebay-caps-absent"))).toEqual([]);
   });
 
   it("does not treat the deploy directory's own package.json as a plugin", () => {
@@ -110,7 +110,7 @@ describe("capability ownership falls back to a clone's own plugin.json", () => {
   });
 
   it("reads pluginIdFromClone's own id over the directory name", () => {
-    const home = withClone(mkdtempSync(join(tmpdir(), "cairn-caps-clone-")), "gateway-clone-dir", { id: "gateway" });
+    const home = withClone(mkdtempSync(join(tmpdir(), "forebay-caps-clone-")), "gateway-clone-dir", { id: "gateway" });
     expect(pluginIdFromClone("gateway-clone-dir", home)).toBe("gateway");
     expect(pluginIdFromClone("nothing-here", home)).toBe("nothing-here");
   });

@@ -37,7 +37,7 @@ describe("providersList", () => {
     const { providersList } = await import("./providers.js");
     const result = await providersList({
       homeDir: "/home",
-      appId: "cairn",
+      appId: "forebay",
       deployed: () => [
         { provider: "vendor", repo: "vendor-auth", handler: "dist/handler.js", handlerPath: "/x", translator: undefined, accountPool: "vendor", models: [] },
         { provider: "vendor-cli", repo: "vendor-auth", handler: "dist/handler.js", handlerPath: "/x", translator: "gemini", accountPool: "vendor", models: [] },
@@ -63,7 +63,7 @@ describe("providersList", () => {
     const { providersList } = await import("./providers.js");
     const result = await providersList({
       homeDir: "/home",
-      appId: "cairn",
+      appId: "forebay",
       deployed: () => [{ provider: "vendor", repo: "vendor-auth", handler: "dist/handler.js", handlerPath: "/x", translator: undefined, accountPool: "vendor", models: [] }],
       accountsFor: () => [],
       exposure: () => ({}),
@@ -84,7 +84,7 @@ describe("providersList", () => {
     const { providersList } = await import("./providers.js");
     const result = await providersList({
       homeDir: "/home",
-      appId: "cairn",
+      appId: "forebay",
       deployed: () => [{ provider: "vendor", repo: "vendor-clone-dir", handler: "dist/handler.js", handlerPath: "/x", translator: undefined, accountPool: "vendor", models: [] }],
       accountsFor: () => [],
       exposure: () => ({}),
@@ -102,7 +102,7 @@ describe("providersList", () => {
     const { providersList } = await import("./providers.js");
     const result = await providersList({
       homeDir: "/home",
-      appId: "cairn",
+      appId: "forebay",
       deployed: () => [{ provider: "orphan", repo: "gone", handler: "dist/handler.js", handlerPath: "/x", translator: undefined, accountPool: "orphan", models: [] }],
       accountsFor: () => [],
       exposure: () => ({}),

@@ -21,7 +21,7 @@ function writeManifest(plugin: string, manifest: Record<string, unknown>, files:
   }
 }
 
-beforeEach(() => { home = mkdtempSync(join(tmpdir(), "cairn-manifest-")); });
+beforeEach(() => { home = mkdtempSync(join(tmpdir(), "forebay-manifest-")); });
 afterEach(() => { rmSync(home, { recursive: true, force: true }); });
 
 describe("readPluginManifest", () => {

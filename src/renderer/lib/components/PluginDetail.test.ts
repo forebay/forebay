@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor, fireEvent, within } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { seedJobsForTest, resetDownloadsForTest } from "../downloads.js";
 import PluginDetail from "./PluginDetail.svelte";
-import type { UnifiedPlugin, PluginVersion } from "@cairn/shared";
+import type { UnifiedPlugin, PluginVersion } from "@forebay/shared";
 
 const PLUGIN: UnifiedPlugin = {
   name: "wakatime-sync",
@@ -68,7 +68,7 @@ function row(label: string): HTMLElement {
 describe("PluginDetail availability", () => {
   // An update being available is not a reason to take removal away from the user.
   it("offers Update AND Remove for the home that is behind", async () => {
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({ ok: true, data: { claude: version({ updateState: "behind" }), opencode: version() } }),
     });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }, { id: "opencode", label: "OpenCode", managesPlugins: true }]);
@@ -82,7 +82,7 @@ describe("PluginDetail availability", () => {
   });
 
   it("keeps Remove for a home that is up to date", async () => {
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version(), opencode: version() } }) });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version(), opencode: version() } }) });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }, { id: "opencode", label: "OpenCode", managesPlugins: true }]);
 
     await waitFor(() => expect(within(row("Claude Code")).getByRole("button", { name: "Remove" })).toBeInTheDocument());
@@ -91,7 +91,7 @@ describe("PluginDetail availability", () => {
   });
 
   it("shows no update or auto-update control for a home with no updater", async () => {
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({ ok: true, data: { claude: version({ updateState: "behind" }), opencode: version({ updateState: "behind" }) } }),
     });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: false }, { id: "opencode", label: "OpenCode", managesPlugins: false }]);
@@ -102,7 +102,7 @@ describe("PluginDetail availability", () => {
   });
 
   it("offers the auto-update control where an updater manages the plugin", async () => {
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }) });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }) });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }]);
 
     const group = await screen.findByRole("group", { name: "Auto-update Claude Code" });
@@ -116,7 +116,7 @@ describe("PluginDetail availability", () => {
 // "Not loaded in any home" for a plugin that is actually loaded and healthy.
 describe("PluginDetail developer tab", () => {
   it("matches the ledger by the plugin's resolved id rather than its entry name", async () => {
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({ ok: true, data: { claude: version() } }),
       pluginLedger: async () => ({
         ok: true,
@@ -138,7 +138,7 @@ describe("PluginDetail developer tab", () => {
   });
 
   it("says not loaded when no ledger row matches the resolved id", async () => {
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({ ok: true, data: { claude: version() } }),
       pluginLedger: async () => ({
         ok: true,
@@ -162,7 +162,7 @@ describe("PluginDetail developer tab", () => {
 describe("PluginDetail settings loading", () => {
   it("fetches no schema while the Configure tab is closed", async () => {
     const configSchemas = vi.fn(async () => ({ ok: true as const, data: [] }));
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }), configSchemas });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }), configSchemas });
     render(PluginDetail, { props: props([{ id: "claude", label: "Claude Code", managesPlugins: true }]) });
 
     await screen.findByRole("button", { name: "Availability" });
@@ -172,7 +172,7 @@ describe("PluginDetail settings loading", () => {
 
   it("fetches the schema once the Configure tab is opened", async () => {
     const configSchemas = vi.fn(async () => ({ ok: true as const, data: [] }));
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }), configSchemas });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version() } }), configSchemas });
     render(PluginDetail, { props: props([{ id: "claude", label: "Claude Code", managesPlugins: true }]) });
 
     await fireEvent.click(await screen.findByRole("button", { name: "Configure" }));
@@ -184,7 +184,7 @@ describe("PluginDetail settings loading", () => {
       id: "j1", kind: "install", plugin: "wakatime-sync", url: "u", home: "opencode",
       status: "queued", phase: "", percent: -1, phases: [], samples: [], queuedAt: 0,
     }]);
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version(), opencode: version() } }) });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version(), opencode: version() } }) });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }, { id: "opencode", label: "OpenCode", managesPlugins: true }]);
 
     await waitFor(() => expect(within(row("OpenCode")).getByTestId("job-opencode")).toHaveTextContent("queued"));
@@ -196,7 +196,7 @@ describe("PluginDetail settings loading", () => {
   });
 
   it("says the update state is unknown rather than implying it is current", async () => {
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: { claude: version({ updateState: "unknown", checkedAt: null }), opencode: version() } }) });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: { claude: version({ updateState: "unknown", checkedAt: null }), opencode: version() } }) });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }, { id: "opencode", label: "OpenCode", managesPlugins: true }]);
 
     await waitFor(() => expect(within(row("Claude Code")).getByText("update state unknown")).toBeInTheDocument());
@@ -212,7 +212,7 @@ describe("PluginDetail settings loading", () => {
       { id: "j1", kind: "install", plugin: "wakatime-sync", url: "u", home: "claude", status: "running", phase: "downloading", percent: 10, phases: [], samples: [], queuedAt: 0 },
       { id: "j2", kind: "install", plugin: "wakatime-sync", url: "u", home: "opencode", status: "queued", phase: "", percent: -1, phases: [], samples: [], queuedAt: 1 },
     ]);
-    stubCairn({ pluginVersions: async () => ({ ok: true, data: {} }) });
+    stubForebay({ pluginVersions: async () => ({ ok: true, data: {} }) });
     await openAvailability([{ id: "claude", label: "Claude Code", managesPlugins: true }, { id: "opencode", label: "OpenCode", managesPlugins: true }]);
 
     await waitFor(() => expect(within(row("Claude Code")).getByTestId("job-claude")).toHaveTextContent("installing"));

@@ -51,7 +51,7 @@ const opencodeApp: AppDescriptor = {
 
 // buildSnapshot() calls getApps() with no args (real env/home), so the
 // registry also needs a temp-file location per test to stay isolated from the
-// real ~/.config/cairn.
+// real ~/.config/forebay.
 beforeEach(() => {
   tempDir = mkdtempSync(join(tmpdir(), "vendor-usage-snapshot-"));
   for (const key of ENV_KEYS) {

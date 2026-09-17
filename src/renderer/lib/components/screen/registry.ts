@@ -1,5 +1,5 @@
 import type { Component } from "svelte";
-import type { NodeStyle, ScreenNode } from "@cairn/shared";
+import type { NodeStyle, ScreenNode } from "@forebay/shared";
 import type { ScreenContext } from "./context.js";
 import Stack from "./Stack.svelte";
 import Grid from "./Grid.svelte";

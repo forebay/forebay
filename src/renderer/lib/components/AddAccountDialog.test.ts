@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import AddAccountDialog from "./AddAccountDialog.svelte";
 
 const provider = { id: "stub", label: "Stub" };
@@ -12,7 +12,7 @@ describe("AddAccountDialog", () => {
       ok: true,
       data: { url: "https://example/login/stub", instructions: "Sign in, then paste the code here." },
     }) as const);
-    stubCairn({ accountsLoginBegin });
+    stubForebay({ accountsLoginBegin });
 
     const { getByText, getByLabelText } = render(AddAccountDialog, { props: { provider, onClose: vi.fn(), onAdded: vi.fn() } });
 
@@ -24,7 +24,7 @@ describe("AddAccountDialog", () => {
 
   it("completes sign-in with the pasted code and reports success", async () => {
     const accountsLoginComplete = vi.fn(async () => ({ ok: true, data: { added: true, label: "a@stub.test" } }) as const);
-    stubCairn({
+    stubForebay({
       accountsLoginBegin: async () => ({ ok: true, data: { url: "https://example/login/stub", instructions: "Do the thing." } }),
       accountsLoginComplete,
     });
@@ -45,7 +45,7 @@ describe("AddAccountDialog", () => {
   // pulling the code out of it is the provider's job, not the dialog's.
   it("forwards a pasted redirect URL as it stands", async () => {
     const accountsLoginComplete = vi.fn(async () => ({ ok: true, data: { added: true } }) as const);
-    stubCairn({
+    stubForebay({
       accountsLoginBegin: async () => ({ ok: true, data: { url: "https://example/login/stub", instructions: "" } }),
       accountsLoginComplete,
     });
@@ -61,7 +61,7 @@ describe("AddAccountDialog", () => {
   });
 
   it("shows the begin error and renders no paste field", async () => {
-    stubCairn({ accountsLoginBegin: async () => ({ ok: false, error: "this provider does not support in-app login" }) });
+    stubForebay({ accountsLoginBegin: async () => ({ ok: false, error: "this provider does not support in-app login" }) });
 
     const { findByText, queryByLabelText } = render(AddAccountDialog, { props: { provider, onClose: vi.fn(), onAdded: vi.fn() } });
 
@@ -71,7 +71,7 @@ describe("AddAccountDialog", () => {
 
   it("calls accountsLoginCancel then onClose on Escape", async () => {
     const accountsLoginCancel = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       accountsLoginBegin: async () => ({ ok: true, data: { url: "https://example/login/stub", instructions: "" } }),
       accountsLoginCancel,
     });

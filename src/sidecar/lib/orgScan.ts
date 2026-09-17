@@ -32,7 +32,7 @@ export interface OrgScanDeps { fetchFn?: typeof fetch; execFn?: (file: string, a
 
 function resolveOrg(getOrg?: () => string): string {
   if (getOrg) return getOrg();
-  const configured = getConfigValue("cairn", "marketplaceOrg");
+  const configured = getConfigValue("forebay", "marketplaceOrg");
   return typeof configured === "string" && configured.trim() ? configured.trim() : ECOSYSTEM_ORG;
 }
 
@@ -43,14 +43,14 @@ interface StoredGithubAccount { login: string; token: string }
 // no accounts stored, falls back to the legacy single githubToken config value so an
 // older config keeps working.
 export function activeGithubToken(): string | null {
-  const accounts = getConfigValue("cairn", "githubAccounts");
+  const accounts = getConfigValue("forebay", "githubAccounts");
   if (Array.isArray(accounts) && accounts.length > 0) {
     const list = accounts as StoredGithubAccount[];
-    const activeLogin = getConfigValue("cairn", "githubActiveLogin");
+    const activeLogin = getConfigValue("forebay", "githubActiveLogin");
     const active = typeof activeLogin === "string" ? list.find((a) => a.login === activeLogin) : undefined;
     return (active ?? list[0]).token?.trim() || null;
   }
-  const legacy = getConfigValue("cairn", "githubToken");
+  const legacy = getConfigValue("forebay", "githubToken");
   return typeof legacy === "string" && legacy.trim() ? legacy.trim() : null;
 }
 

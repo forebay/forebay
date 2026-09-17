@@ -34,7 +34,7 @@ export function pluginsData(name: string, deps: PluginDataDeps = {}): Promise<Re
 
     const found: HomePluginData[] = [];
     for (const home of homes) {
-      if (home.id !== "cairn" && !home.present) continue;
+      if (home.id !== "forebay" && !home.present) continue;
       const entries = await read(home.dir, name, declaredPaths(home.dir, name), home.id);
       if (entries.length > 0) found.push({ home, entries });
     }

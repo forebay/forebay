@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, waitFor, fireEvent, screen } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import RepoDetail from "./RepoDetail.svelte";
 
 const repo = {
@@ -15,7 +15,7 @@ const repo = {
 
 describe("RepoDetail", () => {
   it("renders repo meta: display name, slug, stars, description, topics and readme", async () => {
-    stubCairn({
+    stubForebay({
       repoMeta: async () => ({
         ok: true,
         data: {
@@ -40,7 +40,7 @@ describe("RepoDetail", () => {
   });
 
   it("falls back to catalog description/topics/name when meta is unavailable", async () => {
-    stubCairn({ repoMeta: async () => ({ ok: false, error: "boom" }) });
+    stubForebay({ repoMeta: async () => ({ ok: false, error: "boom" }) });
     render(RepoDetail, { props: { repo, onClose: () => {} } });
 
     expect(await screen.findByText("catalog desc")).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("RepoDetail", () => {
   it("opens GitHub in a new tab and closes on Escape", async () => {
     const onClose = vi.fn();
     const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-    stubCairn({
+    stubForebay({
       repoMeta: async () => ({
         ok: true,
         data: { owner: "o", repo: "r", htmlUrl: "https://github.com/o/r", stars: null, description: "", topics: [], readme: null },

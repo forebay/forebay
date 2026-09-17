@@ -38,7 +38,7 @@ function code(text: string): string {
   return text.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
 }
 
-describe("Cairn names no plugin", () => {
+describe("Forebay names no plugin", () => {
   it("has no plugin name in any source file outside the install-engine seam", () => {
     const offenders: string[] = [];
     for (const file of [...sources(join(ROOT, "src")), ...sources(join(ROOT, "packages", "shared", "src"))]) {

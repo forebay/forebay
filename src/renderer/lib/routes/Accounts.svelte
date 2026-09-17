@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ProviderRow as ProviderRowData, AccountView } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ProviderRow as ProviderRowData, AccountView } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import { debounce } from "../util/debounce.js";
   import { accountLabel, accountStatusInfo } from "../util/accountStatus.js";
@@ -153,12 +153,12 @@
 
   async function loadAccounts(pool: AccountPool): Promise<void> {
     loadingAccounts[pool.id] = true;
-    const result = await cairn.accountsList(pool.controllerId);
+    const result = await forebay.accountsList(pool.controllerId);
     loadingAccounts[pool.id] = false;
     if (!result.ok) {
       accountErrors[pool.id] = result.error;
       // A failed read must not count as read: the usual cause is a plugin that needs
-      // repairing, and holding the failure meant the error outlived the fix until Cairn
+      // repairing, and holding the failure meant the error outlived the fix until Forebay
       // restarted. Dropping the mark lets the next open try again.
       requested.delete(pool.id);
       return;
@@ -198,7 +198,7 @@
   });
 
   async function load(): Promise<void> {
-    const result = await cairn.providersList();
+    const result = await forebay.providersList();
     if (!result.ok) {
       providersError = result.error;
       providers = [];
@@ -209,13 +209,13 @@
   }
 
   async function handleToggle(pool: AccountPool, id: string, on: boolean): Promise<void> {
-    const result = await cairn.accountsEnable(pool.controllerId, id, on);
+    const result = await forebay.accountsEnable(pool.controllerId, id, on);
     if (!result.ok) toast.error(result.error);
     await loadAccounts(pool);
   }
 
   async function handleRemove(pool: AccountPool, id: string): Promise<void> {
-    const result = await cairn.accountsRemove(pool.controllerId, id);
+    const result = await forebay.accountsRemove(pool.controllerId, id);
     if (result.ok) {
       toast.success("Account removed");
     } else {

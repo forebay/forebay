@@ -21,7 +21,7 @@ const activityStats = vi.fn(async () => ({
 }));
 
 vi.mock("../ipc.js", () => ({
-  cairn: {
+  forebay: {
     get globalSettingsRead() { return globalSettingsRead; },
     get activityStats() { return activityStats; },
     get setConfig() { return setConfig; },

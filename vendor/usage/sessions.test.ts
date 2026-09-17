@@ -64,7 +64,7 @@ const opencodeApp: AppDescriptor = {
 
 // buildSessionsWithCosts() is called with no args (real env/home), so the
 // registry file also needs a stable, HUB_APPS_FILE-independent location; a
-// fresh temp file per test keeps it isolated from the real ~/.config/cairn.
+// fresh temp file per test keeps it isolated from the real ~/.config/forebay.
 beforeEach(() => {
   tempDir = mkdtempSync(join(tmpdir(), "vendor-usage-sessions-"));
   for (const key of ENV_KEYS) {

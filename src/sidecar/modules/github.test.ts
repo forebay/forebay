@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ECOSYSTEM_ORG, getConfigValue, setConfigValue } from "@intisy-ai/basekit";
 import { resetOrgScanCache, resolveToken } from "../lib/orgScan.js";
-import { githubStatus, githubAddAccount, githubSwitchAccount, githubRemoveAccount, githubConnectGhCli, githubSetStar, githubStarCairn, githubDeviceStart, githubDevicePoll, resetDeviceFlowState } from "./github.js";
+import { githubStatus, githubAddAccount, githubSwitchAccount, githubRemoveAccount, githubConnectGhCli, githubSetStar, githubStarForebay, githubDeviceStart, githubDevicePoll, resetDeviceFlowState } from "./github.js";
 
 // A developer's shell usually carries a real GITHUB_TOKEN, and resolveToken prefers the
 // environment over a stored account, so a test that does not pass an explicit `env` would
@@ -57,8 +57,8 @@ describe("githubStatus", () => {
         ghCli: null,
         accounts: [],
         activeLogin: null,
-        cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`,
-        cairnStarred: null,
+        forebayRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/forebay`,
+        forebayStarred: null,
       },
     });
   });
@@ -71,7 +71,7 @@ describe("githubStatus", () => {
     });
     expect(result).toEqual({
       ok: true,
-      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`, cairnStarred: null },
+      data: { source: "anonymous", connected: false, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, forebayRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/forebay`, forebayStarred: null },
     });
   });
 
@@ -102,7 +102,7 @@ describe("githubStatus", () => {
     const result = await githubStatus({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: failFetch(401) });
     expect(result).toEqual({
       ok: true,
-      data: { source: "env", connected: true, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, cairnRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/cairn`, cairnStarred: null },
+      data: { source: "env", connected: true, login: null, name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [], activeLogin: null, forebayRepoUrl: `https://github.com/${ECOSYSTEM_ORG}/forebay`, forebayStarred: null },
     });
   });
 
@@ -146,27 +146,27 @@ describe("githubAddAccount", () => {
   it("validates the token via the GitHub API, stores the identity, and makes it active", async () => {
     const result = await githubAddAccount("  new-token  ", false, { fetchFn: userFetch("octocat", { name: "Octo Cat", avatar_url: "https://avatars.githubusercontent.com/u/1" }) });
     expect(result).toEqual({ ok: true, data: { login: "octocat" } });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([
       { login: "octocat", token: "new-token", name: "Octo Cat", avatarUrl: "https://avatars.githubusercontent.com/u/1" },
     ]);
-    expect(getConfigValue("cairn", "githubActiveLogin")).toBe("octocat");
+    expect(getConfigValue("forebay", "githubActiveLogin")).toBe("octocat");
   });
 
   it("stores null name/avatarUrl when the API response omits them", async () => {
     await githubAddAccount("token", false, { fetchFn: userFetch("octocat") });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
   });
 
   it("replaces an existing entry for the same login instead of duplicating it", async () => {
     await githubAddAccount("token-1", false, { fetchFn: userFetch("octocat", { name: "Old Name" }) });
     await githubAddAccount("token-2", false, { fetchFn: userFetch("octocat", { name: "New Name" }) });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "octocat", token: "token-2", name: "New Name", avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "octocat", token: "token-2", name: "New Name", avatarUrl: null }]);
   });
 
   it("rejects an invalid token and stores nothing", async () => {
     const result = await githubAddAccount("bad-token", false, { fetchFn: failFetch(401) });
     expect(result.ok).toBe(false);
-    expect(getConfigValue("cairn", "githubAccounts")).toBeUndefined();
+    expect(getConfigValue("forebay", "githubAccounts")).toBeUndefined();
   });
 
   it("rejects a blank token without calling the network", async () => {
@@ -174,11 +174,11 @@ describe("githubAddAccount", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("stars Cairn when star is true", async () => {
+  it("stars Forebay when star is true", async () => {
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
     const result = await githubAddAccount("token", true, { fetchFn: spyFetch("octocat", calls) });
     expect(result.ok).toBe(true);
-    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/forebay`);
     expect(starCall).toBeDefined();
     expect(starCall?.init?.method).toBe("PUT");
     expect(starCall?.init?.headers?.Authorization).toBe("Bearer token");
@@ -195,14 +195,14 @@ describe("githubAddAccount", () => {
     const calls: { url: string }[] = [];
     const result = await githubAddAccount("token", true, { fetchFn: spyFetch("octocat", calls, "throw") });
     expect(result).toEqual({ ok: true, data: { login: "octocat" } });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
   });
 
   it("still stores the account and reports success when starring returns a non-2xx (insufficient scope)", async () => {
     const calls: { url: string }[] = [];
     const result = await githubAddAccount("token", true, { fetchFn: spyFetch("octocat", calls, "403") });
     expect(result.ok).toBe(true);
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "octocat", token: "token", name: null, avatarUrl: null }]);
   });
 });
 
@@ -213,10 +213,10 @@ describe("githubConnectGhCli", () => {
       fetchFn: userFetch("clidev", { name: "CLI Dev", avatar_url: "https://avatars.githubusercontent.com/u/3" }),
     });
     expect(result).toEqual({ ok: true, data: { login: "clidev" } });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([
       { login: "clidev", token: "ghtoken", name: "CLI Dev", avatarUrl: "https://avatars.githubusercontent.com/u/3" },
     ]);
-    expect(getConfigValue("cairn", "githubActiveLogin")).toBe("clidev");
+    expect(getConfigValue("forebay", "githubActiveLogin")).toBe("clidev");
   });
 
   it("errors when gh has no token", async () => {
@@ -235,17 +235,17 @@ describe("githubConnectGhCli", () => {
       fetchFn: failFetch(401),
     });
     expect(result.ok).toBe(false);
-    expect(getConfigValue("cairn", "githubAccounts")).toBeUndefined();
+    expect(getConfigValue("forebay", "githubAccounts")).toBeUndefined();
   });
 
-  it("stars Cairn using the gh CLI token when star is true", async () => {
+  it("stars Forebay using the gh CLI token when star is true", async () => {
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
     const result = await githubConnectGhCli(true, {
       execFn: async (f, a) => (f === "gh" && a[0] === "auth" ? "ghtoken" : ""),
       fetchFn: spyFetch("clidev", calls),
     });
     expect(result.ok).toBe(true);
-    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/forebay`);
     expect(starCall).toBeDefined();
     expect(starCall?.init?.method).toBe("PUT");
   });
@@ -276,7 +276,7 @@ describe("githubSwitchAccount", () => {
     await githubAddAccount("token-b", false, { fetchFn: userFetch("bob") });
     const result = await githubSwitchAccount("alice");
     expect(result).toEqual({ ok: true, data: undefined });
-    expect(getConfigValue("cairn", "githubActiveLogin")).toBe("alice");
+    expect(getConfigValue("forebay", "githubActiveLogin")).toBe("alice");
   });
 
   it("errors on an unknown login", async () => {
@@ -291,8 +291,8 @@ describe("githubRemoveAccount", () => {
     await githubAddAccount("token-b", false, { fetchFn: userFetch("bob") });
     const result = await githubRemoveAccount("bob");
     expect(result).toEqual({ ok: true, data: undefined });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "alice", token: "token-a", name: null, avatarUrl: null }]);
-    expect(getConfigValue("cairn", "githubActiveLogin")).toBe("alice");
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "alice", token: "token-a", name: null, avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubActiveLogin")).toBe("alice");
   });
 
   it("clears the active login when the last account is removed", async () => {
@@ -316,7 +316,7 @@ describe("resolveToken", () => {
   });
 
   it("still honors a legacy plain githubToken when no accounts are stored", async () => {
-    setConfigValue("cairn", "githubToken", "legacy-token");
+    setConfigValue("forebay", "githubToken", "legacy-token");
     const resolved = await resolveToken({}, noGh);
     expect(resolved).toEqual({ token: "legacy-token", source: "config" });
   });
@@ -374,31 +374,31 @@ describe("githubSetStar", () => {
   });
 });
 
-describe("githubStatus cairn star state", () => {
-  it("reports cairnStarred true when the star check returns 204", async () => {
+describe("githubStatus forebay star state", () => {
+  it("reports forebayStarred true when the star check returns 204", async () => {
     const result = await githubStatus({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: spyFetch("octocat", []) });
-    expect(result.ok && result.data.cairnStarred).toBe(true);
+    expect(result.ok && result.data.forebayStarred).toBe(true);
   });
 
-  it("reports cairnStarred false when the star check returns 404", async () => {
+  it("reports forebayStarred false when the star check returns 404", async () => {
     const notStarred = (async (url: string) =>
       url.includes("/user/starred/")
         ? { ok: false, status: 404, json: async () => ({}) }
         : { ok: true, status: 200, json: async () => ({ login: "octocat" }) }) as unknown as typeof fetch;
     const result = await githubStatus({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: notStarred });
-    expect(result.ok && result.data.cairnStarred).toBe(false);
-    if (result.ok) expect(result.data.cairnRepoUrl).toBe(`https://github.com/${ECOSYSTEM_ORG}/cairn`);
+    expect(result.ok && result.data.forebayStarred).toBe(false);
+    if (result.ok) expect(result.data.forebayRepoUrl).toBe(`https://github.com/${ECOSYSTEM_ORG}/forebay`);
   });
 });
 
-describe("githubStarCairn", () => {
-  it("stars Cairn with every stored account's token, one PUT each", async () => {
+describe("githubStarForebay", () => {
+  it("stars Forebay with every stored account's token, one PUT each", async () => {
     await githubAddAccount("token-a", false, { fetchFn: userFetch("alice") });
     await githubAddAccount("token-b", false, { fetchFn: userFetch("bob") });
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
-    const result = await githubStarCairn({ fetchFn: spyFetch("bob", calls) });
+    const result = await githubStarForebay({ fetchFn: spyFetch("bob", calls) });
     expect(result).toEqual({ ok: true, data: undefined });
-    const starCalls = calls.filter((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn` && c.init?.method === "PUT");
+    const starCalls = calls.filter((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/forebay` && c.init?.method === "PUT");
     expect(starCalls.length).toBe(2);
     expect(starCalls.map((c) => c.init?.headers?.Authorization)).toEqual(
       expect.arrayContaining(["Bearer token-a", "Bearer token-b"]),
@@ -407,14 +407,14 @@ describe("githubStarCairn", () => {
 
   it("falls back to the resolved env/gh token when no account is stored", async () => {
     const calls: { url: string; init?: { method?: string } }[] = [];
-    const result = await githubStarCairn({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: spyFetch("octocat", calls) });
+    const result = await githubStarForebay({ env: { GITHUB_TOKEN: "t" }, execFn: noGh, fetchFn: spyFetch("octocat", calls) });
     expect(result).toEqual({ ok: true, data: undefined });
-    expect(calls.some((c) => c.url.includes(`/user/starred/${ECOSYSTEM_ORG}/cairn`) && c.init?.method === "PUT")).toBe(true);
+    expect(calls.some((c) => c.url.includes(`/user/starred/${ECOSYSTEM_ORG}/forebay`) && c.init?.method === "PUT")).toBe(true);
   });
 
   it("errors when there is no token at all", async () => {
     const calls: { url: string }[] = [];
-    const result = await githubStarCairn({ env: {}, execFn: noGh, fetchFn: spyFetch("octocat", calls) });
+    const result = await githubStarForebay({ env: {}, execFn: noGh, fetchFn: spyFetch("octocat", calls) });
     expect(result.ok).toBe(false);
     expect(calls.length).toBe(0);
   });
@@ -477,10 +477,10 @@ describe("githubDevicePoll", () => {
 
     const authorized = await githubDevicePoll(false, { fetchFn: deviceCodeFetch("success") });
     expect(authorized).toEqual({ ok: true, data: { status: "authorized", login: "octocat" } });
-    expect(getConfigValue("cairn", "githubAccounts")).toEqual([{ login: "octocat", token: "device-token", name: null, avatarUrl: null }]);
+    expect(getConfigValue("forebay", "githubAccounts")).toEqual([{ login: "octocat", token: "device-token", name: null, avatarUrl: null }]);
   });
 
-  it("stars Cairn with the new token when star is true", async () => {
+  it("stars Forebay with the new token when star is true", async () => {
     await githubDeviceStart({ fetchFn: deviceCodeFetch("pending") });
     const calls: { url: string; init?: { method?: string; headers?: Record<string, string> } }[] = [];
     const fetchFn = (async (url: string, init?: { method?: string; headers?: Record<string, string> }) => {
@@ -488,7 +488,7 @@ describe("githubDevicePoll", () => {
       return (deviceCodeFetch("success") as unknown as (u: string, i?: unknown) => Promise<unknown>)(url, init);
     }) as unknown as typeof fetch;
     await githubDevicePoll(true, { fetchFn });
-    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`);
+    const starCall = calls.find((c) => c.url === `https://api.github.com/user/starred/${ECOSYSTEM_ORG}/forebay`);
     expect(starCall?.init?.method).toBe("PUT");
     expect(starCall?.init?.headers?.Authorization).toBe("Bearer device-token");
   });

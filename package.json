@@ -1,8 +1,8 @@
 {
-  "name": "cairn",
-  "productName": "Cairn",
+  "name": "forebay",
+  "productName": "Forebay",
   "version": "0.1.0",
-  "description": "Cairn, an Electron desktop control plane for managing AI providers, accounts, routing, and the local API across Claude Code and OpenCode.",
+  "description": "Forebay, an Electron desktop control plane for managing AI providers, accounts, routing, and the local API across Claude Code and OpenCode.",
   "private": true,
   "type": "module",
   "license": "MIT",

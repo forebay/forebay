@@ -1,6 +1,6 @@
 import { writable, derived, get } from "svelte/store";
-import type { Job, JobKind, JobPhase, JobSample, Result } from "@cairn/shared";
-import { cairn } from "./ipc.js";
+import type { Job, JobKind, JobPhase, JobSample, Result } from "@forebay/shared";
+import { forebay } from "./ipc.js";
 import { invalidate } from "./cache.js";
 import { humanizeId } from "./util/appLabel.js";
 
@@ -124,10 +124,10 @@ export function jobKey(plugin: string, homeId: string): string {
 // Mirror the sidecar's list: the snapshot covers a renderer that started mid-job, the
 // subscription covers everything after.
 export function watchJobs(): () => void {
-  void cairn.jobsList().then((result) => {
+  void forebay.jobsList().then((result) => {
     if (result.ok) jobs.set(result.data);
   });
-  return cairn.onJobEvent((job) => {
+  return forebay.onJobEvent((job) => {
     // A job installs, updates or removes a plugin in a home, so anything the read cache holds
     // about plugins is stale the moment it ends. The renderer only learns this from the event:
     // the change happened in the sidecar, behind no call of its own. Cleared before the store
@@ -145,7 +145,7 @@ export function watchJobs(): () => void {
 
 export async function enqueueJob(kind: JobKind, plugin: string, url: string, homeId: string): Promise<Result<Job>> {
   panelOpen.set(true);
-  const result = await cairn.jobsEnqueue(kind, plugin, url, homeId);
+  const result = await forebay.jobsEnqueue(kind, plugin, url, homeId);
   if (result.ok) {
     jobs.update((list) => (list.some((j) => j.id === result.data.id) ? list : [...list, result.data]));
   }
@@ -153,7 +153,7 @@ export async function enqueueJob(kind: JobKind, plugin: string, url: string, hom
 }
 
 export function cancelRow(row: DownloadRow): void {
-  if (row.jobId) void cairn.jobsCancel(row.jobId);
+  if (row.jobId) void forebay.jobsCancel(row.jobId);
 }
 
 // Waits for the plugin's own work to finish, so a caller can reload once it is really done.
@@ -244,7 +244,7 @@ export function closeDownloads(): void {
 
 export function clearFinished(): void {
   localTasks.update((list) => list.filter((task) => isLive(localRow(task))));
-  if (get(jobs).some((job) => !LIVE.includes(JOB_STATUS[job.status]))) void cairn.jobsClearFinished();
+  if (get(jobs).some((job) => !LIVE.includes(JOB_STATUS[job.status]))) void forebay.jobsClearFinished();
   jobs.update((list) => list.filter((job) => LIVE.includes(JOB_STATUS[job.status])));
 }
 

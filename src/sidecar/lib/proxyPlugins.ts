@@ -9,7 +9,7 @@ import { listedPlugins } from "./pluginManager.js";
 import { reposDir } from "./storagePaths.js";
 
 // These read the dashboard's own store, so the capability is resolved against this app's own home.
-const OWN_APP = "cairn";
+const OWN_APP = "forebay";
 
 export type LoadedProxyDef = { app: string; label: string; profile: () => RoutingProfile; setup?: string };
 

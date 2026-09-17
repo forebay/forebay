@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/svelte";
 import PluginMenu from "./PluginMenu.svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 
 const SCREEN = {
   plugin: "demo", id: "config", label: "Config", homes: ["claude"], refreshOn: ["config."],
@@ -11,7 +11,7 @@ const SCREEN = {
 
 describe("PluginMenu", () => {
   it("paints the plugin's screen from its own data", async () => {
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN] }),
       screenData: async () => ({ ok: true, data: { sources: { line: "from the plugin" } } }),
     });
@@ -22,7 +22,7 @@ describe("PluginMenu", () => {
   it("re-reads after an action that asks for a refresh", async () => {
     const screenData = vi.fn(async () => ({ ok: true, data: { sources: { line: "v1" } } }));
     const screenInvoke = vi.fn(async () => ({ ok: true, data: { ok: true, refresh: true } }));
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN] }),
       screenData,
       screenInvoke,
@@ -37,7 +37,7 @@ describe("PluginMenu", () => {
   });
 
   it("shows the plugin's own error rather than a blank screen", async () => {
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN] }),
       screenData: async () => ({ ok: false, error: "not a git repository" }),
     });
@@ -46,7 +46,7 @@ describe("PluginMenu", () => {
   });
 
   it("says so when the plugin is installed nowhere", async () => {
-    stubCairn({ screensList: async () => ({ ok: true, data: [{ ...SCREEN, homes: [] }] }) });
+    stubForebay({ screensList: async () => ({ ok: true, data: [{ ...SCREEN, homes: [] }] }) });
     render(PluginMenu, { plugin: "demo", screenId: "config" });
     await waitFor(() => expect(screen.getByText(/not installed/)).toBeInTheDocument());
   });
@@ -54,7 +54,7 @@ describe("PluginMenu", () => {
   // A screensList failure must not read as "not installed": that message means the plugin
   // was resolved and genuinely has no homes, which is not what a read error tells you.
   it("surfaces a failure to read the screens instead of rendering an empty screen", async () => {
-    stubCairn({ screensList: async () => ({ ok: false, error: "sidecar down" }) });
+    stubForebay({ screensList: async () => ({ ok: false, error: "sidecar down" }) });
     render(PluginMenu, { plugin: "demo", screenId: "config" });
     await waitFor(() => expect(screen.getByText(/sidecar down/)).toBeInTheDocument());
     expect(screen.queryByText(/not installed/)).toBeNull();
@@ -62,7 +62,7 @@ describe("PluginMenu", () => {
 
   it("switches home when the plugin contributes in more than one", async () => {
     const SCREEN_MULTI = { ...SCREEN, homes: ["claude", "opencode"] };
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN_MULTI] }),
       pluginsList: async () => ({
         ok: true,
@@ -87,7 +87,7 @@ describe("PluginMenu", () => {
     let resolveClaude: (value: { ok: true; data: { sources: Record<string, unknown> } }) => void = () => {};
     const claudePending = new Promise<{ ok: true; data: { sources: Record<string, unknown> } }>((resolve) => { resolveClaude = resolve; });
     const SCREEN_MULTI = { ...SCREEN, homes: ["claude", "opencode"] };
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN_MULTI] }),
       pluginsList: async () => ({
         ok: true,
@@ -126,7 +126,7 @@ describe("refreshOn", () => {
 
   it("re-reads when a drained event's topic matches a declared prefix", async () => {
     const screenData = vi.fn(async () => ({ ok: true, data: { sources: { line: "v1" } } }));
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN] }),
       screenData,
       busDrain: async () => ({ ok: true, data: [{ topic: "config.changed", source: "demo", ts: 0, payload: null }] }),
@@ -140,7 +140,7 @@ describe("refreshOn", () => {
 
   it("ignores a drained event whose topic does not match a declared prefix", async () => {
     const screenData = vi.fn(async () => ({ ok: true, data: { sources: { line: "v1" } } }));
-    stubCairn({
+    stubForebay({
       screensList: async () => ({ ok: true, data: [SCREEN] }),
       screenData,
       busDrain: async () => ({ ok: true, data: [{ topic: "other.thing", source: "demo", ts: 0, payload: null }] }),

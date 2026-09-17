@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/svelte";
 import PluginInstallControl from "./PluginInstallControl.svelte";
-import type { UnifiedPlugin } from "@cairn/shared";
+import type { UnifiedPlugin } from "@forebay/shared";
 
 const HOMES = [
   { id: "claude", label: "Claude Code" },
@@ -171,8 +171,8 @@ describe("PluginInstallControl", () => {
     render(PluginInstallControl, {
       props: {
         ...props({ plugin: plugin([]), updateAvailable: true, updatesEnabled: true, onUpdate: vi.fn() }),
-        homes: [...HOMES, { id: "cairn", label: "Cairn" }],
-        plugin: { ...plugin(["claude"]), homes: { claude: { installed: true }, opencode: { installed: false }, cairn: { installed: false } } },
+        homes: [...HOMES, { id: "forebay", label: "Forebay" }],
+        plugin: { ...plugin(["claude"]), homes: { claude: { installed: true }, opencode: { installed: false }, forebay: { installed: false } } },
       },
     });
     await openMenu();

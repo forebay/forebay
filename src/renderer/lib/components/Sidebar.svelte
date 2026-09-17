@@ -2,15 +2,15 @@
   import { onMount } from "svelte";
   import { router, navigate, SCREENS, pluginScreen, setPluginScreens } from "../router.js";
   import type { ScreenId } from "../router.js";
-  import { cairn } from "../ipc.js";
-  import type { PluginScreen } from "@cairn/shared";
+  import { forebay } from "../ipc.js";
+  import type { PluginScreen } from "@forebay/shared";
   import { serverStatus, watchServerStatus } from "../serverStatus.js";
   import { unseenErrorCount } from "../stores/activity.js";
-  import { PROXY_PORT } from "@cairn/shared";
-  import CairnMark from "./CairnMark.svelte";
+  import { PROXY_PORT } from "@forebay/shared";
+  import ForebayMark from "./ForebayMark.svelte";
 
   let {
-    brandName = "Cairn",
+    brandName = "Forebay",
     brandTag = "AI control plane",
     apiPort = PROXY_PORT,
   }: { brandName?: string; brandTag?: string; apiPort?: number } = $props();
@@ -32,9 +32,9 @@
   }
 
   onMount(() => {
-    void cairn.screensList().then((cached) => {
+    void forebay.screensList().then((cached) => {
       if (cached.ok && cached.data?.length > 0) apply(cached.data);
-      return cairn.screensList({ wait: true }).then((fresh) => {
+      return forebay.screensList({ wait: true }).then((fresh) => {
         if (fresh.ok) apply(fresh.data);
       });
     });
@@ -51,7 +51,7 @@
 
 <aside class="side">
   <div class="brand">
-    <CairnMark size={28} />
+    <ForebayMark size={28} />
     <div class="bname"><b>{brandName}</b><small>{brandTag}</small></div>
   </div>
   <nav class="nav">

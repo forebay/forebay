@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
-import { IPC_CHANNELS } from "@cairn/shared";
-import type { Result } from "@cairn/shared";
+import { IPC_CHANNELS } from "@forebay/shared";
+import type { Result } from "@forebay/shared";
 import * as proxyDaemon from "../daemon/proxyDaemon.js";
 import { wrap } from "../../sidecar/result.js";
 import { DEFAULT_CALL_TIMEOUT_MS, DEFAULT_INVOKE_TIMEOUT_MS } from "../../sidecar/lib/pluginHost.js";

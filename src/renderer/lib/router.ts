@@ -1,12 +1,12 @@
 import { writable } from "svelte/store";
-import type { PluginScreen } from "@cairn/shared";
+import type { PluginScreen } from "@forebay/shared";
 
-export type CairnScreenId = "overview" | "providers" | "accounts" | "routing" | "usage" | "activity" | "localApi" | "apps" | "plugins" | "libraries" | "downloads" | "settings";
+export type ForebayScreenId = "overview" | "providers" | "accounts" | "routing" | "usage" | "activity" | "localApi" | "apps" | "plugins" | "libraries" | "downloads" | "settings";
 // A plugin can declare more than one screen, so a contributed screen is addressed by the
-// plugin AND the screen id, not the plugin alone. Cairn's own screens stay a closed set;
+// plugin AND the screen id, not the plugin alone. Forebay's own screens stay a closed set;
 // anything a plugin contributes lives behind this prefix.
 export type PluginScreenId = `plugin:${string}:${string}`;
-export type ScreenId = CairnScreenId | PluginScreenId;
+export type ScreenId = ForebayScreenId | PluginScreenId;
 export type PluginScreenRef = { plugin: string; screenId: string };
 
 const PLUGIN_PREFIX = "plugin:";
@@ -26,7 +26,7 @@ export function pluginOfScreen(screen: string): PluginScreenRef | null {
 export type ScreenSection = "main" | "network";
 
 export type ScreenDef = {
-  id: CairnScreenId;
+  id: ForebayScreenId;
   label: string;
   glyph: string;
   section: ScreenSection;

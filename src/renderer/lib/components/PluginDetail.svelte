@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { UnifiedPlugin, PluginConfigSchema, PluginVersion, HomeLedger, QuarantineView } from "@cairn/shared";
+  import type { UnifiedPlugin, PluginConfigSchema, PluginVersion, HomeLedger, QuarantineView } from "@forebay/shared";
   import PluginControls from "./PluginControls.svelte";
   import RepoDetail from "./RepoDetail.svelte";
   import SegmentedControl from "./SegmentedControl.svelte";
@@ -8,7 +8,7 @@
   import PluginIcon, { LOGO_SIZE } from "./PluginIcon.svelte";
   import PluginInstallControl from "./PluginInstallControl.svelte";
   import PluginLedgerSection from "./PluginLedgerSection.svelte";
-  import { cairn } from "../ipc.js";
+  import { forebay } from "../ipc.js";
   import { activeByPluginHome, jobKey, cancelRow, type DownloadRow } from "../downloads.js";
 
   type PluginChannel = "inherit" | "stable" | "experimental";
@@ -92,21 +92,21 @@
   }
 
   async function loadVersions(): Promise<void> {
-    const result = await cairn.pluginVersions(plugin.name);
+    const result = await forebay.pluginVersions(plugin.name);
     if (result.ok) versions = result.data;
   }
 
   // A live read: what a plugin provides changes the moment it is installed, enabled,
   // disabled or repaired, so this must never come from a cached list.
   async function loadLedger(): Promise<void> {
-    const result = await cairn.pluginLedger();
+    const result = await forebay.pluginLedger();
     if (result.ok) ledgerGroups = result.data;
   }
 
   // Same live-read reasoning as loadLedger: a home's inability to load this plugin is only
   // known by asking, and it changes the moment the plugin is repaired.
   async function loadQuarantine(): Promise<void> {
-    const result = await cairn.pluginQuarantine();
+    const result = await forebay.pluginQuarantine();
     if (result.ok) quarantine = result.data;
   }
 
@@ -119,7 +119,7 @@
     const current = versions[homeId];
     const previous = current?.autoUpdate ?? false;
     if (current) versions = { ...versions, [homeId]: { ...current, autoUpdate: on } };
-    const result = await cairn.pluginsSetAutoUpdate(homeId, plugin.name, on);
+    const result = await forebay.pluginsSetAutoUpdate(homeId, plugin.name, on);
     // A failed write must not leave the control showing a state the disk never moved to.
     if (!result.ok) {
       const latest = versions[homeId];
@@ -223,7 +223,7 @@
     if (activeTab !== "configure") return;
     if (!home) { controlsSchema = null; return; }
     controlsLoading = true;
-    cairn.configSchemas(home).then((result) => {
+    forebay.configSchemas(home).then((result) => {
       if (controlsHome !== home) return;
       controlsSchema = result.ok ? (result.data.find((s) => s.plugin === name) ?? null) : null;
       controlsLoading = false;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ProxyStatus, ProxyView } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ProxyStatus, ProxyView } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { navigate } from "../router.js";
   import { toast } from "../toast.js";
   import Card from "../components/Card.svelte";
@@ -28,7 +28,7 @@
   const portDirty = $derived(status !== null && portInput !== null && portInput !== status.port);
 
   async function load(): Promise<void> {
-    const result = await cairn.proxyStatus();
+    const result = await forebay.proxyStatus();
     if (result.ok) {
       status = result.data;
       if (portInput === null) portInput = result.data.port;
@@ -47,15 +47,15 @@
     savingPort = true;
     portError = "";
     try {
-      const setResult = await cairn.setConfig("cairn", "localApiPort", portInput);
+      const setResult = await forebay.setConfig("forebay", "localApiPort", portInput);
       if (!setResult.ok) {
         toast.error(setResult.error);
         return;
       }
       // Apply immediately: a running daemon must rebind to the new port.
       if (status.running) {
-        await cairn.proxyStop();
-        const startResult = await cairn.proxyStart();
+        await forebay.proxyStop();
+        const startResult = await forebay.proxyStart();
         if (!startResult.ok) {
           toast.error(startResult.error);
           return;
@@ -69,17 +69,17 @@
   }
 
   async function loadAutostart(): Promise<void> {
-    const result = await cairn.getConfig("cairn", "proxyAutostart");
+    const result = await forebay.getConfig("forebay", "proxyAutostart");
     autostart = result.ok && result.data === true;
   }
 
   async function loadProxies(): Promise<void> {
-    const result = await cairn.proxiesList();
+    const result = await forebay.proxiesList();
     if (result.ok) proxies = result.data;
   }
 
   async function toggleProxy(name: string, on: boolean): Promise<void> {
-    const result = await cairn.proxiesSetEnabled(name, on);
+    const result = await forebay.proxiesSetEnabled(name, on);
     if (!result.ok) toast.error(result.error);
     await loadProxies();
   }
@@ -88,7 +88,7 @@
     if (busy || !status) return;
     busy = true;
     try {
-      const result = status.running ? await cairn.proxyStop() : await cairn.proxyStart();
+      const result = status.running ? await forebay.proxyStop() : await forebay.proxyStart();
       if (!result.ok) {
         actionError = result.error;
         return;
@@ -102,7 +102,7 @@
 
   async function setAutostart(on: boolean): Promise<void> {
     autostart = on;
-    await cairn.setConfig("cairn", "proxyAutostart", on);
+    await forebay.setConfig("forebay", "proxyAutostart", on);
   }
 
   async function copy(text: string, id: string): Promise<void> {
@@ -176,7 +176,7 @@
       <div class="optrow">
         <div class="optlabel">
           <span class="k">Start on launch</span>
-          <span class="desc">Autostart the local API when Cairn opens.</span>
+          <span class="desc">Autostart the local API when Forebay opens.</span>
         </div>
         <ToggleSwitch checked={autostart} label="Start on launch" onchange={setAutostart} />
       </div>

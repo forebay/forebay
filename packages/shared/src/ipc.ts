@@ -1,9 +1,9 @@
-﻿import type { CairnAPI } from "./api.js";
+﻿import type { ForebayAPI } from "./api.js";
 
-// Method name (on CairnAPI) to IPC channel string. This is the single source for
+// Method name (on ForebayAPI) to IPC channel string. This is the single source for
 // the request/response surface: the preload builds its bridge from this map, and
 // the main-process allow-list + router derive their channel list from it. Add a
-// channel here (plus its CairnAPI signature and sidecar handler) and every layer
+// channel here (plus its ForebayAPI signature and sidecar handler) and every layer
 // picks it up.
 export const INVOKE_CHANNELS = {
   getConfig: "config:get",
@@ -86,7 +86,7 @@ export const INVOKE_CHANNELS = {
   githubRemoveAccount: "github:remove-account",
   githubConnectGhCli: "github:connect-gh",
   githubSetStar: "github:set-star",
-  githubStarCairn: "github:star-cairn",
+  githubStarForebay: "github:star-forebay",
   githubDeviceStart: "github:device-start",
   githubDevicePoll: "github:device-poll",
   favoritesList: "favorites:list",
@@ -111,13 +111,13 @@ export const IPC_CHANNELS = {
   receive: ["server:status", "downloads:progress", "activity:event", "jobs:event"] as const,
 };
 
-// The methods on CairnAPI that are NOT request/response invocations (window
+// The methods on ForebayAPI that are NOT request/response invocations (window
 // controls, the push subscriptions, and the static flags).
 type NonInvokeMethod = "minimize" | "maximize" | "close" | "onServerStatus" | "onDownloadProgress" | "onActivityEvent" | "onJobEvent" | "isElectron" | "platform";
-type ApiInvokeMethod = Exclude<keyof CairnAPI, NonInvokeMethod>;
+type ApiInvokeMethod = Exclude<keyof ForebayAPI, NonInvokeMethod>;
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
 
-// Compile-time guard: INVOKE_CHANNELS maps exactly CairnAPI's invoke methods, no
+// Compile-time guard: INVOKE_CHANNELS maps exactly ForebayAPI's invoke methods, no
 // more and no less. A drift on either side turns this into `never` and fails the build.
 const _invokeChannelsMatchApi: Exact<InvokeMethod, ApiInvokeMethod> = true;
 void _invokeChannelsMatchApi;

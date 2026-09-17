@@ -2,8 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor, within, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import type { AccountView } from "@cairn/shared";
-import { stubCairn } from "../testing.js";
+import type { AccountView } from "@forebay/shared";
+import { stubForebay } from "../testing.js";
 import { toasts, toast } from "../toast.js";
 import Accounts from "./Accounts.svelte";
 
@@ -61,7 +61,7 @@ describe("Accounts screen", () => {
   it("renders account rows per provider, toggles enable, and removes an account", async () => {
     const accountsEnable = vi.fn(async () => ({ ok: true, data: undefined }) as const);
     const accountsRemove = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
       accountsEnable,
@@ -88,7 +88,7 @@ describe("Accounts screen", () => {
   });
 
   it("shows an inline error when providersList fails", async () => {
-    stubCairn({ providersList: async () => ({ ok: false, error: "boom" }) });
+    stubForebay({ providersList: async () => ({ ok: false, error: "boom" }) });
     const { getByText } = render(Accounts);
     await waitFor(() => expect(getByText(/boom/i)).toBeTruthy());
   });
@@ -98,7 +98,7 @@ describe("Accounts screen", () => {
       .fn()
       .mockResolvedValueOnce({ ok: false, error: "boom" })
       .mockResolvedValueOnce({ ok: true, data: PROVIDERS });
-    stubCairn({
+    stubForebay({
       providersList,
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
     });
@@ -115,7 +115,7 @@ describe("Accounts screen", () => {
   });
 
   it("shows an inline error when accountsList fails for a provider", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async () => ({ ok: false, error: "account store is locked" }),
     });
@@ -135,7 +135,7 @@ describe("Accounts screen", () => {
   }
 
   it("empty search shows every provider as a section", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: TWO_PROVIDERS }),
       accountsList: async (provider) => twoProviderAccounts(provider),
     });
@@ -145,7 +145,7 @@ describe("Accounts screen", () => {
   });
 
   it("search narrows to matching accounts across providers", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: TWO_PROVIDERS }),
       accountsList: async (provider) => twoProviderAccounts(provider),
     });
@@ -169,7 +169,7 @@ describe("Accounts screen", () => {
       enabled: true,
       quota: [],
     }));
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data } : { ok: true, data: [] }),
     });
@@ -186,7 +186,7 @@ describe("Accounts screen", () => {
   });
 
   it("toasts an error when toggling an account fails, without a success toast", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
       accountsEnable: async () => ({ ok: false, error: "toggle boom" }),
@@ -202,7 +202,7 @@ describe("Accounts screen", () => {
   });
 
   it("toasts success when removing an account succeeds", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
       accountsRemove: async () => ({ ok: true, data: undefined }),
@@ -219,7 +219,7 @@ describe("Accounts screen", () => {
   });
 
   it("toasts an error when removing an account fails", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
       accountsRemove: async () => ({ ok: false, error: "remove boom" }),
@@ -237,7 +237,7 @@ describe("Accounts screen", () => {
 
   it("opens the add-account dialog for a provider chosen from the top-level control", async () => {
     const accountsLoginBegin = vi.fn(async () => ({ ok: true, data: { url: "https://x/login", instructions: "" } }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: PROVIDERS }),
       accountsList: async (provider) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }),
       accountsLoginBegin,
@@ -265,7 +265,7 @@ describe("Accounts screen", () => {
     ];
     const accountsLoginBegin = vi.fn(async () => ({ ok: true, data: { url: "https://x/login", instructions: "" } }) as const);
     const accountsList = vi.fn(async (provider: string) => (provider === "stub" ? { ok: true, data: ACCOUNTS } : { ok: true, data: [] }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: providersWithEmpty }),
       accountsList,
       accountsLoginBegin,
@@ -294,7 +294,7 @@ describe("Accounts screen", () => {
 
   it("gives providers sharing one account pool a single section naming both", async () => {
     const accountsList = vi.fn(async () => ({ ok: true, data: ACCOUNTS }) as const);
-    stubCairn({ providersList: async () => ({ ok: true, data: SHARED_POOL }), accountsList });
+    stubForebay({ providersList: async () => ({ ok: true, data: SHARED_POOL }), accountsList });
 
     const { container, findAllByText } = render(Accounts);
     await waitFor(() => expect(groupLabels(container)).toEqual(["Antigravity, Gemini CLI"]));
@@ -305,7 +305,7 @@ describe("Accounts screen", () => {
   });
 
   it("counts a shared pool's accounts once in the summary", async () => {
-    stubCairn({ providersList: async () => ({ ok: true, data: SHARED_POOL }), accountsList: async () => ({ ok: true, data: ACCOUNTS }) });
+    stubForebay({ providersList: async () => ({ ok: true, data: SHARED_POOL }), accountsList: async () => ({ ok: true, data: ACCOUNTS }) });
 
     const { findByText } = render(Accounts);
     expect(await findByText(/across 1 of 1 providers/)).toBeTruthy();
@@ -318,7 +318,7 @@ describe("Accounts screen", () => {
       { ...SHARED_POOL[0], defsError: "Cannot find package '@intisy-ai/basekit/auth'" },
       SHARED_POOL[1],
     ];
-    stubCairn({ providersList: async () => ({ ok: true, data: brokenFirst }), accountsList });
+    stubForebay({ providersList: async () => ({ ok: true, data: brokenFirst }), accountsList });
 
     const { container } = render(Accounts);
     await openGroup(container, "Antigravity, Gemini CLI");
@@ -333,7 +333,7 @@ describe("Accounts screen", () => {
       authKind: "oauth" as const, accountCount: 0, enabled: true, exposure: { claude: true, opencode: true },
     }));
     const accountsList = vi.fn(async () => ({ ok: true, data: [] }) as const);
-    stubCairn({ providersList: async () => ({ ok: true, data: many }), accountsList });
+    stubForebay({ providersList: async () => ({ ok: true, data: many }), accountsList });
 
     const { container } = render(Accounts);
     await waitFor(() => expect(groupHeaders(container).length).toBeGreaterThan(0));
@@ -342,11 +342,11 @@ describe("Accounts screen", () => {
   });
 
   // The usual cause is a plugin that needs repairing, which happens outside this screen.
-  // Holding the failed read meant the error outlived the fix until Cairn restarted.
+  // Holding the failed read meant the error outlived the fix until Forebay restarted.
   it("re-reads a pool whose accounts failed to load rather than holding the error", async () => {
     let fail = true;
     const accountsList = vi.fn(async () => (fail ? { ok: false, error: "stub-auth failed to load" } : { ok: true, data: ACCOUNTS }) as const);
-    stubCairn({ providersList: async () => ({ ok: true, data: PROVIDERS }), accountsList });
+    stubForebay({ providersList: async () => ({ ok: true, data: PROVIDERS }), accountsList });
 
     const { container, findByText, findByRole } = render(Accounts);
     await openGroup(container, "Stub");
@@ -360,7 +360,7 @@ describe("Accounts screen", () => {
   });
 
   it("says why a pool cannot be managed when every lane's bundle failed", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [{ ...SHARED_POOL[0], defsError: "Cannot find package '@intisy-ai/basekit/auth'" }],

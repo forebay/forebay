@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import TestWrapper from "./ImportDialog.test.svelte";
 
 describe("ImportDialog", () => {
   it("shows preview counts and imports only the selected categories", async () => {
     const importRun = vi.fn(async () => ({ ok: true, data: { accounts: 2, providers: 2, routingImported: false, notes: ["done"] } }) as const);
-    stubCairn({
+    stubForebay({
       importPreview: async () => ({ ok: true, data: { accounts: 2, routingSlots: 3, exposedProviders: 4 } }),
       importRun,
     });

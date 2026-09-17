@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { IpcRendererEvent } from "electron";
-import { IPC_CHANNELS, INVOKE_CHANNELS } from "@cairn/shared";
-import type { CairnAPI, Result, ProxyStatus, DownloadProgress, ActivityRecord, Job, InvokeMethod } from "@cairn/shared";
+import { IPC_CHANNELS, INVOKE_CHANNELS } from "@forebay/shared";
+import type { ForebayAPI, Result, ProxyStatus, DownloadProgress, ActivityRecord, Job, InvokeMethod } from "@forebay/shared";
 
 const invokeChannels: readonly string[] = IPC_CHANNELS.invoke;
 const sendChannels: readonly string[] = IPC_CHANNELS.send;
@@ -28,15 +28,15 @@ export function safeOn(channel: string, listener: (...args: unknown[]) => void):
 
 // Every request/response method is the same shape: forward its args positionally to
 // its channel. Build them from the one channel map so the bridge can never drift from
-// the allow-list. CairnAPI (checked against the map at compile time) supplies the types.
-type InvokeApi = Pick<CairnAPI, InvokeMethod>;
+// the allow-list. ForebayAPI (checked against the map at compile time) supplies the types.
+type InvokeApi = Pick<ForebayAPI, InvokeMethod>;
 const invokers = Object.fromEntries(
   (Object.entries(INVOKE_CHANNELS) as [InvokeMethod, string][]).map(
     ([method, channel]) => [method, (...args: unknown[]): Promise<Result<unknown>> => safeInvoke(channel, ...args)],
   ),
 ) as InvokeApi;
 
-const api: CairnAPI = {
+const api: ForebayAPI = {
   ...invokers,
   minimize: () => safeSend("window:minimize"),
   maximize: () => safeSend("window:maximize"),
@@ -49,4 +49,4 @@ const api: CairnAPI = {
   platform: process.platform,
 };
 
-contextBridge.exposeInMainWorld("cairn", api);
+contextBridge.exposeInMainWorld("forebay", api);

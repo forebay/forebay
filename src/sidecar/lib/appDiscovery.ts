@@ -89,7 +89,7 @@ function readInstalledIcon(dir: string, exists: (p: string) => boolean, readFile
   try { return readFile(iconPath); } catch { return undefined; }
 }
 
-// Populates ~/.config/cairn/apps.json from two best-effort sources: the org-scan
+// Populates ~/.config/forebay/apps.json from two best-effort sources: the org-scan
 // catalog's loader manifests (app block + the loader's published icon), and the
 // installed loader clone (a fresher app block when present, and its icon.svg for
 // offline icons). Never throws; each source degrades independently, and an

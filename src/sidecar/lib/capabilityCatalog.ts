@@ -41,8 +41,8 @@ function authenticatedFetchJson(): (url: string) => Promise<unknown> {
     try {
       const response = await fetch(url, {
         headers: token
-          ? { "User-Agent": "cairn", Authorization: `Bearer ${token}` }
-          : { "User-Agent": "cairn" },
+          ? { "User-Agent": "forebay", Authorization: `Bearer ${token}` }
+          : { "User-Agent": "forebay" },
       });
       if (!response.ok) return null;
       return await response.json();

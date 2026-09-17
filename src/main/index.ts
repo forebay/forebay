@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 import { resolveStoreDir } from "./lib/storeDir.js";
+import { migrateLegacySettings } from "./lib/legacySettings.js";
 import { shouldAutostart } from "./lib/autostart.js";
 import { createSupervisor } from "./sidecar/supervisor.js";
 import { registerHandlers } from "./ipc/registerHandlers.js";
@@ -68,7 +69,7 @@ function registerWindowControls(): void {
 function autostartProxyIfConfigured(storeDir: string): void {
   let configured = false;
   try {
-    const raw = readFileSync(join(storeDir, "config", "cairn.json"), "utf8");
+    const raw = readFileSync(join(storeDir, "config", "forebay.json"), "utf8");
     configured = shouldAutostart(JSON.parse(raw));
   } catch {
     configured = false;
@@ -80,7 +81,7 @@ function autostartProxyIfConfigured(storeDir: string): void {
 
 function createTray(): void {
   tray = new Tray(nativeImage.createEmpty());
-  tray.setToolTip("Cairn");
+  tray.setToolTip("Forebay");
   tray.setContextMenu(Menu.buildFromTemplate([{ label: "Quit", click: () => app.quit() }]));
 }
 
@@ -114,6 +115,7 @@ if (!app.requestSingleInstanceLock()) {
     applyContentSecurityPolicy();
 
     const storeDir = resolveStoreDir(process.env, process.platform, homedir());
+    migrateLegacySettings(storeDir);
     supervisor = createSupervisor({
       sidecarPath: join(dirName, "sidecar.js"),
       storeDir,

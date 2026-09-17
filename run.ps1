@@ -1,4 +1,4 @@
-# Launch the Cairn dashboard in dev mode. Handles first-run setup:
+# Launch the Forebay dashboard in dev mode. Handles first-run setup:
 # installs dependencies and re-extracts the Electron binary if its download
 # was left unpacked (a known Windows install quirk).
 $ErrorActionPreference = "Stop"
@@ -26,5 +26,5 @@ if (-not (Test-Path $electron)) {
   }
 }
 
-Write-Host "Starting Cairn..." -ForegroundColor Green
+Write-Host "Starting Forebay..." -ForegroundColor Green
 npm run dev

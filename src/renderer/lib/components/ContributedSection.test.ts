@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
 import { render, fireEvent, waitFor, screen } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
-import type { PluginConfigSchema, PluginSettingsSection } from "@cairn/shared";
+import { stubForebay } from "../testing.js";
+import type { PluginConfigSchema, PluginSettingsSection } from "@forebay/shared";
 import ContributedSection from "./ContributedSection.svelte";
 
 const SCHEMA: PluginConfigSchema = {
@@ -23,14 +23,14 @@ function section(overrides: Partial<PluginSettingsSection> = {}): PluginSettings
 
 describe("ContributedSection", () => {
   it("names the plugin that added it", async () => {
-    stubCairn({ configSchemas: async () => ({ ok: true, data: [SCHEMA] }) });
+    stubForebay({ configSchemas: async () => ({ ok: true, data: [SCHEMA] }) });
     render(ContributedSection, { section: section() });
     expect(await screen.findByText("Added by a-plugin")).toBeInTheDocument();
   });
 
   it("lets the reader pick a home when the same section is offered by several", async () => {
     const asked: string[] = [];
-    stubCairn({ configSchemas: async (home: string) => { asked.push(home); return { ok: true, data: [SCHEMA] }; } });
+    stubForebay({ configSchemas: async (home: string) => { asked.push(home); return { ok: true, data: [SCHEMA] }; } });
     render(ContributedSection, {
       section: section({ homes: ["claude", "opencode"] }),
       homeLabels: { claude: "Claude Code", opencode: "OpenCode" },
@@ -45,7 +45,7 @@ describe("ContributedSection", () => {
   // pick would imply a choice that does not exist.
   it("offers no home choice for a section that spans homes, and writes to all of them", async () => {
     const writes: unknown[][] = [];
-    stubCairn({
+    stubForebay({
       configSchemas: async () => ({ ok: true, data: [SCHEMA] }),
       configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; },
     });
@@ -63,13 +63,13 @@ describe("ContributedSection", () => {
   });
 
   it("says so when the plugin has no schema in the selected home", async () => {
-    stubCairn({ configSchemas: async () => ({ ok: true, data: [] }) });
+    stubForebay({ configSchemas: async () => ({ ok: true, data: [] }) });
     render(ContributedSection, { section: section(), homeLabels: { claude: "Claude Code" } });
     expect(await screen.findByText(/not configurable in Claude Code/)).toBeInTheDocument();
   });
 
   it("reports a failed read instead of rendering an empty frame", async () => {
-    stubCairn({ configSchemas: async () => ({ ok: false, error: "probe exploded" }) });
+    stubForebay({ configSchemas: async () => ({ ok: false, error: "probe exploded" }) });
     render(ContributedSection, { section: section() });
     expect(await screen.findByText(/probe exploded/)).toBeInTheDocument();
   });

@@ -84,7 +84,7 @@ describe("import", () => {
     expect(r.data.every((a) => a.hasConfig === false)).toBe(true);
   });
 
-  it("imports accounts and routing from the app's real home into Cairn's own store", async () => {
+  it("imports accounts and routing from the app's real home into Forebay's own store", async () => {
     deployStubProvider(process.env.HUB_CONFIG_DIR!);
     const appHomeDir = mkdtempSync(join(tmpdir(), "dash-import-app-home-"));
     seedAppHome(appHomeDir);

@@ -1,7 +1,7 @@
 import { getConfigValue } from "@intisy-ai/basekit";
 import { invokeLibraryManagement, readLibraryManagement } from "../lib/pluginManager.js";
 
-const CONFIG_NAME = "cairn";
+const CONFIG_NAME = "forebay";
 const CONFIG_KEY = "pruneUnusedLibraries";
 
 // Uninstalling a plugin leaves the libraries it put in the home's shared store behind. That is

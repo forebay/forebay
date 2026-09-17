@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen, waitFor, within } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import MarketplacesDialog from "./MarketplacesDialog.svelte";
-import type { MarketplaceSource } from "@cairn/shared";
+import type { MarketplaceSource } from "@forebay/shared";
 
 const noop = (): void => {};
 
@@ -13,7 +13,7 @@ const configured: MarketplaceSource[] = [
 ];
 
 function stub(save = vi.fn(async (sources: MarketplaceSource[]) => ({ ok: true, data: sources }) as const)) {
-  stubCairn({
+  stubForebay({
     marketplaceSourcesList: async () => ({ ok: true, data: configured }),
     marketplaceSourcesSave: save,
   });

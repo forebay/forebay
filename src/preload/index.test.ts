@@ -1,13 +1,13 @@
 // @vitest-environment node
 import { describe, it, expect, vi } from "vitest";
-import { INVOKE_CHANNELS } from "@cairn/shared";
-import type { CairnAPI } from "@cairn/shared";
+import { INVOKE_CHANNELS } from "@forebay/shared";
+import type { ForebayAPI } from "@forebay/shared";
 
 const invokeCalls: { channel: string; args: unknown[] }[] = [];
-let exposed: CairnAPI | undefined;
+let exposed: ForebayAPI | undefined;
 
 vi.mock("electron", () => ({
-  contextBridge: { exposeInMainWorld: (_name: string, api: CairnAPI) => { exposed = api; } },
+  contextBridge: { exposeInMainWorld: (_name: string, api: ForebayAPI) => { exposed = api; } },
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => { invokeCalls.push({ channel, args }); return Promise.resolve({ ok: true, data: channel }); },
     send: () => {},

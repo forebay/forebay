@@ -1,4 +1,4 @@
-import type { PluginScreen } from "@cairn/shared";
+import type { PluginScreen } from "@forebay/shared";
 
 export const GALLERY_SCREEN: PluginScreen = {
   plugin: "demo", id: "demo", label: "Demo", glyph: "◆", order: 10, homes: ["claude", "opencode"],

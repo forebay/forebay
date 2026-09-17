@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@intisy/bayonet/schema/plugin.schema.json",
-  "id": "cairn",
+  "id": "forebay",
   "api": 1,
   "repo": {
     "role": "Desktop control dashboard",

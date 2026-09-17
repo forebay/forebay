@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import PluginDetail from "./PluginDetail.svelte";
-import type { UnifiedPlugin } from "@cairn/shared";
+import type { UnifiedPlugin } from "@forebay/shared";
 
 const PLUGIN: UnifiedPlugin = {
   name: "wakatime-sync",
@@ -40,7 +40,7 @@ async function openAvailability(extra: Partial<Record<string, unknown>> = {}) {
 }
 
 function stubVersions(autoUpdate: boolean) {
-  stubCairn({
+  stubForebay({
     pluginVersions: async () => ({
       ok: true,
       data: {
@@ -63,7 +63,7 @@ describe("PluginDetail auto-update control", () => {
   it("sends false when Off is picked", async () => {
     const pluginsSetAutoUpdate = vi.fn(async () => ({ ok: true, data: undefined }) as const);
     stubVersions(true);
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({
         ok: true,
         data: { claude: { kind: "git", label: "v1", updateState: "current", autoUpdate: true, onExperimental: false, experimentalAvailable: null } },
@@ -77,7 +77,7 @@ describe("PluginDetail auto-update control", () => {
 
   it("sends true when On is picked", async () => {
     const pluginsSetAutoUpdate = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({
         ok: true,
         data: { claude: { kind: "git", label: "v1", updateState: "current", autoUpdate: false, onExperimental: false, experimentalAvailable: null } },
@@ -93,7 +93,7 @@ describe("PluginDetail auto-update control", () => {
   // the control showing a state the disk was never moved to.
   it("reverts to the previous selection when the write fails", async () => {
     const pluginsSetAutoUpdate = vi.fn(async () => ({ ok: false, error: "denied" }) as const);
-    stubCairn({
+    stubForebay({
       pluginVersions: async () => ({
         ok: true,
         data: { claude: { kind: "git", label: "v1", updateState: "current", autoUpdate: true, onExperimental: false, experimentalAvailable: null } },

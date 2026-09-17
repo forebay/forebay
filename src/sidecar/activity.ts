@@ -6,9 +6,9 @@ import type { Impact } from "@intisy-ai/basekit";
 import { pluginHomes, homeDir } from "./lib/pluginHomes.js";
 import type { PluginHome, PluginHomeId } from "../../packages/shared/src/domain.js";
 
-const SOURCE = "cairn";
+const SOURCE = "forebay";
 
-export interface CairnActionSpec {
+export interface ForebayActionSpec {
   action: string;
   subject: { kind: string; id: string; label?: string };
   homeId?: string;
@@ -29,7 +29,7 @@ async function targetFor(homeId: string | undefined, homes?: PluginHome[]): Prom
   }
 }
 
-export async function emitCairnAction(spec: CairnActionSpec, homes?: PluginHome[]): Promise<void> {
+export async function emitForebayAction(spec: ForebayActionSpec, homes?: PluginHome[]): Promise<void> {
   try {
     emitEvent({
       topic: spec.topic ?? "plugin.state",

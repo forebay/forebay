@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { PluginConfigSchema } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { PluginConfigSchema } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import ToggleSwitch from "./ToggleSwitch.svelte";
   import SettingRow from "./SettingRow.svelte";
 
@@ -8,13 +8,13 @@
   // showing these controls costs no extra probing of the home's bundles.
   let { homeId, schema }: { homeId: string; schema: PluginConfigSchema | null } = $props();
 
-  type Triggers = { loader: boolean; app: boolean; cairn: boolean };
+  type Triggers = { loader: boolean; app: boolean; forebay: boolean };
 
   const MODES = ["off", "check", "update"];
   const TRIGGER_LABELS: { key: keyof Triggers; label: string }[] = [
     { key: "loader", label: "when the launcher menu opens" },
     { key: "app", label: "when this app starts" },
-    { key: "cairn", label: "when the dashboard starts" },
+    { key: "forebay", label: "when the dashboard starts" },
   ];
 
   let modeOverride = $state<string | null>(null);
@@ -30,9 +30,9 @@
   });
   const storedTriggers = $derived.by((): Triggers => {
     const stored = values.auto_update_triggers;
-    if (!stored || typeof stored !== "object" || Array.isArray(stored)) return { loader: true, app: true, cairn: true };
+    if (!stored || typeof stored !== "object" || Array.isArray(stored)) return { loader: true, app: true, forebay: true };
     const t = stored as Record<string, unknown>;
-    return { loader: t.loader !== false, app: t.app !== false, cairn: t.cairn !== false };
+    return { loader: t.loader !== false, app: t.app !== false, forebay: t.forebay !== false };
   });
 
   // A local override shows the change instantly; the stored value governs until then.
@@ -44,7 +44,7 @@
   async function write(key: string, value: unknown): Promise<void> {
     if (!schema) return;
     try {
-      const result = await cairn.configWrite(homeId, schema.plugin, key, value);
+      const result = await forebay.configWrite(homeId, schema.plugin, key, value);
       if (!result.ok) loadError = result.error;
     } catch (e) {
       loadError = (e as { message?: string }).message ?? String(e);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 import { groupHistory } from "./downloadHistory.js";
 
 function record(overrides: Partial<ActivityRecord> & { app?: string } = {}): ActivityRecord {
@@ -29,13 +29,13 @@ const installed = new Set(["antigravity-auth", "sync-bridge"]);
 describe("groupHistory", () => {
   it("collapses one plugin at one version across homes into a single entry", () => {
     const entries = groupHistory([
-      record({ app: "cairn", ts: 3 }),
+      record({ app: "forebay", ts: 3 }),
       record({ app: "claude", ts: 2 }),
       record({ app: "opencode", ts: 1 }),
     ], { installed });
     expect(entries).toHaveLength(1);
     expect(entries[0]).toMatchObject({ plugin: "antigravity-auth", toVersion: "4c011a5b" });
-    expect(entries[0].homes).toEqual(["cairn", "claude", "opencode"]);
+    expect(entries[0].homes).toEqual(["forebay", "claude", "opencode"]);
   });
 
   // Recent describes where a plugin stands now, so an older version is superseded, not listed.
@@ -50,11 +50,11 @@ describe("groupHistory", () => {
 
   it("lists only the homes that carry the newest version", () => {
     const entries = groupHistory([
-      record({ ts: 3, app: "cairn", details: { version: "newnewne1" } }),
+      record({ ts: 3, app: "forebay", details: { version: "newnewne1" } }),
       record({ ts: 2, app: "claude", details: { version: "newnewne1" } }),
       record({ ts: 1, app: "opencode", details: { version: "oldoldol1" } }),
     ], { installed });
-    expect(entries[0].homes).toEqual(["cairn", "claude"]);
+    expect(entries[0].homes).toEqual(["forebay", "claude"]);
   });
 
   it("reports the newest outcome, so a fresh failure is what the row shows", () => {

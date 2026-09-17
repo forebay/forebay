@@ -136,11 +136,11 @@
   --elev-2: 0 1px 2px rgba(0, 0, 0, .5), 0 18px 50px rgba(0, 0, 0, .6);
 }
 
-/* Cairn logo tokens: edit here to recolor the mark everywhere (geometry lives in packages/shared/src/logo.ts) */
-:root { --cairn-c1: #9a9ea6; --cairn-c2: #7d818a; --cairn-c3: #62666e; --cairn-ring: #2a2c31; --cairn-node: #2a2c31; }
-@media (prefers-color-scheme: dark) { :root { --cairn-c1: #b0b4bc; --cairn-c2: #8d919a; --cairn-c3: #6d717a; --cairn-ring: #eef0f2; --cairn-node: #eef0f2; } }
-:root[data-theme="light"] { --cairn-c1: #9a9ea6; --cairn-c2: #7d818a; --cairn-c3: #62666e; --cairn-ring: #2a2c31; --cairn-node: #2a2c31; }
-:root[data-theme="dark"] { --cairn-c1: #b0b4bc; --cairn-c2: #8d919a; --cairn-c3: #6d717a; --cairn-ring: #eef0f2; --cairn-node: #eef0f2; }
+/* Forebay logo tokens: edit here to recolor the mark everywhere (geometry lives in packages/shared/src/logo.ts) */
+:root { --forebay-c1: #9a9ea6; --forebay-c2: #7d818a; --forebay-c3: #62666e; --forebay-ring: #2a2c31; --forebay-node: #2a2c31; }
+@media (prefers-color-scheme: dark) { :root { --forebay-c1: #b0b4bc; --forebay-c2: #8d919a; --forebay-c3: #6d717a; --forebay-ring: #eef0f2; --forebay-node: #eef0f2; } }
+:root[data-theme="light"] { --forebay-c1: #9a9ea6; --forebay-c2: #7d818a; --forebay-c3: #62666e; --forebay-ring: #2a2c31; --forebay-node: #2a2c31; }
+:root[data-theme="dark"] { --forebay-c1: #b0b4bc; --forebay-c2: #8d919a; --forebay-c3: #6d717a; --forebay-ring: #eef0f2; --forebay-node: #eef0f2; }
 
 * {
   box-sizing: border-box;

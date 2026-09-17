@@ -16,7 +16,7 @@ function account(provider: string, enabled: boolean, remaining: number | null): 
 }
 
 const homes: PluginHome[] = [
-  { id: "cairn", label: "Cairn", dir: "/cairn", present: true, managesPlugins: true },
+  { id: "forebay", label: "Forebay", dir: "/forebay", present: true, managesPlugins: true },
   { id: "claude", label: "Claude", dir: "/claude", present: true, managesPlugins: true },
 ];
 
@@ -24,7 +24,7 @@ const deps = {
   probe: async () => true,
   accounts: () => [account("anthropic", true, 0.9), account("anthropic", false, 0.4), account("google", true, null)],
   homes: async () => homes,
-  pluginsIn: (dir: string) => (dir === "/cairn" ? [{}, {}] : [{}]),
+  pluginsIn: (dir: string) => (dir === "/forebay" ? [{}, {}] : [{}]),
   detect: async () => ({ claude: true, opencode: false }),
   providers: () => [{ provider: "anthropic" }, { provider: "google" }],
 };

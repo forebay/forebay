@@ -8,7 +8,7 @@ import { pathsForHome } from "./storagePaths.js";
 
 // Pinned so the registry lookup behind pathsForHome() cannot read the developer's real apps.json.
 // HUB_APPS_FILE is the one that matters here; it is read live per call, so no reimport is needed.
-const registryHome = mkdtempSync(join(tmpdir(), "cairn-catreg-"));
+const registryHome = mkdtempSync(join(tmpdir(), "forebay-catreg-"));
 process.env.HUB_CONFIG_DIR = registryHome;
 process.env.HUB_APPS_FILE = join(registryHome, "apps.json");
 
@@ -21,7 +21,7 @@ const entry = (id: string, capabilities: string[]) => ({
 // (basekit/loader's readJson, not deps.readFileFn, which only backs a "local" marketplace
 // source). A fixture catalog is staged the same way, at the same path.
 function homeWithCache(entries: ReturnType<typeof entry>[]): string {
-  const home = mkdtempSync(join(tmpdir(), "cairn-cat-"));
+  const home = mkdtempSync(join(tmpdir(), "forebay-cat-"));
   const cacheDir = pathsForHome(home).cache;
   mkdirSync(cacheDir, { recursive: true });
   writeFileSync(join(cacheDir, CATALOG_CACHE_FILE), JSON.stringify({ time: 0, entries }));
@@ -49,7 +49,7 @@ describe("the capability catalog for one home", () => {
   });
 
   it("answers an empty list rather than throwing when every source fails", async () => {
-    const home = mkdtempSync(join(tmpdir(), "cairn-cat-"));
+    const home = mkdtempSync(join(tmpdir(), "forebay-cat-"));
     expect(await catalogEntriesFor(home, { fetchJson: async () => null, now: () => 0 })).toEqual([]);
   });
 });

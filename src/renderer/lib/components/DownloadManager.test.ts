@@ -4,11 +4,11 @@ import { render, fireEvent } from "@testing-library/svelte";
 import { get } from "svelte/store";
 import { router } from "../router.js";
 import { seedTasksForTest, seedJobsForTest, openPanelForTest, resetDownloadsForTest, type DownloadRow } from "../downloads.js";
-import type { Job } from "@cairn/shared";
+import type { Job } from "@forebay/shared";
 
 const cancelled: string[] = [];
 vi.mock("../ipc.js", () => ({
-  cairn: {
+  forebay: {
     jobsCancel: async (id: string) => { cancelled.push(id); return { ok: true, data: true }; },
     jobsClearFinished: async () => ({ ok: true, data: undefined }),
     jobsList: async () => ({ ok: true, data: [] }),

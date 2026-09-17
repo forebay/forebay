@@ -42,7 +42,7 @@ let home: string;
 let prevEnv: string | undefined;
 
 beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), "cairn-jobs-"));
+  home = mkdtempSync(join(tmpdir(), "forebay-jobs-"));
   prevEnv = process.env.HUB_CONFIG_DIR;
   process.env.HUB_CONFIG_DIR = home;
   sent.length = 0;
@@ -57,7 +57,7 @@ afterEach(() => {
 
 function homesIn(root: string) {
   return [
-    { id: "cairn", label: "Cairn", dir: join(root, "cairn"), present: true, managesPlugins: false },
+    { id: "forebay", label: "Forebay", dir: join(root, "forebay"), present: true, managesPlugins: false },
     { id: "app-a", label: "App A", dir: join(root, "app-a"), present: true, managesPlugins: false },
   ];
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ActivityRecord, Impact } from "@cairn/shared";
+  import type { ActivityRecord, Impact } from "@forebay/shared";
   import { humanizeId } from "../util/appLabel.js";
   import Chip from "./Chip.svelte";
   import SearchField from "./SearchField.svelte";

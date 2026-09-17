@@ -79,7 +79,7 @@ async function collect(deps: ContributionsDeps): Promise<Contributions> {
   const sections = new Map<string, PluginSettingsSection>();
 
   for (const home of homes) {
-    if (home.id !== "cairn" && !home.present) continue;
+    if (home.id !== "forebay" && !home.present) continue;
 
     try {
       for (const spec of await screensOf(home.dir, home.id)) {

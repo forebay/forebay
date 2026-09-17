@@ -9,7 +9,7 @@ import { getConfigValue, activityEnv, getAppDescriptor, registerPluginWithApp } 
 import type { ActionResult, ManagedNpmPlugin, ManagedPlugin, PluginManagementCapability, PluginUpdateCache } from "@intisy-ai/basekit";
 import { readPluginManifest } from "../lib/pluginManifest.js";
 import { pluginIdFromClone } from "../lib/capabilityOwner.js";
-import { emitCairnAction } from "../activity.js";
+import { emitForebayAction } from "../activity.js";
 import type { HomePlugins, PluginHome, PluginHomeId, PluginRow, PluginVersion, UpdateState, Result, InstallManyResult, InstallOutcome } from "../../../packages/shared/src/domain.js";
 import { pluginHomes, homeDir, homeById, managerInstalled } from "../lib/pluginHomes.js";
 import { readNamespace, writeCacheMany } from "../lib/cache.js";
@@ -413,7 +413,7 @@ export function pluginsInstall(homeId: PluginHomeId, name: string, url: string, 
     // First event in this dispatch's cause scope, so it becomes the trace root every
     // record the install produces chains back to (activityEnv exports it to the
     // separately-bundled updater as HUB_ACTIVITY_PARENT).
-    await emitCairnAction({
+    await emitForebayAction({
       action: "plugin_install_requested",
       subject: { kind: "plugin", id: name, label: name },
       homeId,
@@ -436,26 +436,26 @@ export function pluginsInstall(homeId: PluginHomeId, name: string, url: string, 
 
     const installPlugin = deps.installPlugin ?? installPluginRepo;
     let autoUpdateDefault = true;
-    const val = getConfigValue("cairn", "autoUpdateDefault");
+    const val = getConfigValue("forebay", "autoUpdateDefault");
     if (typeof val === "boolean") autoUpdateDefault = val;
     report?.("Downloading and building", 40);
     await withAttribution(homeId, async () => {
       await installPlugin(dir, name, url, homeId, report);
       report?.("Registering", 90);
       await (deps.registerPlugin ?? realRegisterPlugin)(dir, name, url, homeId);
-      // register records the entry; the home's default for auto-updates is Cairn's own setting, so
+      // register records the entry; the home's default for auto-updates is Forebay's own setting, so
       // it is applied as a second call rather than smuggled into the contract's register.
       if (!autoUpdateDefault) await (deps.setPluginAutoUpdate ?? realSetPluginAutoUpdate)(dir, name, false, homeId);
     });
 
     // An app loads the manager through its own config, so a clone alone would leave a
     // manager that is installed but never runs.
-    if ((await isPluginManager(name, dir)) && homeId !== "cairn") {
+    if ((await isPluginManager(name, dir)) && homeId !== "forebay") {
       report?.("Registering with the app", 93);
       await (deps.registerWithApp ?? realRegisterWithApp)(dir, homeId, name);
     }
 
-    if (homeId !== "cairn") {
+    if (homeId !== "forebay") {
       report?.("Syncing to other apps", 95);
       const syncPluginsAcrossApps = deps.syncPluginsAcrossApps ?? realSyncPluginsAcrossApps;
       await syncPluginsAcrossApps(dir, homeId);
@@ -484,7 +484,7 @@ export function pluginsSetEnabled(homeId: PluginHomeId, name: string, on: boolea
     const result = await (deps.setPluginEnabled ?? realSetPluginEnabled)(dir, name, on, homeId);
     if (result === null) throw new Error(`nothing manages the plugins of ${homeId}`);
     if (!result) throw new Error(`plugin not found: ${name}`);
-    await emitCairnAction({
+    await emitForebayAction({
       action: on ? "plugin_enabled" : "plugin_disabled",
       subject: { kind: "plugin", id: name, label: name },
       homeId,
@@ -500,7 +500,7 @@ export function pluginsSetAutoUpdate(homeId: PluginHomeId, name: string, on: boo
     const result = await (deps.setPluginAutoUpdate ?? realSetPluginAutoUpdate)(dir, name, on, homeId);
     if (result === null) throw new Error(`nothing manages the plugins of ${homeId}`);
     if (!result) throw new Error(`plugin not found: ${name}`);
-    await emitCairnAction({
+    await emitForebayAction({
       action: "plugin_autoupdate_changed",
       subject: { kind: "plugin", id: name, label: name },
       homeId,
@@ -517,7 +517,7 @@ export function pluginsSetChannel(homeId: PluginHomeId, name: string, channel: P
     const result = await setChannel(dir, name, channel, homeId);
     if (result === null) throw new Error(`nothing manages the plugins of ${homeId}`);
     if (!result) throw new Error(`plugin not found: ${name}`);
-    await emitCairnAction({
+    await emitForebayAction({
       action: "plugin_channel_changed",
       subject: { kind: "plugin", id: name, label: name },
       homeId,

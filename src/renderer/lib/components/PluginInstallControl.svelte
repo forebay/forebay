@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { UnifiedPlugin } from "@cairn/shared";
+  import type { UnifiedPlugin } from "@forebay/shared";
   import type { DownloadRow } from "../downloads.js";
   import SplitButton from "./SplitButton.svelte";
 

@@ -2,7 +2,7 @@
   import type { Snippet } from "svelte";
 
   // One setting: its name and what it does on the left, the control on the right. Every
-  // settings surface uses this so a plugin's controls sit on the same rhythm as Cairn's own.
+  // settings surface uses this so a plugin's controls sit on the same rhythm as Forebay's own.
   let {
     name,
     description = "",

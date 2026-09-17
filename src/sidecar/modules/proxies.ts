@@ -26,5 +26,5 @@ export function proxiesList(deps: ProxiesDeps = {}): Promise<Result<ProxyView[]>
 
 export function proxiesSetEnabled(name: string, on: boolean, deps: ProxiesDeps = {}): Promise<Result<void>> {
   const setEnabled = deps.pluginsSetEnabled ?? realPluginsSetEnabled;
-  return setEnabled("cairn", name, on);
+  return setEnabled("forebay", name, on);
 }

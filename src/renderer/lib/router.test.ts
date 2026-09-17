@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { get } from "svelte/store";
 import { router, navigate, consumeParams, back, forward, nav, SCREENS, pluginScreen, pluginOfScreen, setPluginScreens } from "./router.js";
-import type { PluginScreen } from "@cairn/shared";
+import type { PluginScreen } from "@forebay/shared";
 
 function screen(plugin: string, label: string): PluginScreen {
   return { plugin, id: "main", label, homes: ["claude"], layout: { kind: "text" } };
@@ -126,7 +126,7 @@ describe("plugin-contributed screens", () => {
     expect(pluginOfScreen(get(router).screen)).toEqual({ plugin: "config-ledger", screenId: "main" });
   });
 
-  it("reports no plugin for one of Cairn's own screens", () => {
+  it("reports no plugin for one of Forebay's own screens", () => {
     expect(pluginOfScreen("settings")).toBeNull();
   });
 

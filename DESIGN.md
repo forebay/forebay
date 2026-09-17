@@ -1,4 +1,4 @@
-# Cairn visual direction
+# Forebay visual direction
 
 What the UI is trying to look like, stated in numbers so a screen can be checked against it
 instead of argued about. The scale itself lives in `src/renderer/app.css`; this file says how to
@@ -7,14 +7,14 @@ use it.
 ## Seeing the UI before shipping it
 
 `npm run gallery` opens a dev-only page rendering every component in every state against fixture
-data (real components, real `app.css`, stubbed `window.cairn`, no sidecar). `npm run gallery:shots`
+data (real components, real `app.css`, stubbed `window.forebay`, no sidecar). `npm run gallery:shots`
 builds it and writes one image per section, theme and width to `out/gallery-shots/`, which is how
 a change gets looked at rather than imagined. The `screens` section renders the real Plugins and
 Apps routes against fixtures, so a layout change can be judged on the actual screen.
 
 ## Density
 
-Cairn is an operator console: many rows on screen beats generous whitespace.
+Forebay is an operator console: many rows on screen beats generous whitespace.
 
 - **Row**: `12px` vertical, `18px` horizontal padding, `14px` between cells. A row with one line
   of title plus a subtitle lands at roughly 62-66px, which is the number `ROW_HEIGHT` and the

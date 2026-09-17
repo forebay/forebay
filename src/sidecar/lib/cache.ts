@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { getConfigDir } from "@intisy-ai/basekit/auth";
 import { cacheDir } from "./storagePaths.js";
 
-// A generic, persistent, namespaced key/value cache for anything Cairn wants to
+// A generic, persistent, namespaced key/value cache for anything Forebay wants to
 // show instantly on load and refresh in the background: plugin versions, repo
 // stars/readmes, and whatever comes next. Entries are opaque JSON keyed by
 // (namespace, key); callers own the shape. Best-effort: a read or write failure
@@ -16,7 +16,7 @@ type CacheFile = Record<string, Record<string, CacheEntry<unknown>>>;
 const memory = new Map<string, CacheFile>();
 
 function cachePath(configDir: string): string {
-  return join(cacheDir(configDir), "cairn-cache.json");
+  return join(cacheDir(configDir), "forebay-cache.json");
 }
 
 function load(configDir: string): CacheFile {

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { CatalogKind, RepoRef, Result } from "@cairn/shared";
-  import { parseRepoRef, classifyRepoName } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { CatalogKind, RepoRef, Result } from "@forebay/shared";
+  import { parseRepoRef, classifyRepoName } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { track } from "../downloads.js";
   import Button from "./Button.svelte";
   import { fadeMotion, flyMotion } from "../util/motion.js";
@@ -34,7 +34,7 @@
   }
 
   function defaultInstall(repo: RepoRef): Promise<Result<unknown>> {
-    return track(`Install ${repo.repo}`, home, () => cairn.pluginsInstall(home, repo.repo, repo.url));
+    return track(`Install ${repo.repo}`, home, () => forebay.pluginsInstall(home, repo.repo, repo.url));
   }
 
   async function handleInstall(): Promise<void> {

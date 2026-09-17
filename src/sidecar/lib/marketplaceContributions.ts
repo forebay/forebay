@@ -59,7 +59,7 @@ function contributionsFrom(raw: unknown, plugin: string): MarketplaceContributio
 // A contribution states a MATCH, never a list of entries. That is what keeps it dynamic: a
 // translator published tomorrow carries the topic the category matches and appears with no
 // change to the plugin that declared the category, and no plugin code runs when the
-// marketplace opens. Cairn holds no plugin identity of its own either way; it renders
+// marketplace opens. Forebay holds no plugin identity of its own either way; it renders
 // whatever the installed manifests declare.
 export function readMarketplaceContributions(deps: ContributionDeps = {}): MarketplaceContribution[] {
   const dir = deps.reposDir;

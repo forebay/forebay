@@ -1,7 +1,7 @@
 <script lang="ts">
   import AddPluginDialog from "./AddPluginDialog.svelte";
 
-  export let home = "cairn";
+  export let home = "forebay";
   export let closed = 0;
   export let installed = 0;
 </script>

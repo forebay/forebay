@@ -1,4 +1,4 @@
-﻿import type { AccountQuota, AccountView, ActivityRecord, CairnAPI, HomePlugins, HostApp, PluginConfigSchema, PluginHome, ProviderRow, UnifiedPlugin } from "@cairn/shared";
+﻿import type { AccountQuota, AccountView, ActivityRecord, ForebayAPI, HomePlugins, HostApp, PluginConfigSchema, PluginHome, ProviderRow, UnifiedPlugin } from "@forebay/shared";
 
 export const HOST_APPS: HostApp[] = [
   { id: "alpha", label: "Alpha" },
@@ -97,16 +97,16 @@ export const ACTIVITY: ActivityRecord[] = [
     subject: { kind: "plugin", id: "antigravity-auth", label: "antigravity-auth" },
     details: { url: "https://example/antigravity-auth", message: "Installed antigravity-auth into Alpha" },
     text: "Installed antigravity-auth into Alpha",
-    origin: { app: "alpha", home: "/home/alpha", entry: "cairn" },
+    origin: { app: "alpha", home: "/home/alpha", entry: "forebay" },
     cause: { kind: "user", surface: "plugins" }, trace: { id: "trace-1" }, outcome: "ok", durationMs: 8400,
   },
   {
     id: "act-2", ts: Date.parse("2026-08-10T11:58:00Z"), home: "/home/alpha", topic: "provider.state",
-    action: "provider_enabled", actor: "user", impact: "info", source: "cairn",
+    action: "provider_enabled", actor: "user", impact: "info", source: "forebay",
     subject: { kind: "provider", id: "antigravity", label: "Antigravity" },
     details: { message: "Enabled antigravity everywhere" },
     text: "Enabled antigravity everywhere",
-    origin: { app: "alpha", home: "/home/alpha", entry: "cairn" },
+    origin: { app: "alpha", home: "/home/alpha", entry: "forebay" },
     cause: { kind: "user", surface: "providers" }, trace: { id: "trace-2" },
     changes: [{ key: "exposure.alpha", from: false, to: true }, { key: "apiKey", redacted: true }],
   },
@@ -191,7 +191,7 @@ export const PLUGIN_DETAIL_HOMES = [
 ];
 
 // Enough of the API for the real screens to render populated in the gallery.
-export function screenFixtures(): Partial<CairnAPI> {
+export function screenFixtures(): Partial<ForebayAPI> {
   return {
     activityRead: async () => ({ ok: true, data: { records: ACTIVITY, nextCursor: undefined } }),
     marketplaceSourcesList: async () => ({
@@ -226,7 +226,7 @@ export function screenFixtures(): Partial<CairnAPI> {
     // "system" and repaint the gallery in whatever the host prefers, ruining the light shot.
     getConfig: async (name: string, key: string) => ({
       ok: true,
-      data: name === "cairn" && key === "theme" ? document.documentElement.dataset.theme ?? "system" : undefined,
+      data: name === "forebay" && key === "theme" ? document.documentElement.dataset.theme ?? "system" : undefined,
     }),
     settingsSections: async () => ({ ok: true, data: [CONTRIBUTED_SECTION] }),
     configSchemas: async () => ({ ok: true, data: [CONTRIBUTED_SCHEMA] }),

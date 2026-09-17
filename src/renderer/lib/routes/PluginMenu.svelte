@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import type { PluginScreen } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { PluginScreen } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import PageHeader from "../components/PageHeader.svelte";
   import Card from "../components/Card.svelte";
   import ErrorState from "../components/ErrorState.svelte";
@@ -20,7 +20,7 @@
   let busy = $state(false);
 
   async function loadScreen(): Promise<void> {
-    const [screens, sections] = await Promise.all([cairn.screensList(), cairn.pluginsList()]);
+    const [screens, sections] = await Promise.all([forebay.screensList(), forebay.pluginsList()]);
     if (!screens.ok) { loadError = screens.error; loaded = true; return; }
     spec = screens.data.find((s) => s.plugin === plugin && s.id === screenId) ?? null;
     homeId = spec?.homes[0] ?? "";
@@ -31,7 +31,7 @@
   async function loadData(): Promise<void> {
     if (!spec || !homeId) return;
     const requestedHome = homeId;
-    const result = await cairn.screenData(plugin, screenId, homeId);
+    const result = await forebay.screenData(plugin, screenId, homeId);
     if (requestedHome !== homeId) return;
     if (!result.ok) { loadError = result.error; return; }
     loadError = "";
@@ -42,7 +42,7 @@
     if (busy) return;
     busy = true;
     try {
-      const result = await cairn.screenInvoke(plugin, screenId, actionId, homeId, args);
+      const result = await forebay.screenInvoke(plugin, screenId, actionId, homeId, args);
       if (!result.ok) { loadError = result.error; return; }
       notice = result.data.message ?? "";
       if (result.data.refresh) await loadData();
@@ -68,7 +68,7 @@
   async function follow(): Promise<void> {
     const prefixes = spec?.refreshOn ?? [];
     if (!prefixes.length) return;
-    const events = await cairn.busDrain();
+    const events = await forebay.busDrain();
     if (events.ok && events.data.some((e) => prefixes.some((p) => e.topic.startsWith(p)))) await loadData();
   }
 

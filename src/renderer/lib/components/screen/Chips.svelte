@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode } from "@cairn/shared";
+  import type { ScreenNode } from "@forebay/shared";
   import Chip from "../Chip.svelte";
   import EmptyState from "../EmptyState.svelte";
   import type { ScreenContext } from "./context.js";

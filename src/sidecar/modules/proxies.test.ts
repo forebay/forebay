@@ -32,11 +32,11 @@ describe("proxiesList", () => {
 });
 
 describe("proxiesSetEnabled", () => {
-  it("delegates to the injected pluginsSetEnabled scoped to the cairn home", async () => {
+  it("delegates to the injected pluginsSetEnabled scoped to the forebay home", async () => {
     const pluginsSetEnabled = vi.fn(async () => ({ ok: true as const, data: undefined }));
     const result = await proxiesSetEnabled("some-proxy", false, { pluginsSetEnabled });
     expect(result.ok).toBe(true);
-    expect(pluginsSetEnabled).toHaveBeenCalledWith("cairn", "some-proxy", false);
+    expect(pluginsSetEnabled).toHaveBeenCalledWith("forebay", "some-proxy", false);
   });
 
   it("surfaces an error result from pluginsSetEnabled", async () => {

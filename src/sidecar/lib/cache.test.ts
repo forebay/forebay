@@ -8,7 +8,7 @@ let dir: string;
 
 beforeEach(() => {
   resetCacheForTests();
-  dir = mkdtempSync(join(tmpdir(), "cairn-cache-"));
+  dir = mkdtempSync(join(tmpdir(), "forebay-cache-"));
 });
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true });

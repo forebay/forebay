@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import ActivityDetailDialog from "./ActivityDetailDialog.svelte";
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 
 function record(overrides: Partial<ActivityRecord> = {}): ActivityRecord {
   return {

@@ -6,7 +6,7 @@ function home(id: string, label: string, overrides: Partial<PluginHome> = {}): P
   return { id, label, dir: `/${id}`, present: true, managesPlugins: true, ...overrides };
 }
 
-const HOMES = [home("cairn", "Cairn"), home("claude", "Claude Code"), home("opencode", "OpenCode", { present: false })];
+const HOMES = [home("forebay", "Forebay"), home("claude", "Claude Code"), home("opencode", "OpenCode", { present: false })];
 
 describe("pluginsData", () => {
   it("reports what the plugin left in each home, leaving out the homes holding nothing", async () => {
@@ -29,7 +29,7 @@ describe("pluginsData", () => {
       declaredPaths: () => [],
       read: async (dir) => { asked.push(dir); return []; },
     });
-    expect(asked).toEqual(["/cairn", "/claude"]);
+    expect(asked).toEqual(["/forebay", "/claude"]);
   });
 
   // The declaration lives in the deployed sidecar, so it has to be read while the plugin is
@@ -41,7 +41,7 @@ describe("pluginsData", () => {
       declaredPaths: () => ["state/mirror"],
       read,
     });
-    expect(read).toHaveBeenCalledWith("/cairn", "sync-bridge", ["state/mirror"], "cairn");
+    expect(read).toHaveBeenCalledWith("/forebay", "sync-bridge", ["state/mirror"], "forebay");
   });
 });
 

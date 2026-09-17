@@ -16,19 +16,19 @@ describe("resolveLocalApiPort", () => {
   });
 
   it("returns a configured numeric port", () => {
-    store["cairn:localApiPort"] = 40000;
+    store["forebay:localApiPort"] = 40000;
     expect(resolveLocalApiPort()).toBe(40000);
   });
 
   it("coerces a numeric string", () => {
-    store["cairn:localApiPort"] = "8080";
+    store["forebay:localApiPort"] = "8080";
     expect(resolveLocalApiPort()).toBe(8080);
   });
 
   it("rejects an out-of-range or non-numeric value", () => {
-    store["cairn:localApiPort"] = 70000;
+    store["forebay:localApiPort"] = 70000;
     expect(resolveLocalApiPort()).toBe(PROXY_PORT);
-    store["cairn:localApiPort"] = "not-a-port";
+    store["forebay:localApiPort"] = "not-a-port";
     expect(resolveLocalApiPort()).toBe(PROXY_PORT);
   });
 });

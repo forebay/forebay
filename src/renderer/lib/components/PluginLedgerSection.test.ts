@@ -51,14 +51,14 @@ describe("PluginLedgerSection", () => {
       groups: [{ home: { id: "opencode-runtime", label: "OpenCode", dir: "/o", present: true, managesPlugins: true }, rows: [row] }],
       plugin: "historian",
       quarantine: [{
-        homeId: "cairn-desktop", homeLabel: "Cairn",
+        homeId: "forebay-desktop", homeLabel: "Forebay",
         pluginId: "historian", detail: "historian is installed but the version in this home declares no plugin manifest",
         fix: "reinstall it from a channel that provides one, or wait for a release that does",
       }],
     });
     expect(screen.getByText("OpenCode")).toBeInTheDocument();
     expect(screen.getByText("historian:history")).toBeInTheDocument();
-    expect(screen.getByText("Cairn")).toBeInTheDocument();
+    expect(screen.getByText("Forebay")).toBeInTheDocument();
     expect(screen.getByText("historian is installed but the version in this home declares no plugin manifest")).toBeInTheDocument();
     expect(screen.getByText("reinstall it from a channel that provides one, or wait for a release that does")).toBeInTheDocument();
     expect(screen.queryByText(/not loaded in any home/i)).toBeNull();
@@ -69,11 +69,11 @@ describe("PluginLedgerSection", () => {
       groups: [],
       plugin: "historian",
       quarantine: [{
-        homeId: "cairn-desktop", homeLabel: "Cairn",
+        homeId: "forebay-desktop", homeLabel: "Forebay",
         pluginId: "some-other-plugin", detail: "irrelevant", fix: "irrelevant",
       }],
     });
     expect(screen.getByText(/not loaded in any home/i)).toBeInTheDocument();
-    expect(screen.queryByText("Cairn")).toBeNull();
+    expect(screen.queryByText("Forebay")).toBeNull();
   });
 });

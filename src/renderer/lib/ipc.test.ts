@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, waitFor } from "@testing-library/svelte";
-import { INVOKE_CHANNELS, isReadOnlyChannel } from "@cairn/shared";
-import { stubCairn, defaultCairn } from "./testing.js";
-import { cairn, classify, classifiedReadNames, type IpcKind } from "./ipc.js";
+import { INVOKE_CHANNELS, isReadOnlyChannel } from "@forebay/shared";
+import { stubForebay, defaultForebay } from "./testing.js";
+import { forebay, classify, classifiedReadNames, type IpcKind } from "./ipc.js";
 import Overview from "./routes/Overview.svelte";
 
-// Every CairnAPI method, by how the proxy must treat it. A method absent here, or
+// Every ForebayAPI method, by how the proxy must treat it. A method absent here, or
 // classified differently by ipc.ts, fails the drift test below: an unclassified read
 // falls through to the mutation branch and silently wipes every screen's cache.
 const EXPECTED: Record<string, IpcKind> = {
@@ -42,14 +42,14 @@ const EXPECTED: Record<string, IpcKind> = {
   configAction: "mutation", screenInvoke: "mutation", busDrain: "mutation",
   updatesCheck: "mutation", updatesOne: "mutation", updatesAll: "mutation", importRun: "mutation",
   githubAddAccount: "mutation", githubSwitchAccount: "mutation", githubRemoveAccount: "mutation",
-  githubConnectGhCli: "mutation", githubSetStar: "mutation", githubStarCairn: "mutation",
+  githubConnectGhCli: "mutation", githubSetStar: "mutation", githubStarForebay: "mutation",
   githubDeviceStart: "mutation", githubDevicePoll: "mutation", favoritesToggle: "mutation",
   marketplaceSourcesSave: "mutation", customEndpointsUpsert: "mutation",
   customEndpointsRemove: "mutation", customEndpointsSaveKey: "mutation",
 };
 
-describe("cairn proxy", () => {
-  it("reads window.cairn lazily, so a stub installed after import still resolves", async () => {
+describe("forebay proxy", () => {
+  it("reads window.forebay lazily, so a stub installed after import still resolves", async () => {
     const data = {
       providersConnected: 3,
       accountsTotal: 5,
@@ -60,14 +60,14 @@ describe("cairn proxy", () => {
       serverRunning: true,
       serverPort: 34567,
     };
-    stubCairn({ overviewSummary: async () => ({ ok: true, data }) });
+    stubForebay({ overviewSummary: async () => ({ ok: true, data }) });
 
-    const result = await cairn.overviewSummary();
+    const result = await forebay.overviewSummary();
     expect(result).toEqual({ ok: true, data });
   });
 
-  it("lets a component that imported { cairn } before the stub see the stubbed value", async () => {
-    stubCairn({
+  it("lets a component that imported { forebay } before the stub see the stubbed value", async () => {
+    stubForebay({
       overviewSummary: async () => ({
         ok: true,
         data: {
@@ -93,18 +93,18 @@ describe("cairn proxy", () => {
 });
 
 describe("method classification", () => {
-  const methods = Object.entries(defaultCairn())
+  const methods = Object.entries(defaultForebay())
     .filter(([, value]) => typeof value === "function")
     .map(([name]) => name);
 
-  it("classifies every CairnAPI method deliberately", () => {
+  it("classifies every ForebayAPI method deliberately", () => {
     const unclassified = methods.filter((name) => !(name in EXPECTED));
     expect(unclassified).toEqual([]);
     expect(Object.keys(EXPECTED).filter((name) => !methods.includes(name))).toEqual([]);
     for (const name of methods) expect([name, classify(name)]).toEqual([name, EXPECTED[name]]);
   });
 
-  it("maps every cached or live read to a real invoke channel, so window.cairn[name] is never silently undefined", () => {
+  it("maps every cached or live read to a real invoke channel, so window.forebay[name] is never silently undefined", () => {
     const orphaned = classifiedReadNames().filter((name) => !(name in INVOKE_CHANNELS));
     expect(orphaned).toEqual([]);
   });
@@ -117,39 +117,39 @@ describe("method classification", () => {
 
   it("keeps another screen's cached read across a live read", async () => {
     const appsList = vi.fn(async () => ({ ok: true as const, data: [] }));
-    stubCairn({ appsList });
+    stubForebay({ appsList });
 
-    await cairn.appsList();
-    await cairn.jobsList();
-    await cairn.appsList();
+    await forebay.appsList();
+    await forebay.jobsList();
+    await forebay.appsList();
 
     expect(appsList).toHaveBeenCalledTimes(1);
   });
 
   it("drops it across a mutation", async () => {
     const appsList = vi.fn(async () => ({ ok: true as const, data: [] }));
-    stubCairn({ appsList });
+    stubForebay({ appsList });
 
-    await cairn.appsList();
-    await cairn.proxyStart();
-    await cairn.appsList();
+    await forebay.appsList();
+    await forebay.proxyStart();
+    await forebay.appsList();
 
     expect(appsList).toHaveBeenCalledTimes(2);
   });
 
   it("sends a repeated storage write through rather than answering it from the cache", async () => {
     const appStorageSet = vi.fn(async () => ({ ok: true as const, data: { names: { repos: "r", plugin: "p", cache: "c", config: "cfg" }, moves: [] } }));
-    stubCairn({ appStorageSet });
+    stubForebay({ appStorageSet });
 
     const names = { repos: "r", plugin: "p", cache: "c", config: "cfg" };
-    await cairn.appStorageSet("claude", names);
-    await cairn.appStorageSet("claude", names);
+    await forebay.appStorageSet("claude", names);
+    await forebay.appStorageSet("claude", names);
 
     expect(appStorageSet).toHaveBeenCalledTimes(2);
   });
 
   it("returns a subscription's unsubscribe function, not a promise of one", () => {
-    stubCairn();
-    expect(typeof cairn.onJobEvent(() => {})).toBe("function");
+    stubForebay();
+    expect(typeof forebay.onJobEvent(() => {})).toBe("function");
   });
 });

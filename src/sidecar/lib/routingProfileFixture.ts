@@ -1,4 +1,4 @@
-// Test-only fixture. Cairn's no-hardcoded-apps rule holds in tests too: exercising
+// Test-only fixture. Forebay's no-hardcoded-apps rule holds in tests too: exercising
 // routing/model-map logic must not import a specific app-proxy's RoutingProfile
 // (e.g. claude-code-proxy's anthropicProfile). This is a synthetic, generic profile
 // carrying just enough shape for the routing/model-map code paths under test.

@@ -3,7 +3,7 @@ import { enginesList, ensureEngineIn, pluginOwningCapability } from "./engines.j
 import type { PluginHome } from "../../../packages/shared/src/domain.js";
 
 const homes: PluginHome[] = [
-  { id: "cairn", label: "Cairn", dir: "/homes/cairn", present: true, managesPlugins: true },
+  { id: "forebay", label: "Forebay", dir: "/homes/forebay", present: true, managesPlugins: true },
   { id: "app-a", label: "App A", dir: "/homes/a", present: true, managesPlugins: true },
 ];
 
@@ -25,7 +25,7 @@ describe("enginesList", () => {
     expect(history?.id).toBe("historian");
     expect(history?.url).toBe("https://example/historian");
     expect(history?.homes["app-a"]).toEqual({ installed: true, enabled: true });
-    expect(history?.homes.cairn).toEqual({ installed: false, enabled: false });
+    expect(history?.homes.forebay).toEqual({ installed: false, enabled: false });
   });
 
   it("enumerates no capability of its own: an unknown one from the catalog is listed too", async () => {
@@ -48,7 +48,7 @@ describe("enginesList", () => {
   // reading only one, since every home would then answer with the same catalog either way.
   it("unions catalog entries across homes rather than reading only one", async () => {
     const perHome: Record<string, typeof catalog> = {
-      "/homes/cairn": [catalog[0]],
+      "/homes/forebay": [catalog[0]],
       "/homes/a": [catalog[1]],
     };
     const result = await enginesList({

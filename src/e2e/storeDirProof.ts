@@ -2,7 +2,7 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /**
- * Counts files under a directory, recursively. Used to prove Cairn actually wrote
+ * Counts files under a directory, recursively. Used to prove Forebay actually wrote
  * into the sandboxed store dir, rather than merely having it configured.
  */
 export function countFilesUnder(dir: string): number {

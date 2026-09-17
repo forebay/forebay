@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode, ItemShape } from "@cairn/shared";
+  import type { ScreenNode, ItemShape } from "@forebay/shared";
   import ItemList from "../ItemList.svelte";
   import ItemBox from "../ItemBox.svelte";
   import ActionButton from "./ActionButton.svelte";
@@ -13,7 +13,7 @@
   const rows = $derived(Array.isArray(ctx.sources[node.source as string]) ? (ctx.sources[node.source as string] as Row[]) : []);
   const shape = $derived((node.item ?? {}) as Partial<ItemShape>);
   const rowActions = $derived(Array.isArray(node.rowActions) ? (node.rowActions as string[]) : []);
-  // A screen names its own long lists rather than Cairn guessing from row count, since a
+  // A screen names its own long lists rather than Forebay guessing from row count, since a
   // plugin knows which of its lists can grow unbounded.
   const virtualizeAfter = $derived(node.virtual === true ? 0 : 40);
 

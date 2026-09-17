@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { AppPathNames, AppStorage } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { AppPathNames, AppStorage } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import Button from "./Button.svelte";
   import Spinner from "./Spinner.svelte";
@@ -28,7 +28,7 @@
   });
 
   async function load(): Promise<void> {
-    const result = await cairn.appStorageGet(app);
+    const result = await forebay.appStorageGet(app);
     if (!result.ok) return;
     storage = result.data;
     draft = { ...result.data.names };
@@ -52,7 +52,7 @@
     if (!draft || busy) return;
     busy = true;
     saveError = "";
-    const result = await cairn.appStorageSet(app, { ...draft });
+    const result = await forebay.appStorageSet(app, { ...draft });
     busy = false;
     if (!result.ok) {
       saveError = result.error;

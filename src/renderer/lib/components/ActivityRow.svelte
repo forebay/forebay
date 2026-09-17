@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ActivityRecord, Impact } from "@cairn/shared";
-  import { formatDuration } from "@cairn/shared";
+  import type { ActivityRecord, Impact } from "@forebay/shared";
+  import { formatDuration } from "@forebay/shared";
   import { humanizeId } from "../util/appLabel.js";
   import { relativeTime } from "../util/time.js";
 

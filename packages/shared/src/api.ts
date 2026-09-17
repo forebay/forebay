@@ -1,5 +1,5 @@
 ﻿import type { Result, OverviewSummary, AccountView, ProviderRow, ProxyStatus, ProxyView, RoutingState, RoutingApp, Chain, AppPresence, HostApp, AppConnection, RepoMeta, CliResult, HomePlugins, HomeLibraries, HomePluginData, AppStorage, AppStorageResult, AppPathNames, PluginVersion, UsageSnapshot, ImportableApp, ImportSummary, ImportPreview, ImportSelection, CatalogResult, MarketplaceSource, AppSummary, PluginConfigSchema, PluginScreen, ScreenData, InvokeResult, PluginSettingsSection, CustomEndpoint, CustomEndpointView, InstallManyResult, DownloadProgress, BusEvent, EngineView, LoginBegin, LoginComplete, GithubStatus, ActivityRecord, ActivityQuery, ActivityStats, FieldSpec, Job, JobKind, HomeLedger, QuarantineView } from "./domain.js";
-export interface CairnAPI {
+export interface ForebayAPI {
   getConfig(name: string, key: string): Promise<Result<unknown>>;
   setConfig(name: string, key: string, value: unknown): Promise<Result<void>>;
   overviewSummary(): Promise<Result<OverviewSummary>>;
@@ -80,7 +80,7 @@ export interface CairnAPI {
   githubRemoveAccount(login: string): Promise<Result<void>>;
   githubConnectGhCli(star: boolean): Promise<Result<{ login: string }>>;
   githubSetStar(url: string, starred: boolean): Promise<Result<void>>;
-  githubStarCairn(): Promise<Result<void>>;
+  githubStarForebay(): Promise<Result<void>>;
   githubDeviceStart(): Promise<Result<{ userCode: string; verificationUri: string; intervalSeconds: number }>>;
   githubDevicePoll(star: boolean): Promise<Result<{ status: string; login?: string; message?: string; intervalSeconds?: number }>>;
   favoritesList(): Promise<Result<string[]>>;

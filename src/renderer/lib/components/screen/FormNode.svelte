@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode, FieldSpec, FieldType } from "@cairn/shared";
+  import type { ScreenNode, FieldSpec, FieldType } from "@forebay/shared";
   import SettingRow from "../SettingRow.svelte";
   import ToggleSwitch from "../ToggleSwitch.svelte";
   import Button from "../Button.svelte";

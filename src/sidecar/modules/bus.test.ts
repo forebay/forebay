@@ -10,7 +10,7 @@ describe("sidecar bus module", () => {
   it("drains present home buses and maps envelopes to BusEvent", async () => {
     let seenHomes: string[] = [];
     const res = await busDrain({
-      homes: async () => [home("cairn", "/cairn"), home("claude", "/c"), home("opencode", "/o", false)],
+      homes: async () => [home("forebay", "/forebay"), home("claude", "/c"), home("opencode", "/o", false)],
       drain: (homes, _id, handler) => {
         seenHomes = homes;
         handler({ v: 1, id: "1", ts: 111, topic: "config.snapshot", source: "config-ledger", payload: { reason: "manual" } });
@@ -19,7 +19,7 @@ describe("sidecar bus module", () => {
     });
     expect(res.ok).toBe(true);
     if (!res.ok) return;
-    expect(seenHomes).toEqual(["/cairn", "/c"]); // absent opencode excluded
+    expect(seenHomes).toEqual(["/forebay", "/c"]); // absent opencode excluded
     expect(res.data).toEqual([{ topic: "config.snapshot", source: "config-ledger", ts: 111, payload: { reason: "manual" } }]);
   });
 });

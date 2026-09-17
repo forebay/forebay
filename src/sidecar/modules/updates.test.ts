@@ -2,13 +2,13 @@ import { describe, it, expect } from "vitest";
 import type { PluginHome } from "../../../packages/shared/src/domain.js";
 
 const claudeDir = "/tmp/updates-claude";
-const cairnDir = "/tmp/updates-cairn";
+const forebayDir = "/tmp/updates-forebay";
 
 function home(id: string, dir: string, present = true): PluginHome {
   return { id, label: id, dir, present, managesPlugins: true } as PluginHome;
 }
 
-const fakeHomes: PluginHome[] = [home("cairn", cairnDir), home("claude", claudeDir)];
+const fakeHomes: PluginHome[] = [home("forebay", forebayDir), home("claude", claudeDir)];
 
 describe("updates sidecar module", () => {
   it("checks the home the caller named and reports the plugins flagged as available", async () => {
@@ -72,23 +72,23 @@ describe("updates sidecar module", () => {
 
   it("fails an update in a home with nothing managing its plugins", async () => {
     const { updatesAll } = await import("./updates.js");
-    const result = await updatesAll("cairn", { homes: async () => fakeHomes, updateAll: async () => null });
+    const result = await updatesAll("forebay", { homes: async () => fakeHomes, updateAll: async () => null });
 
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("unreachable");
-    expect(result.error).toContain("nothing manages the plugins of cairn");
+    expect(result.error).toContain("nothing manages the plugins of forebay");
   });
 
   it("updates everything in the named home", async () => {
     const { updatesAll } = await import("./updates.js");
     const seen: Array<[string, string]> = [];
-    const result = await updatesAll("cairn", {
+    const result = await updatesAll("forebay", {
       homes: async () => fakeHomes,
       updateAll: async (dir, appId) => { seen.push([dir, appId]); return { ok: true }; },
     });
 
     expect(result.ok).toBe(true);
-    expect(seen).toEqual([[cairnDir, "cairn"]]);
+    expect(seen).toEqual([[forebayDir, "forebay"]]);
   });
 
   it("refuses a home it does not know, without asking any manager", async () => {

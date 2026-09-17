@@ -9,7 +9,7 @@ export interface DeployedHandler {
 }
 
 // Node keys its ESM registry by URL and keeps the entry for the life of the process, a
-// failed load included. Repairing a provider therefore changed nothing until Cairn was
+// failed load included. Repairing a provider therefore changed nothing until Forebay was
 // restarted: the next import replayed the cached failure. Stamping the bundle's mtime into
 // the URL makes a rebuilt bundle a different module while an untouched one still hits the
 // cache.

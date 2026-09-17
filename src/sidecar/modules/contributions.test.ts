@@ -12,7 +12,7 @@ function home(id: string, label: string, overrides: Partial<PluginHome> = {}): P
   return { id, label, dir: `/${id}`, present: true, managesPlugins: true, ...overrides };
 }
 
-const HOMES = [home("cairn", "Cairn"), home("claude", "Claude Code"), home("opencode", "OpenCode")];
+const HOMES = [home("forebay", "Forebay"), home("claude", "Claude Code"), home("opencode", "OpenCode")];
 
 let cacheDir: string;
 
@@ -20,7 +20,7 @@ beforeEach(() => {
   resetCacheForTests();
   resetContributionsForTests();
   if (cacheDir) rmSync(cacheDir, { recursive: true, force: true });
-  cacheDir = mkdtempSync(join(tmpdir(), "cairn-contributions-"));
+  cacheDir = mkdtempSync(join(tmpdir(), "forebay-contributions-"));
   resetPluginHostsForTests();
 });
 
@@ -46,7 +46,7 @@ describe("a screen declared for more than one surface", () => {
   const spec = {
     id: "s", label: "S",
     layout: { kind: "text", text: "generic" },
-    surfaces: { cairn: { kind: "text", text: "for the dashboard" }, tui: { kind: "text", text: "for the terminal" } },
+    surfaces: { forebay: { kind: "text", text: "for the dashboard" }, tui: { kind: "text", text: "for the terminal" } },
   };
 
   function hostServing(declaration: unknown) {
@@ -62,8 +62,8 @@ describe("a screen declared for more than one surface", () => {
   }
 
   it("renders the layout the plugin declared for this surface", async () => {
-    await hostFor("/cairn", "cairn", { start: hostServing({ screens: () => [spec] }) });
-    const result = await screensList({ wait: true }, { cacheDir, homes: [home("cairn", "Cairn")], schemas: async () => [] });
+    await hostFor("/forebay", "forebay", { start: hostServing({ screens: () => [spec] }) });
+    const result = await screensList({ wait: true }, { cacheDir, homes: [home("forebay", "Forebay")], schemas: async () => [] });
     if (!result.ok) throw new Error("unreachable");
     const screens = result.data;
     expect(screens).toHaveLength(1);
@@ -73,16 +73,16 @@ describe("a screen declared for more than one surface", () => {
   // Nothing downstream should have to choose between two layouts, and the override map is answered
   // by the time a screen leaves here.
   it("carries no surface map onward", async () => {
-    await hostFor("/cairn", "cairn", { start: hostServing({ screens: () => [spec] }) });
-    const result = await screensList({ wait: true }, { cacheDir, homes: [home("cairn", "Cairn")], schemas: async () => [] });
+    await hostFor("/forebay", "forebay", { start: hostServing({ screens: () => [spec] }) });
+    const result = await screensList({ wait: true }, { cacheDir, homes: [home("forebay", "Forebay")], schemas: async () => [] });
     if (!result.ok) throw new Error("unreachable");
     expect(result.data[0]).not.toHaveProperty("surfaces");
   });
 
   it("falls back to the generic layout when the plugin declared none for this surface", async () => {
     const only = { id: "s", label: "S", layout: { kind: "text", text: "generic" }, surfaces: { tui: { kind: "text", text: "terminal" } } };
-    await hostFor("/cairn", "cairn", { start: hostServing({ screens: () => [only] }) });
-    const result = await screensList({ wait: true }, { cacheDir, homes: [home("cairn", "Cairn")], schemas: async () => [] });
+    await hostFor("/forebay", "forebay", { start: hostServing({ screens: () => [only] }) });
+    const result = await screensList({ wait: true }, { cacheDir, homes: [home("forebay", "Forebay")], schemas: async () => [] });
     if (!result.ok) throw new Error("unreachable");
     expect(result.data[0].layout).toEqual({ kind: "text", text: "generic" });
   });
@@ -103,8 +103,8 @@ describe("screensList", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error("unreachable");
     expect(result.data).toEqual([
-      { plugin: "updater", id: "updater", label: "Aa", order: 1, layout: { kind: "stack" }, homes: ["cairn", "opencode"] },
-      { plugin: "ledger", id: "ledger", label: "Ledger", layout: { kind: "stack" }, homes: ["cairn", "claude", "opencode"] },
+      { plugin: "updater", id: "updater", label: "Aa", order: 1, layout: { kind: "stack" }, homes: ["forebay", "opencode"] },
+      { plugin: "ledger", id: "ledger", label: "Ledger", layout: { kind: "stack" }, homes: ["forebay", "claude", "opencode"] },
     ]);
   });
 
@@ -150,18 +150,18 @@ describe("screensList", () => {
     });
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error("unreachable");
-    expect(result.data).toEqual([{ plugin: "p", id: "s", label: "P", layout: { kind: "stack" }, homes: ["cairn", "opencode"] }]);
+    expect(result.data).toEqual([{ plugin: "p", id: "s", label: "P", layout: { kind: "stack" }, homes: ["forebay", "opencode"] }]);
   });
 
   it("does not probe an app home that is not installed", async () => {
     const asked: string[] = [];
     await screensList({ wait: true }, {
       cacheDir,
-      homes: [home("cairn", "Cairn"), home("claude", "Claude Code", { present: false })],
+      homes: [home("forebay", "Forebay"), home("claude", "Claude Code", { present: false })],
       schemas: async () => [],
       screensOf: async (_dir, homeId) => { asked.push(homeId); return []; },
     });
-    expect(asked).toEqual(["cairn"]);
+    expect(asked).toEqual(["forebay"]);
   });
 
   it("takes the first home's presentation when two homes declare the same plugin differently", async () => {
@@ -169,9 +169,9 @@ describe("screensList", () => {
       cacheDir,
       homes: [HOMES[0], HOMES[1]],
       schemas: async () => [],
-      screensOf: async (_dir, homeId) => [screen("p", "s", homeId, homeId === "cairn" ? { label: "First" } : { label: "Second" })],
+      screensOf: async (_dir, homeId) => [screen("p", "s", homeId, homeId === "forebay" ? { label: "First" } : { label: "Second" })],
     });
-    expect(result.ok && result.data).toEqual([{ plugin: "p", id: "s", label: "First", layout: { kind: "stack" }, homes: ["cairn", "claude"] }]);
+    expect(result.ok && result.data).toEqual([{ plugin: "p", id: "s", label: "First", layout: { kind: "stack" }, homes: ["forebay", "claude"] }]);
   });
 
   it("keeps two screens of the same plugin apart, and the same id of two plugins apart", async () => {
@@ -295,7 +295,7 @@ describe("contributions cache", () => {
     });
 
     expect(readCache<Contributions>(CONTRIBUTIONS_NS, "contributions", cacheDir)?.value).toEqual({
-      screens: [{ plugin: "p", id: "s", label: "P", layout: { kind: "stack" }, homes: ["cairn"] }],
+      screens: [{ plugin: "p", id: "s", label: "P", layout: { kind: "stack" }, homes: ["forebay"] }],
       sections: [],
     });
     const schemas = vi.fn(async () => []);
@@ -337,8 +337,8 @@ describe("contributions cache", () => {
 
   it("drops a contribution from the cache once the plugin stops making it", async () => {
     cached({
-      screens: [{ plugin: "gone", id: "g", label: "Gone", layout: { kind: "stack" }, homes: ["cairn"] }],
-      sections: [{ plugin: "gone", id: "g", label: "G", homes: ["cairn"] }],
+      screens: [{ plugin: "gone", id: "g", label: "Gone", layout: { kind: "stack" }, homes: ["forebay"] }],
+      sections: [{ plugin: "gone", id: "g", label: "G", homes: ["forebay"] }],
     });
 
     const result = await screensList({ wait: true }, { cacheDir, homes: [HOMES[0]], schemas: async () => [], screensOf: async () => [] });

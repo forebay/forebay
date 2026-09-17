@@ -2,14 +2,14 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { router, navigate } from "../router.js";
 import Sidebar from "./Sidebar.svelte";
 import { serverStatus } from "../serverStatus.js";
 
 describe("Sidebar", () => {
   it("always shows the Routing nav item", () => {
-    stubCairn();
+    stubForebay();
     const { getByText } = render(Sidebar);
     expect(getByText("Routing")).toBeTruthy();
   });
@@ -17,7 +17,7 @@ describe("Sidebar", () => {
 
 describe("contributed screens", () => {
   it("renders a nav item per contributed screen, with its declared label and glyph", async () => {
-    stubCairn({ screensList: async () => ({ ok: true, data: [{ plugin: "config-ledger", id: "main", label: "Ledger", glyph: "@", homes: ["claude"], layout: { kind: "text" } }] }) });
+    stubForebay({ screensList: async () => ({ ok: true, data: [{ plugin: "config-ledger", id: "main", label: "Ledger", glyph: "@", homes: ["claude"], layout: { kind: "text" } }] }) });
     render(Sidebar);
 
     const button = await screen.findByRole("button", { name: /Ledger/ });
@@ -25,7 +25,7 @@ describe("contributed screens", () => {
   });
 
   it("navigates to that plugin's own screen when the item is pressed", async () => {
-    stubCairn({ screensList: async () => ({ ok: true, data: [{ plugin: "config-ledger", id: "main", label: "Ledger", homes: ["claude"], layout: { kind: "text" } }] }) });
+    stubForebay({ screensList: async () => ({ ok: true, data: [{ plugin: "config-ledger", id: "main", label: "Ledger", homes: ["claude"], layout: { kind: "text" } }] }) });
     render(Sidebar);
 
     await fireEvent.click(await screen.findByRole("button", { name: /Ledger/ }));
@@ -34,7 +34,7 @@ describe("contributed screens", () => {
   });
 
   it("shows no plugin section at all when nothing contributes a screen", async () => {
-    stubCairn({ screensList: async () => ({ ok: true, data: [] }) });
+    stubForebay({ screensList: async () => ({ ok: true, data: [] }) });
     render(Sidebar);
 
     await waitFor(() => expect(screen.getByText("Network")).toBeInTheDocument());
@@ -45,7 +45,7 @@ describe("contributed screens", () => {
 describe("screen painting", () => {
   it("paints cached screens first, then replaces them when the refresh lands", async () => {
     const calls: (boolean | undefined)[] = [];
-    stubCairn({
+    stubForebay({
       screensList: async (opts?: { wait?: boolean }) => {
         calls.push(opts?.wait);
         return opts?.wait
@@ -62,7 +62,7 @@ describe("screen painting", () => {
   });
 
   it("survives a cached answer with no data array (a stale pre-upgrade cache) and still refreshes", async () => {
-    stubCairn({
+    stubForebay({
       screensList: async (opts?: { wait?: boolean }) => (opts?.wait
         ? { ok: true as const, data: [{ plugin: "ledger", id: "main", label: "Ledger", homes: ["claude"], layout: { kind: "text" } }] }
         : { ok: true as const, data: undefined as never }),
@@ -73,7 +73,7 @@ describe("screen painting", () => {
   });
 
   it("still shows the refreshed screens when the cache was cold", async () => {
-    stubCairn({
+    stubForebay({
       screensList: async (opts?: { wait?: boolean }) => (opts?.wait
         ? { ok: true as const, data: [{ plugin: "ledger", id: "main", label: "Ledger", homes: ["claude"], layout: { kind: "text" } }] }
         : { ok: true as const, data: [] }),

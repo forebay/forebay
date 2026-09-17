@@ -28,10 +28,10 @@ export interface SandboxedApp {
 
 /**
  * @implNote The real registry has no built-in apps merged in (see `build()` in core/src/apps.ts),
- * so pointing HUB_APPS_FILE at a synthetic copy gives total control over which app homes Cairn sees.
+ * so pointing HUB_APPS_FILE at a synthetic copy gives total control over which app homes Forebay sees.
  */
 function readRealAppRegistry(): AppRegistry {
-  const realAppsFile = join(homedir(), ".config", "cairn", "apps.json");
+  const realAppsFile = join(homedir(), ".config", "forebay", "apps.json");
   if (!existsSync(realAppsFile)) return {};
   const parsed = JSON.parse(readFileSync(realAppsFile, "utf8")) as unknown;
   return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as AppRegistry) : {};
@@ -56,7 +56,7 @@ function sanitizedEnv(source: NodeJS.ProcessEnv): Record<string, string> {
 function requireBuiltMainEntry(): string {
   const mainEntry = join(repoRoot, "out", "main", "index.js");
   if (!existsSync(mainEntry)) {
-    throw new Error(`Cairn is not built: missing ${mainEntry}. Run "npm run build" first.`);
+    throw new Error(`Forebay is not built: missing ${mainEntry}. Run "npm run build" first.`);
   }
   return mainEntry;
 }
@@ -65,7 +65,7 @@ export async function launchSandboxedApp(): Promise<SandboxedApp> {
   const mainEntry = requireBuiltMainEntry();
   const electronBinary = nodeRequire("electron") as unknown as string;
 
-  const tempDir = mkdtempSync(join(tmpdir(), "cairn-e2e-"));
+  const tempDir = mkdtempSync(join(tmpdir(), "forebay-e2e-"));
   const appDataDir = join(tempDir, "appdata");
   const storeDir = join(appDataDir, "intisy");
   const appsFile = join(tempDir, "apps.json");

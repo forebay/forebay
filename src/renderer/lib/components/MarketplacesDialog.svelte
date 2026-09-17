@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { MarketplaceSource, MarketplaceSourceType } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { MarketplaceSource, MarketplaceSourceType } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
@@ -22,7 +22,7 @@
   const draftType = $derived(TYPES.find((t) => t.id === draft.type) ?? TYPES[0]);
 
   async function load(): Promise<void> {
-    const result = await cairn.marketplaceSourcesList();
+    const result = await forebay.marketplaceSourcesList();
     if (result.ok) sources = result.data;
     else error = result.error;
     loaded = true;
@@ -62,7 +62,7 @@
 
   async function save(): Promise<void> {
     busy = true;
-    const result = await cairn.marketplaceSourcesSave(sources);
+    const result = await forebay.marketplaceSourcesSave(sources);
     busy = false;
     if (!result.ok) {
       error = result.error;

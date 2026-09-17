@@ -1,14 +1,14 @@
 <script lang="ts">
   import { theme, setTheme } from "../theme.js";
-  import { cairn } from "../ipc.js";
+  import { forebay } from "../ipc.js";
   import { nav, back, forward } from "../router.js";
-  import CairnMark from "./CairnMark.svelte";
+  import ForebayMark from "./ForebayMark.svelte";
   import DownloadManager from "./DownloadManager.svelte";
   import GitHubMenu from "./GitHubMenu.svelte";
 
-  let { title = "Cairn", subtitle = "" }: { title?: string; subtitle?: string } = $props();
+  let { title = "Forebay", subtitle = "" }: { title?: string; subtitle?: string } = $props();
 
-  const isMac = typeof window !== "undefined" && window.cairn?.platform === "darwin";
+  const isMac = typeof window !== "undefined" && window.forebay?.platform === "darwin";
 
   function toggleTheme(): void {
     setTheme($theme === "dark" ? "light" : "dark");
@@ -21,7 +21,7 @@
     <button class="navbtn" title="Back" aria-label="Go back" disabled={!$nav.canBack} onclick={back}>‹</button>
     <button class="navbtn" title="Forward" aria-label="Go forward" disabled={!$nav.canForward} onclick={forward}>›</button>
   </div>
-  <CairnMark size={18} />
+  <ForebayMark size={18} />
   <div class="wm">
     <span class="bname">{title}</span>
     {#if subtitle}<span class="bsep">·</span><span class="bsub">{subtitle}</span>{/if}
@@ -32,13 +32,13 @@
   <button class="iconbtn" title="Toggle theme" aria-label="Toggle light or dark theme" onclick={toggleTheme}>◐</button>
   {#if !isMac}
     <div class="winctl">
-      <button class="wc" aria-label="Minimize window" onclick={() => cairn.minimize()}>
+      <button class="wc" aria-label="Minimize window" onclick={() => forebay.minimize()}>
         <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1" /></svg>
       </button>
-      <button class="wc" aria-label="Maximize window" onclick={() => cairn.maximize()}>
+      <button class="wc" aria-label="Maximize window" onclick={() => forebay.maximize()}>
         <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1" /></svg>
       </button>
-      <button class="wc close" aria-label="Close window" onclick={() => cairn.close()}>
+      <button class="wc close" aria-label="Close window" onclick={() => forebay.close()}>
         <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1.5" y1="1.5" x2="8.5" y2="8.5" stroke="currentColor" stroke-width="1" /><line x1="8.5" y1="1.5" x2="1.5" y2="8.5" stroke="currentColor" stroke-width="1" /></svg>
       </button>
     </div>

@@ -8,7 +8,7 @@
     if (name.startsWith("--space-")) return "space";
     if (name.startsWith("--radius")) return "radius";
     if (name.startsWith("--shadow") || name.startsWith("--elev")) return "elevation";
-    if (name.startsWith("--cairn-")) return "other";
+    if (name.startsWith("--forebay-")) return "other";
     return "colour";
   }
 
@@ -43,7 +43,7 @@
           {:else if group === "elevation"}
             <span class="elev" style={`box-shadow:${token.value}`}></span>
           {:else if group === "type"}
-            <span class="type" style={`font-size:${token.value}`}>Cairn 123</span>
+            <span class="type" style={`font-size:${token.value}`}>Forebay 123</span>
           {/if}
           <span class="meta"><code>{token.name}</code><span class="val">{token.value}</span></span>
         </div>

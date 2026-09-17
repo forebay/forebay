@@ -47,7 +47,7 @@ export function attachLogCollector(app: SandboxedElectronApp, page: SandboxedPag
 
 // Playwright's Electron support attaches a Node debugger to the main process (so
 // `electronApp.evaluate()` can run there); these two exact lines are Node's own
-// diagnostics when that inspector session ends, not anything Cairn's code prints.
+// diagnostics when that inspector session ends, not anything Forebay's code prints.
 // Anchored start-to-end on the literal message shape so a real error cannot hide
 // behind a loose match (see logCollector.test.ts for the adversarial proof).
 const PLAYWRIGHT_INSPECTOR_DETACH_LINES: readonly RegExp[] = [

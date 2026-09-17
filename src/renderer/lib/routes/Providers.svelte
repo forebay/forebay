@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ProviderRow as ProviderRowData, HostApp } from "@cairn/shared";
-  import { renderCairnMark } from "@cairn/shared";
+  import type { ProviderRow as ProviderRowData, HostApp } from "@forebay/shared";
+  import { renderForebayMark } from "@forebay/shared";
   import StatusPill, { type StatusVariant } from "../components/StatusPill.svelte";
-  import { cairn } from "../ipc.js";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import { navigate } from "../router.js";
   import { debounce } from "../util/debounce.js";
@@ -103,7 +103,7 @@
   const apiKeyConnectedCount = $derived(apiKeyRows.filter(isConnected).length);
 
   async function load(): Promise<void> {
-    const result = await cairn.providersList();
+    const result = await forebay.providersList();
     if (result.ok) {
       rows = result.data;
       loadError = "";
@@ -127,33 +127,33 @@
   }
 
   async function handleSetEnabled(id: string, on: boolean): Promise<void> {
-    const result = await cairn.providersSetEnabled(id, on);
+    const result = await forebay.providersSetEnabled(id, on);
     if (!result.ok) toast.error(result.error);
     await load();
   }
 
   async function handleSetExposure(id: string, appId: string, on: boolean): Promise<void> {
-    await cairn.providersSetExposure(id, appId, on);
+    await forebay.providersSetExposure(id, appId, on);
     await load();
   }
 
   async function loadApps(): Promise<void> {
-    const result = await cairn.appsList();
+    const result = await forebay.appsList();
     if (result.ok) apps = result.data;
   }
 
-  // Providers are installed into Cairn's own home too, so it belongs beside the host apps
-  // here. Its mark is the one logo Cairn owns, from the canonical module, passed as markup so
+  // Providers are installed into Forebay's own home too, so it belongs beside the host apps
+  // here. Its mark is the one logo Forebay owns, from the canonical module, passed as markup so
   // it follows the theme.
   const availabilityApps = $derived<HostApp[]>([
-    { id: "cairn", label: "Cairn", icon: renderCairnMark() },
+    { id: "forebay", label: "Forebay", icon: renderForebayMark() },
     ...apps,
   ]);
 
   async function handleImport(): Promise<void> {
     importError = "";
     importNotes = [];
-    const result = await cairn.importApps();
+    const result = await forebay.importApps();
     if (!result.ok) {
       importError = result.error;
       return;

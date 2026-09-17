@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ActivityRecord } from "@cairn/shared";
-  import { formatBytes, formatRate, formatDuration } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ActivityRecord } from "@forebay/shared";
+  import { formatBytes, formatRate, formatDuration } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { rows, cancelRow, clearFinished, type DownloadRow } from "../downloads.js";
   import { groupHistory } from "../util/downloadHistory.js";
   import { humanizeId } from "../util/appLabel.js";
@@ -34,7 +34,7 @@
   let historyLoading = $state(true);
 
   async function loadInstalled(): Promise<void> {
-    const result = await cairn.pluginsList();
+    const result = await forebay.pluginsList();
     if (result.ok) {
       const rows = result.data.flatMap((section) => section.rows);
       installed = new Set(rows.map((row) => row.name));
@@ -53,7 +53,7 @@
   }
 
   async function loadHistory(): Promise<void> {
-    const result = await cairn.activityRead({ topics: ["plugin.installed"], limit: 200 });
+    const result = await forebay.activityRead({ topics: ["plugin.installed"], limit: 200 });
     if (result.ok) history = result.data.records;
   }
 
@@ -89,7 +89,7 @@
   }
 </script>
 
-<PageHeader title="Downloads" subtitle="Plugin work Cairn is doing, queued, or has done">
+<PageHeader title="Downloads" subtitle="Plugin work Forebay is doing, queued, or has done">
   {#snippet actions()}
     {#if totalRate > 0}
       <span class="headrate" data-testid="total-rate">{formatRate(totalRate)}</span>

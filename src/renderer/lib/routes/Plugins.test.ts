@@ -2,11 +2,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor, within, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { downloads, resetDownloadsForTest } from "../downloads.js";
 import { router, navigate } from "../router.js";
 import Plugins from "./Plugins.svelte";
-import type { HomePlugins, PluginHome, Job } from "@cairn/shared";
+import type { HomePlugins, PluginHome, Job } from "@forebay/shared";
 
 function jobFor(home: string, plugin = "demo"): Job {
   return { id: `job-${home}-${plugin}`, kind: "install", plugin, url: "u", home, status: "done", phase: "", percent: 100, phases: [], samples: [], queuedAt: 0, endedAt: 1 };
@@ -21,13 +21,13 @@ function home(id: string, label: string, overrides: Partial<PluginHome> = {}): P
   return { id, label, dir: `/${id}`, present: true, managesPlugins: true, ...overrides };
 }
 
-const CAIRN = home("cairn", "Cairn");
+const FOREBAY = home("forebay", "Forebay");
 const CLAUDE = home("claude", "Claude Code");
 const OPENCODE = home("opencode", "OpenCode");
 
 function baseSections(): HomePlugins[] {
   return [
-    { home: CAIRN, rows: [] },
+    { home: FOREBAY, rows: [] },
     { home: CLAUDE, rows: [{ name: "wakatime-sync", kind: "git", enabled: true, updateAvailable: false, description: "Tracks time" }] },
     { home: OPENCODE, rows: [] },
   ];
@@ -49,7 +49,7 @@ describe("Plugins screen", () => {
   });
 
   it("renders a unified row per plugin with its description text", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -62,7 +62,7 @@ describe("Plugins screen", () => {
   });
 
   it("tags a row on the experimental channel and leaves an off-channel row untagged", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginVersionsAll: async () => ({
@@ -86,7 +86,7 @@ describe("Plugins screen", () => {
   it("checks every managed home for updates and reloads the rows afterwards", async () => {
     const checked: string[] = [];
     let listCalls = 0;
-    stubCairn({
+    stubForebay({
       pluginsList: async () => { listCalls += 1; return { ok: true, data: baseSections() }; },
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       updatesCheck: async (homeId: string) => {
@@ -100,12 +100,12 @@ describe("Plugins screen", () => {
 
     await fireEvent.click(screen.getByRole("button", { name: "Check for updates" }));
 
-    await waitFor(() => expect(checked).toEqual(["cairn", "claude", "opencode"]));
+    await waitFor(() => expect(checked).toEqual(["forebay", "claude", "opencode"]));
     await waitFor(() => expect(listCalls).toBeGreaterThan(before));
   });
 
   it("offers Update all only while something is actually behind", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -115,7 +115,7 @@ describe("Plugins screen", () => {
   });
 
   it("offers the check as a refresh icon rather than a worded button", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -129,10 +129,10 @@ describe("Plugins screen", () => {
 
   it("hides every update control when no home has an updater to run them", async () => {
     const noUpdater = [
-      { home: home("cairn", "Cairn", { managesPlugins: false }), rows: [] },
+      { home: home("forebay", "Forebay", { managesPlugins: false }), rows: [] },
       { home: home("claude", "Claude Code", { managesPlugins: false }), rows: [{ name: "wakatime-sync", kind: "git" as const, enabled: true, updateAvailable: true, description: "Tracks time" }] },
     ];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: noUpdater }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -148,10 +148,10 @@ describe("Plugins screen", () => {
   // a button that does nothing.
   it("offers Update all only when something behind sits in a home with an updater", async () => {
     const behindWhereUnmanaged = [
-      { home: home("cairn", "Cairn"), rows: [] },
+      { home: home("forebay", "Forebay"), rows: [] },
       { home: home("claude", "Claude Code", { managesPlugins: false }), rows: [{ name: "wakatime-sync", kind: "git" as const, enabled: true, updateAvailable: true, description: "Tracks time" }] },
     ];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: behindWhereUnmanaged }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -165,7 +165,7 @@ describe("Plugins screen", () => {
   it("narrows the list to what is behind, counting only homes that can update", async () => {
     const behind = baseSections();
     behind[1].rows[0].updateAvailable = true;
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: behind }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -180,7 +180,7 @@ describe("Plugins screen", () => {
   });
 
   it("offers no update filter matches when nothing is behind", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -191,11 +191,11 @@ describe("Plugins screen", () => {
 
   it("checks only the homes that actually have an updater", async () => {
     const mixed = [
-      { home: home("cairn", "Cairn", { managesPlugins: false }), rows: [] },
+      { home: home("forebay", "Forebay", { managesPlugins: false }), rows: [] },
       { home: home("claude", "Claude Code"), rows: [{ name: "wakatime-sync", kind: "git" as const, enabled: true, updateAvailable: false, description: "Tracks time" }] },
     ];
     const checked: string[] = [];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: mixed }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       updatesCheck: async (homeId: string) => {
@@ -214,7 +214,7 @@ describe("Plugins screen", () => {
     const behind = baseSections();
     behind[1].rows[0].updateAvailable = true;
     const updated: string[] = [];
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: behind }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       updatesAll: async (homeId: string) => {
@@ -226,16 +226,16 @@ describe("Plugins screen", () => {
     await screen.findByText("wakatime-sync");
 
     await fireEvent.click(await screen.findByRole("button", { name: "Update all" }));
-    await waitFor(() => expect(updated).toEqual(["cairn", "claude", "opencode"]));
+    await waitFor(() => expect(updated).toEqual(["forebay", "claude", "opencode"]));
   });
 
   it("clicking the star button favorites a plugin locally and mirrors the star to GitHub, without opening the detail view", async () => {
     const favoritesToggle = vi.fn(async (name: string) => ({ ok: true, data: [name] }) as const);
     const githubSetStar = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
-      githubStatus: async () => ({ ok: true, data: { source: "config", connected: true, login: "octocat", name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [{ login: "octocat", name: null, avatarUrl: null }], activeLogin: "octocat", cairnRepoUrl: "https://github.com/forebay/cairn", cairnStarred: null } }),
+      githubStatus: async () => ({ ok: true, data: { source: "config", connected: true, login: "octocat", name: null, avatarUrl: null, ghCliDetected: false, ghCli: null, accounts: [{ login: "octocat", name: null, avatarUrl: null }], activeLogin: "octocat", forebayRepoUrl: "https://github.com/forebay/forebay", forebayStarred: null } }),
       favoritesToggle,
       githubSetStar,
     });
@@ -252,7 +252,7 @@ describe("Plugins screen", () => {
 
   it("prompts to connect GitHub instead of favoriting when starring while not connected", async () => {
     const favoritesToggle = vi.fn(async (name: string) => ({ ok: true, data: [name] }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       favoritesToggle,
@@ -267,7 +267,7 @@ describe("Plugins screen", () => {
   });
 
   it("the Favorites chip filters to favorited plugins and a favorited plugin sorts to the top", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       favoritesList: async () => ({ ok: true, data: ["demo"] }),
@@ -284,7 +284,7 @@ describe("Plugins screen", () => {
   });
 
   it("shows claude filled and opencode outline for a plugin installed only on claude", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -299,7 +299,7 @@ describe("Plugins screen", () => {
 
   it("Install (primary) on an uninstalled catalog plugin queues a job per applicable home", async () => {
     const jobsEnqueue = enqueueSpy();
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       jobsEnqueue,
@@ -316,7 +316,7 @@ describe("Plugins screen", () => {
 
   it("clicking an outline pill on an installed plugin queues a job for that one home", async () => {
     const jobsEnqueue = enqueueSpy();
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       jobsEnqueue,
@@ -333,7 +333,7 @@ describe("Plugins screen", () => {
     const jobsEnqueue = vi.fn(async (_kind: string, _plugin: string, _url: string, home: string) =>
       home === "opencode" ? ({ ok: false, error: "disk full" } as const) : ({ ok: true, data: jobFor(home) } as const),
     );
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       jobsEnqueue,
@@ -346,9 +346,9 @@ describe("Plugins screen", () => {
     await waitFor(() => expect(jobsEnqueue).toHaveBeenCalledWith("install", "demo", "u", "opencode"));
   });
 
-  it("adding a plugin-kind repo by URL installs to the applicable host-app homes, not cairn", async () => {
+  it("adding a plugin-kind repo by URL installs to the applicable host-app homes, not forebay", async () => {
     const jobsEnqueue = enqueueSpy();
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       jobsEnqueue,
@@ -368,7 +368,7 @@ describe("Plugins screen", () => {
   });
 
   it("opens the Add dialog on mount when deep-linked with an add param", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -379,11 +379,11 @@ describe("Plugins screen", () => {
   });
 
   it("shows the display name as the title and the repo name as a subtitle", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({
         ok: true,
         data: [
-          { home: CAIRN, rows: [] },
+          { home: FOREBAY, rows: [] },
           { home: CLAUDE, rows: [{ name: "wakatime-sync", kind: "git", enabled: true, updateAvailable: false, description: "d", displayName: "WakaTime", icon: "" }] },
           { home: OPENCODE, rows: [] },
         ],
@@ -396,7 +396,7 @@ describe("Plugins screen", () => {
   });
 
   it("renders repo topic chips on a plugin row", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: { entries: [{ name: "wakatime-sync", url: "u", kind: "plugin", description: "Tracks time", deprecated: false, topics: ["forebay", "plugin", "typescript"] }], source: "gh" } }),
     });
@@ -406,11 +406,11 @@ describe("Plugins screen", () => {
   });
 
   it("offers install into every home, including one with no updater yet", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({
         ok: true,
         data: [
-          { home: CAIRN, rows: [] },
+          { home: FOREBAY, rows: [] },
           { home: home("claude", "Claude Code", { managesPlugins: false }), rows: [] },
           { home: home("opencode", "OpenCode", { managesPlugins: true }), rows: [] },
         ],
@@ -438,7 +438,7 @@ describe("Plugins screen", () => {
   });
 
   it("offers an Engines filter and shows only engine rows when active", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "plugin-updater", url: "u", kind: "plugin", description: "engine", deprecated: false, topics: [] },
@@ -458,7 +458,7 @@ describe("Plugins screen", () => {
 
 
   it("keeps remove controls in the detail pane for a non-mandatory plugin", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -474,7 +474,7 @@ describe("Plugins screen", () => {
   });
 
   it("names the single remaining home in the install button", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -485,11 +485,11 @@ describe("Plugins screen", () => {
   });
 
   it("makes the header split-button Remove everywhere when installed in every applicable home", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({
         ok: true,
         data: [
-          { home: CAIRN, rows: [] },
+          { home: FOREBAY, rows: [] },
           { home: CLAUDE, rows: [{ name: "wakatime-sync", kind: "git", enabled: true, updateAvailable: false, description: "" }] },
           { home: OPENCODE, rows: [{ name: "wakatime-sync", kind: "git", enabled: true, updateAvailable: false, description: "" }] },
         ],
@@ -507,7 +507,7 @@ describe("Plugins screen", () => {
   it("updates a home and toggles its auto-update from the detail's Availability tab", async () => {
     const pluginsSetAutoUpdate = vi.fn(async () => ({ ok: true, data: undefined }) as const);
     const jobsEnqueue = enqueueSpy();
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginVersions: async () => ({
@@ -545,7 +545,7 @@ describe("Plugins screen", () => {
   it("does not enqueue an update when the channel write fails", async () => {
     const pluginsSetChannel = vi.fn(async () => ({ ok: false, error: "boom" }) as const);
     const jobsEnqueue = enqueueSpy();
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginVersions: async () => ({
@@ -578,7 +578,7 @@ describe("Plugins screen", () => {
 
   it("confirms before removing a plugin everywhere", async () => {
     const pluginsRemoveEverywhere = vi.fn(async () => ({ ok: true, data: { outcomes: [] } }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginsRemoveEverywhere,
@@ -600,7 +600,7 @@ describe("Plugins screen", () => {
   // deleting them is a deliberate extra tick.
   it("offers to delete the plugin's data on uninstall, off by default", async () => {
     const pluginsRemoveData = vi.fn(async () => ({ ok: true, data: [] }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginsRemoveEverywhere: async () => ({ ok: true, data: { outcomes: [] } }),
@@ -631,7 +631,7 @@ describe("Plugins screen", () => {
 
   it("deletes exactly the listed paths once the box is ticked", async () => {
     const pluginsRemoveData = vi.fn(async () => ({ ok: true, data: [] }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginsRemoveEverywhere: async () => ({ ok: true, data: { outcomes: [] } }),
@@ -658,7 +658,7 @@ describe("Plugins screen", () => {
   });
 
   it("does not offer the checkbox for a plugin that left nothing behind", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginsRemoveEverywhere: async () => ({ ok: true, data: { outcomes: [] } }),
@@ -675,7 +675,7 @@ describe("Plugins screen", () => {
   });
 
   it("shows a Clear filters empty state when the search matches nothing, and clicking it restores the rows", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -696,7 +696,7 @@ describe("Plugins screen", () => {
   });
 
   it("renders a view toggle and starts in grid mode when that is the stored preference, showing plugin cards", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       getConfig: async () => ({ ok: true, data: "grid" }),
@@ -713,7 +713,7 @@ describe("Plugins screen", () => {
 
   it("switches back to list view and persists the choice", async () => {
     const setConfig = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       getConfig: async () => ({ ok: true, data: "grid" }),
@@ -727,11 +727,11 @@ describe("Plugins screen", () => {
 
     await waitFor(() => expect(screen.getByTestId("plugins-list")).toBeInTheDocument());
     expect(screen.queryByTestId("plugins-grid")).toBeNull();
-    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("cairn", "viewMode.plugins", "list"));
+    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("forebay", "viewMode.plugins", "list"));
   });
 
   it("keeps the Engines filter and grid mode working together", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "plugin-updater", url: "u", kind: "plugin", description: "engine", deprecated: false, topics: [] },
@@ -756,7 +756,7 @@ describe("Plugins screen", () => {
   it("shows a loading skeleton before plugins resolve, then content", async () => {
     let resolvePlugins!: (v: { ok: true; data: HomePlugins[] }) => void;
     const pending = new Promise<{ ok: true; data: HomePlugins[] }>((r) => (resolvePlugins = r));
-    stubCairn({
+    stubForebay({
       pluginsList: () => pending,
       catalogList: async () => ({ ok: true, data: { entries: [], source: "anonymous" } }),
     });
@@ -768,7 +768,7 @@ describe("Plugins screen", () => {
   });
 
   it("opens on the plugin filter by default, hiding non-plugin repos", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "acme-provider", url: "u", kind: "provider" as const, description: "a provider", deprecated: false, topics: [] },
@@ -782,7 +782,7 @@ describe("Plugins screen", () => {
 
   it("preselects the provider filter when opened via an Add-provider deep link", async () => {
     navigate("plugins", { kind: "provider" });
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "acme-provider", url: "u", kind: "provider" as const, description: "a provider", deprecated: false, topics: [] },
@@ -795,7 +795,7 @@ describe("Plugins screen", () => {
   });
 
   it("shows loaders under the Loaders filter, hidden by default", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "opencode-loader", url: "u", kind: "loader" as const, description: "a loader", deprecated: false, topics: [] },
@@ -816,7 +816,7 @@ describe("Plugins screen", () => {
   // remembered so it need only be asked once.
   it("keeps archived repos out of the list until the Deprecated filter is turned on", async () => {
     const setConfig = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "demo", url: "u", kind: "plugin" as const, description: "a plugin", deprecated: false, topics: [] },
@@ -833,11 +833,11 @@ describe("Plugins screen", () => {
 
     await waitFor(() => expect(getByText("metric-dashboard")).toBeTruthy());
     expect(getByText("deprecated")).toBeTruthy();
-    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("cairn", "showDeprecated", true));
+    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("forebay", "showDeprecated", true));
   });
 
   it("starts with archived repos listed when that was the stored answer", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
         { name: "metric-dashboard", url: "u", kind: "plugin" as const, description: "an archived one", deprecated: true, topics: [] },
@@ -850,7 +850,7 @@ describe("Plugins screen", () => {
 
   // Hiding one that is already on disk would leave no way to remove it.
   it("lists an archived repo that is installed even with the filter off", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: [
         { home: CLAUDE, rows: [{ name: "metric-dashboard", kind: "git" as const, enabled: true, updateAvailable: false, description: "on disk" }] },
       ] }),
@@ -867,7 +867,7 @@ describe("Plugins screen", () => {
   it("paints the cached list while the real one is still being read", async () => {
     let releaseLive: (value: { ok: true; data: HomePlugins[] }) => void = () => {};
     const live = new Promise<{ ok: true; data: HomePlugins[] }>((resolve) => { releaseLive = resolve; });
-    stubCairn({
+    stubForebay({
       pluginsListCached: async () => ({ ok: true, data: [
         { home: CLAUDE, rows: [{ name: "from-cache", kind: "git" as const, enabled: true, updateAvailable: false, description: "cached" }] },
       ] }),
@@ -892,7 +892,7 @@ describe("Plugins screen", () => {
   it("waits for the stored view before painting anything", async () => {
     let releaseConfig: (value: { ok: true; data: string }) => void = () => {};
     const config = new Promise<{ ok: true; data: string }>((resolve) => { releaseConfig = resolve; });
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       getConfig: () => config,
@@ -910,7 +910,7 @@ describe("Plugins screen", () => {
   });
 
   it("leaves the skeleton up when nothing is cached yet", async () => {
-    stubCairn({
+    stubForebay({
       pluginsListCached: async () => ({ ok: true, data: [] }),
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
@@ -924,7 +924,7 @@ describe("Plugins screen", () => {
   it("waits for the full row set when only the plugin list is cached", async () => {
     let releaseCatalog: (value: { ok: true; data: { entries: []; source: "gh" } }) => void = () => {};
     const catalogPending = new Promise<{ ok: true; data: { entries: []; source: "gh" } }>((resolve) => { releaseCatalog = resolve; });
-    stubCairn({
+    stubForebay({
       pluginsListCached: async () => ({ ok: true, data: baseSections() }),
       catalogListCached: async () => ({ ok: true, data: null }),
       pluginsList: async () => ({ ok: true, data: baseSections() }),
@@ -942,7 +942,7 @@ describe("Plugins screen", () => {
 
   // A row on the Downloads screen links here with the plugin named, so it must open.
   it("opens the named plugin when arrived at with a plugin param", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
     });
@@ -968,14 +968,14 @@ describe("Plugins screen", () => {
 
   // With one marketplace the screen must look exactly as it did before this existed.
   it("offers no source filter while only one marketplace is configured", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: baseCatalog() }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: baseCatalog() }) });
     render(Plugins);
     await screen.findByText("wakatime-sync");
     expect(screen.queryByTestId("source-filters")).toBeNull();
   });
 
   it("browses marketplaces combined by default and one at a time when asked", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: multiSourceCatalog() }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: multiSourceCatalog() }) });
     render(Plugins);
     await screen.findByTestId("source-filters");
 
@@ -999,7 +999,7 @@ describe("Plugins screen", () => {
         { id: "acme", label: "Acme", type: "manifest" as const, ok: false, entryCount: 0, error: "http 404" },
       ],
     };
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withFailure }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withFailure }) });
     render(Plugins);
 
     expect(await screen.findByText("wakatime-sync")).toBeTruthy();
@@ -1015,7 +1015,7 @@ describe("Plugins screen", () => {
         { id: "demo", label: "Demo", type: "local" as const, ok: true, entryCount: 1, shadowed: [{ name: "wakatime-sync", by: "forebay" }] },
       ],
     };
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withShadow }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withShadow }) });
     render(Plugins);
 
     const warning = await screen.findByTestId("source-shadowed");
@@ -1034,7 +1034,7 @@ describe("Plugins screen", () => {
       ],
       contributions: [{ id: "translators", label: "Translators", match: { topics: ["vendor-translator"] }, contributedBy: "custom-auth" }],
     };
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withTranslators }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withTranslators }) });
     render(Plugins);
 
     const row = await screen.findByTestId("contributed-filters");
@@ -1045,21 +1045,21 @@ describe("Plugins screen", () => {
   });
 
   it("offers no contributed categories when no plugin declares one", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: baseCatalog() }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: baseCatalog() }) });
     render(Plugins);
     await screen.findByText("wakatime-sync");
     expect(screen.queryByTestId("contributed-filters")).toBeNull();
   });
 
   it("shows no shadowing warning when no marketplace lost an entry", async () => {
-    stubCairn({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: multiSourceCatalog() }) });
+    stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: multiSourceCatalog() }) });
     render(Plugins);
     await screen.findByTestId("source-filters");
     expect(screen.queryByTestId("source-shadowed")).toBeNull();
   });
 
   it("warns about a quarantined plugin, naming the home, the reason and the fix", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginQuarantine: async () => ({
@@ -1075,7 +1075,7 @@ describe("Plugins screen", () => {
   });
 
   it("shows no quarantine notice when every plugin loaded", async () => {
-    stubCairn({
+    stubForebay({
       pluginsList: async () => ({ ok: true, data: baseSections() }),
       catalogList: async () => ({ ok: true, data: baseCatalog() }),
       pluginQuarantine: async () => ({ ok: true, data: [] }),

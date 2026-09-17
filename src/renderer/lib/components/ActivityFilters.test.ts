@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import ActivityFilters from "./ActivityFilters.svelte";
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 
 function record(app: string, causeKind: string, actor: string): ActivityRecord {
   return {

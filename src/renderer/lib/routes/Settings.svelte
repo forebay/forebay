@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { PLUGIN_MANAGEMENT } from "@cairn/shared";
-  import type { HomePlugins, PluginConfigSchema, PluginSettingsSection } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import { PLUGIN_MANAGEMENT } from "@forebay/shared";
+  import type { HomePlugins, PluginConfigSchema, PluginSettingsSection } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { applyThemeSetting } from "../theme.js";
   import type { ThemeSetting } from "../theme.js";
   import Card from "../components/Card.svelte";
@@ -25,15 +25,15 @@
   let sectionsError = $state("");
   let schemasByHome = $state<Record<string, PluginConfigSchema[]>>({});
 
-  const appGroups = $derived(sections.filter((s) => s.home.id === "cairn" || s.home.present));
+  const appGroups = $derived(sections.filter((s) => s.home.id === "forebay" || s.home.present));
 
-  async function loadCairnSettings(): Promise<void> {
+  async function loadForebaySettings(): Promise<void> {
     const [theme, deprecated, autoUpdate, autostart, prune] = await Promise.all([
-      cairn.getConfig("cairn", "theme"),
-      cairn.getConfig("cairn", "showDeprecated"),
-      cairn.getConfig("cairn", "autoUpdateDefault"),
-      cairn.getConfig("cairn", "proxyAutostart"),
-      cairn.getConfig("cairn", "pruneUnusedLibraries"),
+      forebay.getConfig("forebay", "theme"),
+      forebay.getConfig("forebay", "showDeprecated"),
+      forebay.getConfig("forebay", "autoUpdateDefault"),
+      forebay.getConfig("forebay", "proxyAutostart"),
+      forebay.getConfig("forebay", "pruneUnusedLibraries"),
     ]);
     themeSetting = theme.ok && (theme.data === "light" || theme.data === "dark" || theme.data === "system") ? theme.data : "system";
     showDeprecated = deprecated.ok && deprecated.data === true;
@@ -51,7 +51,7 @@
   let loadedHomes = $state<Record<string, boolean>>({});
 
   async function loadAppGroups(): Promise<void> {
-    const result = await cairn.pluginsList();
+    const result = await forebay.pluginsList();
     if (!result.ok) {
       sectionsError = result.error;
       return;
@@ -59,7 +59,7 @@
     sectionsError = "";
     // Every group needs an explicit boolean before it renders: `bind:` cannot start from an
     // absent value. Assign the flags first so the sections render already knowing their state.
-    const groups = result.data.filter((s) => s.home.id === "cairn" || s.home.present);
+    const groups = result.data.filter((s) => s.home.id === "forebay" || s.home.present);
     openHomes = Object.fromEntries(groups.map((group, index) => [group.home.id, index === 0]));
     sections = result.data;
   }
@@ -67,7 +67,7 @@
   async function loadGroup(homeId: string): Promise<void> {
     if (loadedHomes[homeId]) return;
     loadedHomes = { ...loadedHomes, [homeId]: true };
-    const schemas = await cairn.configSchemas(homeId);
+    const schemas = await forebay.configSchemas(homeId);
     if (schemas.ok) schemasByHome = { ...schemasByHome, [homeId]: schemas.data };
   }
 
@@ -78,7 +78,7 @@
   });
 
   // Whichever plugin manages this home's plugins owns the automatic-update settings, so the row
-  // is found by what it PROVIDES. Cairn renders a screen for a capability, never for a plugin.
+  // is found by what it PROVIDES. Forebay renders a screen for a capability, never for a plugin.
   function managerSchemaFor(homeId: string): PluginConfigSchema | null {
     return (schemasByHome[homeId] ?? []).find((s) => s.capabilities?.includes(PLUGIN_MANAGEMENT)) ?? null;
   }
@@ -86,43 +86,43 @@
   async function handleThemeChange(next: ThemeSetting): Promise<void> {
     themeSetting = next;
     applyThemeSetting(next);
-    await cairn.setConfig("cairn", "theme", next);
+    await forebay.setConfig("forebay", "theme", next);
   }
 
   async function handleShowDeprecatedChange(on: boolean): Promise<void> {
     showDeprecated = on;
-    await cairn.setConfig("cairn", "showDeprecated", on);
+    await forebay.setConfig("forebay", "showDeprecated", on);
   }
 
   async function handleAutoUpdateChange(on: boolean): Promise<void> {
     autoUpdateDefault = on;
-    await cairn.setConfig("cairn", "autoUpdateDefault", on);
+    await forebay.setConfig("forebay", "autoUpdateDefault", on);
   }
 
   async function handleProxyAutostartChange(on: boolean): Promise<void> {
     proxyAutostart = on;
-    await cairn.setConfig("cairn", "proxyAutostart", on);
+    await forebay.setConfig("forebay", "proxyAutostart", on);
   }
 
   async function handlePruneLibrariesChange(on: boolean): Promise<void> {
     pruneLibraries = on;
-    await cairn.setConfig("cairn", "pruneUnusedLibraries", on);
+    await forebay.setConfig("forebay", "pruneUnusedLibraries", on);
   }
 
-  // Every section here is a plugin's own declaration, rendered generically. Cairn keeps no
+  // Every section here is a plugin's own declaration, rendered generically. Forebay keeps no
   // knowledge of which plugin contributes what.
   let contributed = $state<PluginSettingsSection[]>([]);
   const homeLabels = $derived(Object.fromEntries(sections.map((s) => [s.home.id, s.home.label])));
 
   async function loadContributed(): Promise<void> {
-    const cached = await cairn.settingsSections();
+    const cached = await forebay.settingsSections();
     if (cached.ok) contributed = cached.data;
-    const fresh = await cairn.settingsSections({ wait: true });
+    const fresh = await forebay.settingsSections({ wait: true });
     if (fresh.ok) contributed = fresh.data;
   }
 
   onMount(() => {
-    loadCairnSettings();
+    loadForebaySettings();
     loadAppGroups();
     loadContributed();
   });
@@ -187,7 +187,7 @@
 <section class="category">
   <h2>Local API</h2>
   <Card>
-    <SettingRow name="Start the local API on launch" description="Autostart the proxy daemon when Cairn opens.">
+    <SettingRow name="Start the local API on launch" description="Autostart the proxy daemon when Forebay opens.">
       {#snippet control()}
         <ToggleSwitch checked={proxyAutostart} label="Start the local API on launch" onchange={handleProxyAutostartChange} />
       {/snippet}

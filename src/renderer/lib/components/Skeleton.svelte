@@ -23,9 +23,9 @@
     display: block;
     background: linear-gradient(90deg, var(--surface) 25%, var(--border) 37%, var(--surface) 63%);
     background-size: 400% 100%;
-    animation: cairn-shimmer 1.4s ease infinite;
+    animation: forebay-shimmer 1.4s ease infinite;
   }
-  @keyframes cairn-shimmer {
+  @keyframes forebay-shimmer {
     0% { background-position: 100% 0; }
     100% { background-position: 0 0; }
   }

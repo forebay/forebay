@@ -15,16 +15,16 @@ describe("sidecar activity module", () => {
   it("reads activity across present homes and excludes absent ones", async () => {
     let seenHomes: string[] = [];
     const res = await activityRead({ impacts: ["notice"] }, {
-      homes: async () => [home("cairn", "/cairn"), home("claude", "/c"), home("opencode", "/o", false)],
+      homes: async () => [home("forebay", "/forebay"), home("claude", "/c"), home("opencode", "/o", false)],
       read: (homes, q) => {
         seenHomes = homes;
         expect(q.impacts).toEqual(["notice"]);
-        return { records: [record("1", "/cairn"), record("2", "/c")], nextCursor: undefined };
+        return { records: [record("1", "/forebay"), record("2", "/c")], nextCursor: undefined };
       },
     });
     expect(res.ok).toBe(true);
     if (!res.ok) return;
-    expect(seenHomes).toEqual(["/cairn", "/c"]);
+    expect(seenHomes).toEqual(["/forebay", "/c"]);
     expect(res.data.records.map((r) => r.id)).toEqual(["1", "2"]);
     expect(res.data.nextCursor).toBeUndefined();
   });
@@ -33,20 +33,20 @@ describe("sidecar activity module", () => {
     const { activityStatsRead } = await import("./activity.js");
     const seen: string[][] = [];
     const res = await activityStatsRead({
-      homes: async () => [home("cairn", "/cairn"), home("claude", "/c", false)],
+      homes: async () => [home("forebay", "/forebay"), home("claude", "/c", false)],
       stats: (dirs) => { seen.push(dirs); return { homes: [], bytes: 42, segments: 1 }; },
     });
 
     expect(res.ok).toBe(true);
     if (!res.ok) return;
     expect(res.data.bytes).toBe(42);
-    expect(seen).toEqual([["/cairn"]]);
+    expect(seen).toEqual([["/forebay"]]);
   });
 
   it("propagates a paging cursor from the reader", async () => {
     const res = await activityRead({}, {
-      homes: async () => [home("cairn", "/cairn")],
-      read: () => ({ records: [record("1", "/cairn")], nextCursor: "AQ==" }),
+      homes: async () => [home("forebay", "/forebay")],
+      read: () => ({ records: [record("1", "/forebay")], nextCursor: "AQ==" }),
     });
     expect(res.ok).toBe(true);
     if (!res.ok) return;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { HomeLibraries, HostApp, UnifiedLibrary } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { HomeLibraries, HostApp, UnifiedLibrary } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import { debounce } from "../util/debounce.js";
   import { buildUnifiedLibraries, isOrphan, orphanHomeIds } from "../util/unifiedLibraries.js";
@@ -110,7 +110,7 @@
       targets.map(homeLabel).join(", "),
       async () => {
         for (const homeId of targets) {
-          const removed = await cairn.librariesRemove(homeId, library.specifier);
+          const removed = await forebay.librariesRemove(homeId, library.specifier);
           if (!removed.ok) return removed;
         }
         return { ok: true, data: undefined } as const;
@@ -126,7 +126,7 @@
       const result = await track(
         `Remove ${plugin} everywhere`,
         "all homes",
-        () => cairn.pluginsRemoveEverywhere(plugin),
+        () => forebay.pluginsRemoveEverywhere(plugin),
         (data) => (data.outcomes.find((outcome) => outcome.error)?.error ?? null),
       );
       if (!result.ok) {
@@ -174,7 +174,7 @@
   }
 
   async function load(): Promise<void> {
-    const result = await cairn.librariesList();
+    const result = await forebay.librariesList();
     if (result.ok) {
       homes = result.data;
       loadError = "";

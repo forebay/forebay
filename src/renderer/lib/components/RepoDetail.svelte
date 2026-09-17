@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { onMount, untrack } from "svelte";
-  import type { RepoMeta, CatalogKind } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { RepoMeta, CatalogKind } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { renderMarkdown } from "../util/markdown.js";
   import PluginIcon, { LOGO_SIZE } from "./PluginIcon.svelte";
   import IconButton from "./IconButton.svelte";
@@ -57,13 +57,13 @@
   onMount(() => {
     // Paint cached stars/readme instantly, then refresh from GitHub in the
     // background so the panel never opens to an empty "Loading…" state.
-    cairn.repoMetaCached(repo.url).then((result) => {
+    forebay.repoMetaCached(repo.url).then((result) => {
       if (result.ok && result.data && !meta) {
         meta = result.data;
         metaLoaded = true;
       }
     });
-    cairn.repoMeta(repo.url).then((result) => {
+    forebay.repoMeta(repo.url).then((result) => {
       if (result.ok) meta = result.data;
       metaLoaded = true;
     });

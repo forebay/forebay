@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { getApps, getAppDescriptor, resolveHome } from "@intisy-ai/basekit";
 import { resolveStoreDir } from "../../main/lib/storeDir.js";
 import { appsDetect } from "../modules/apps.js";
-import { renderCairnMark } from "../../../packages/shared/src/logo.js";
+import { renderForebayMark } from "../../../packages/shared/src/logo.js";
 import { svgIconDataUri } from "./pluginIcon.js";
 import type { AppPresence, PluginHome, PluginHomeId, Result } from "../../../packages/shared/src/domain.js";
 import { hasCapability, listedPlugins, PLUGIN_MANAGEMENT } from "./pluginManager.js";
@@ -12,19 +12,19 @@ export function appRealHome(app: string, env: NodeJS.ProcessEnv = process.env, h
   return desc ? resolveHome(desc, env, home) : "";
 }
 
-// Cairn's OWN home: the store directory main launches the sidecar against, holding its
-// config, repos, accounts and logs. Anything about Cairn itself (its plugin home, where
+// Forebay's OWN home: the store directory main launches the sidecar against, holding its
+// config, repos, accounts and logs. Anything about Forebay itself (its plugin home, where
 // an install lands, the home its activity is stamped with and its background updates run
 // against) asks here, and gets the same directory `HUB_CONFIG_DIR` already points every
 // other sidecar path at.
 //
 // @implNote Neither of the two directories this used to name will do. basekit/auth's
 // getConfigDir falls back to the ACTIVE APP's home when HUB_CONFIG_DIR is unset, which
-// once made "install into Cairn" write into Claude's home. The app registry's directory
+// once made "install into Forebay" write into Claude's home. The app registry's directory
 // is a fixed global path so loaders and providers inside Claude or OpenCode can find it
 // without HUB_CONFIG_DIR, and naming it here pointed the plugin list, installs and
 // background updates at a directory nothing else ever wrote to.
-export function cairnHome(): string {
+export function forebayHome(): string {
   const forced = process.env.HUB_CONFIG_DIR?.trim();
   return forced || resolveStoreDir(process.env, process.platform, homedir());
 }
@@ -66,7 +66,7 @@ export async function loaderInstalled(
 
 export interface PluginHomesDeps {
   detect?: () => Promise<Result<AppPresence>>;
-  cairnDir?: string;
+  forebayDir?: string;
   managesPlugins?: (dir: string, appId: string) => boolean | Promise<boolean>;
   hasLoader?: (dir: string, loaderId?: string, appId?: string) => boolean | Promise<boolean>;
   appHome?: (app: string) => string;
@@ -76,7 +76,7 @@ export async function pluginHomes(deps: PluginHomesDeps = {}): Promise<PluginHom
   const detect = deps.detect ?? appsDetect;
   const managesPlugins = deps.managesPlugins ?? managerInstalled;
   const hasLoader = deps.hasLoader ?? loaderInstalled;
-  const cairnDir = deps.cairnDir ?? cairnHome();
+  const forebayDir = deps.forebayDir ?? forebayHome();
   const appHomeForId = deps.appHome ?? appRealHome;
   const detected = await detect();
   const present: AppPresence = detected.ok ? detected.data : {};
@@ -96,9 +96,9 @@ export async function pluginHomes(deps: PluginHomesDeps = {}): Promise<PluginHom
     }),
   );
   return [
-    // Cairn's own home is a home like any other: until something providing plugin-management is
+    // Forebay's own home is a home like any other: until something providing plugin-management is
     // installed into it, the only plugin it can gain is one that provides a capability itself.
-    { id: "cairn", label: "Cairn", icon: renderCairnMark(), dir: cairnDir, present: true, managesPlugins: await managesPlugins(cairnDir, "cairn") },
+    { id: "forebay", label: "Forebay", icon: renderForebayMark(), dir: forebayDir, present: true, managesPlugins: await managesPlugins(forebayDir, "forebay") },
     ...appHomes,
   ];
 }

@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor, within, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { router, consumeParams } from "../router.js";
 import { toasts, toast } from "../toast.js";
 import Providers from "./Providers.svelte";
@@ -14,7 +14,7 @@ describe("Providers screen", () => {
 
   it("renders a provider row from providersList and toggles exposure", async () => {
     const providersSetExposure = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -42,13 +42,13 @@ describe("Providers screen", () => {
   });
 
   it("shows an inline error when providersList fails", async () => {
-    stubCairn({ providersList: async () => ({ ok: false, error: "boom" }) });
+    stubForebay({ providersList: async () => ({ ok: false, error: "boom" }) });
     const { getByText } = render(Providers);
     await waitFor(() => expect(getByText(/boom/i)).toBeTruthy());
   });
 
   it("offers the All/Connected/OAuth/API key filter chips", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -71,7 +71,7 @@ describe("Providers screen", () => {
   });
 
   it("filters to authKind:oauth rows when the OAuth chip is active", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -92,7 +92,7 @@ describe("Providers screen", () => {
   });
 
   it("filters to authKind:api-key rows when the API key chip is active", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -113,7 +113,7 @@ describe("Providers screen", () => {
   });
 
   it("filters to accountCount>0 rows when the Connected chip is active", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -143,7 +143,7 @@ describe("Providers screen", () => {
       ok: true,
       data: { accounts: 1, providers: 2, routingImported: true, notes: ["exposed 2 provider(s) for Claude Code"] },
     }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: [] }),
       importApps,
       importPreview: async () => ({ ok: true, data: { accounts: 1, routingSlots: 2, exposedProviders: 2 } }),
@@ -164,7 +164,7 @@ describe("Providers screen", () => {
   });
 
   it("Import navigates to Apps when more than one app is importable", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({ ok: true, data: [] }),
       importApps: async () => ({
         ok: true,
@@ -184,7 +184,7 @@ describe("Providers screen", () => {
   });
 
   it("+ Add provider navigates to Plugins with deep-link params", async () => {
-    stubCairn({ providersList: async () => ({ ok: true, data: [] }) });
+    stubForebay({ providersList: async () => ({ ok: true, data: [] }) });
     router.set({ screen: "providers" });
 
     const { getByText } = render(Providers);
@@ -197,7 +197,7 @@ describe("Providers screen", () => {
   });
 
   it("filters rows by id or by label as the debounced search settles", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -233,7 +233,7 @@ describe("Providers screen", () => {
       enabled: true,
       exposure: { claude: false, opencode: false },
     }));
-    stubCairn({ providersList: async () => ({ ok: true, data }) });
+    stubForebay({ providersList: async () => ({ ok: true, data }) });
 
     const { getByText, container } = render(Providers);
     await waitFor(() => expect(getByText("Provider 0")).toBeTruthy());
@@ -248,7 +248,7 @@ describe("Providers screen", () => {
   });
 
   it("shows the provider's translator as a chip", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -262,7 +262,7 @@ describe("Providers screen", () => {
   });
 
   it("shows the provider id beside a display name that differs from it", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -277,7 +277,7 @@ describe("Providers screen", () => {
   });
 
   it("says a provider whose bundle failed to load will not load, and why", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -293,14 +293,14 @@ describe("Providers screen", () => {
   });
 
   it("opens the custom endpoints dialog from the toolbar", async () => {
-    stubCairn({ providersList: async () => ({ ok: true, data: [] }), customEndpointsList: async () => ({ ok: true, data: [] }) });
+    stubForebay({ providersList: async () => ({ ok: true, data: [] }), customEndpointsList: async () => ({ ok: true, data: [] }) });
     const { findByRole } = render(Providers);
     await fireEvent.click(await findByRole("button", { name: /custom endpoints/i }));
     expect(await findByRole("dialog", { name: /custom endpoints/i })).toBeInTheDocument();
   });
 
   it("collapsing the Available group hides its rows", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -320,7 +320,7 @@ describe("Providers screen", () => {
   });
 
   it("toasts an error when setting a provider enabled fails, without a success toast", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -341,7 +341,7 @@ describe("Providers screen", () => {
   it("shows a loading skeleton before providers resolve, then content", async () => {
     let resolveProviders!: (v: { ok: true; data: [] }) => void;
     const pending = new Promise<{ ok: true; data: [] }>((r) => (resolveProviders = r));
-    stubCairn({
+    stubForebay({
       providersList: () => pending,
       appsList: async () => ({ ok: true, data: [] }),
     });
@@ -353,7 +353,7 @@ describe("Providers screen", () => {
   });
 
   it("renders a view toggle and starts in grid mode when that is the stored preference, showing compact provider cards", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -375,7 +375,7 @@ describe("Providers screen", () => {
   });
 
   it("grid mode renders a provider's real icon instead of a lettermark", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -395,7 +395,7 @@ describe("Providers screen", () => {
   });
 
   it("grid mode falls back to a lettermark when a provider carries no icon", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -416,7 +416,7 @@ describe("Providers screen", () => {
 
   it("switches back to list view and persists the choice", async () => {
     const setConfig = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -435,12 +435,12 @@ describe("Providers screen", () => {
 
     await waitFor(() => expect(screen.queryByTestId("providers-grid")).toBeNull());
     expect(screen.getByText("Stub")).toBeInTheDocument();
-    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("cairn", "viewMode.providers", "list"));
+    await waitFor(() => expect(setConfig).toHaveBeenCalledWith("forebay", "viewMode.providers", "list"));
   });
 
   it("grid mode's enable switch reuses the same providersSetEnabled wiring", async () => {
     const providersSetEnabled = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -461,7 +461,7 @@ describe("Providers screen", () => {
 
   it("enabling one provider does not touch another provider's enabled call", async () => {
     const providersSetEnabled = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -481,7 +481,7 @@ describe("Providers screen", () => {
   });
 
   it("clicking a provider row opens its detail modal", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [
@@ -500,7 +500,7 @@ describe("Providers screen", () => {
   });
 
   it("clicking the enable toggle does not open the detail modal", async () => {
-    stubCairn({
+    stubForebay({
       providersList: async () => ({
         ok: true,
         data: [

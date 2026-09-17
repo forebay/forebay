@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Chain, ModelCatalogEntry, RoutingApp } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { Chain, ModelCatalogEntry, RoutingApp } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import { navigate } from "../router.js";
   import Card from "../components/Card.svelte";
@@ -34,7 +34,7 @@
   }
 
   async function load(): Promise<void> {
-    const result = await cairn.routingGet(app);
+    const result = await forebay.routingGet(app);
     if (result.ok) {
       tiers = result.data.tiers;
       map = result.data.map;
@@ -52,7 +52,7 @@
   }
 
   async function setChain(slot: string, chain: { provider: string; model: string }[]): Promise<void> {
-    const result = await cairn.routingSetChain(app, slot, chain);
+    const result = await forebay.routingSetChain(app, slot, chain);
     if (!result.ok) {
       toast.error(result.error);
     } else {
@@ -94,7 +94,7 @@
   }
 
   onMount(async () => {
-    const result = await cairn.routingApps();
+    const result = await forebay.routingApps();
     if (result.ok) {
       apps = result.data;
       app = result.data[0]?.app ?? "";

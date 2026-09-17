@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { cairn } from "../ipc.js";
+import { forebay } from "../ipc.js";
 
 // Counts error-impact activity records seen since the Activity screen was last
 // opened. Wired once at app startup (App.svelte) so the sidebar badge stays
@@ -11,7 +11,7 @@ export const unseenErrorCount = writable(0);
 let active = false;
 
 export function watchActivityErrors(): () => void {
-  return cairn.onActivityEvent((record) => {
+  return forebay.onActivityEvent((record) => {
     if (record.impact === "error" && !active) unseenErrorCount.update((n) => n + 1);
   });
 }

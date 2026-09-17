@@ -3,7 +3,7 @@ import type { Result, BusEvent, PluginHome } from "../../../packages/shared/src/
 import { pluginHomes } from "../lib/pluginHomes.js";
 import { wrap } from "../result.js";
 
-const CONSUMER_ID = "cairn-ui";
+const CONSUMER_ID = "forebay-ui";
 
 export interface BusDeps {
   homes?: () => Promise<PluginHome[]>;

@@ -1,4 +1,4 @@
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 
 export interface ActivityHop {
   record: ActivityRecord;

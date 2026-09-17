@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { HostApp, AppConnection, AppSummary, ImportableApp } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { HostApp, AppConnection, AppSummary, ImportableApp } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { track } from "../downloads.js";
   import { debounce } from "../util/debounce.js";
   import StatusPill from "../components/StatusPill.svelte";
@@ -50,7 +50,7 @@
     applySearch(searchRaw);
   });
 
-  const hostApps = $derived(apps.filter((app) => app.id !== "cairn"));
+  const hostApps = $derived(apps.filter((app) => app.id !== "forebay"));
   const visibleApps = $derived.by(() => {
     const term = search.trim().toLowerCase();
     if (!term) return hostApps;
@@ -96,12 +96,12 @@
   }
 
   async function loadApps(): Promise<void> {
-    const result = await cairn.appsList();
+    const result = await forebay.appsList();
     if (result.ok) apps = result.data;
   }
 
   async function loadConn(app: string): Promise<void> {
-    const result = await cairn.appsConnection(app);
+    const result = await forebay.appsConnection(app);
     if (result.ok) {
       conns = { ...conns, [app]: result.data };
       connError = "";
@@ -111,7 +111,7 @@
   }
 
   async function loadImportable(): Promise<void> {
-    const result = await cairn.importApps();
+    const result = await forebay.importApps();
     if (result.ok) importable = result.data;
   }
 
@@ -121,7 +121,7 @@
     summaryGen[app] = gen;
     summaries = { ...summaries, [app]: null };
     summaryErrors = { ...summaryErrors, [app]: "" };
-    cairn.appsSummary(app).then((result) => {
+    forebay.appsSummary(app).then((result) => {
       if (summaryGen[app] !== gen) return;
       if (result.ok) {
         summaries = { ...summaries, [app]: result.data };
@@ -150,9 +150,9 @@
   // in its own CLI. Apps without a loader fall back to a direct CLI install.
   async function handlePrimary(app: HostApp): Promise<void> {
     if (conns[app.id]?.loaderId) {
-      await withBusy(app.id, () => track(`Connect ${app.label}`, app.id, () => cairn.appsInstallLoader(app.id)));
+      await withBusy(app.id, () => track(`Connect ${app.label}`, app.id, () => forebay.appsInstallLoader(app.id)));
     } else {
-      await withBusy(app.id, () => track(`Install ${app.label} CLI`, app.id, () => cairn.appsInstallCli(app.id)));
+      await withBusy(app.id, () => track(`Install ${app.label} CLI`, app.id, () => forebay.appsInstallCli(app.id)));
     }
     await loadConn(app.id);
   }
@@ -164,7 +164,7 @@
   }
 
   async function handleUninstall(app: HostApp, wipe: boolean): Promise<void> {
-    await track(`Uninstall ${app.label}`, app.id, () => cairn.appsUninstallCli(app.id, wipe));
+    await track(`Uninstall ${app.label}`, app.id, () => forebay.appsUninstallCli(app.id, wipe));
     const { [app.id]: _removed, ...rest } = summaries;
     summaries = rest;
     selected = null;
@@ -173,7 +173,7 @@
 
   onMount(() => {
     Promise.all([loadApps(), loadImportable()])
-      .then(() => Promise.all(apps.filter((a) => a.id !== "cairn").map((a) => loadConn(a.id))))
+      .then(() => Promise.all(apps.filter((a) => a.id !== "forebay").map((a) => loadConn(a.id))))
       .finally(() => (loaded = true));
     loadViewMode("apps").then((mode) => { view = mode; viewLoaded = true; });
   });
@@ -183,7 +183,7 @@
   title="Apps"
   subtitle={loaded && hostApps.length > 0
     ? `${connectedCount} of ${hostApps.length} connected and routing through the local API.`
-    : "Connect the host CLIs Cairn routes through the local API."}
+    : "Connect the host CLIs Forebay routes through the local API."}
 />
 
 {#if connError}

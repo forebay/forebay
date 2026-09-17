@@ -48,7 +48,7 @@ export interface Runner {
 // The worker is emitted as a SIBLING of the sidecar bundle this code is inlined into
 // (out/main/sidecar.js and out/main/installer.js), so it resolves against this module's own
 // directory. The override exists because running from source puts this file a few dirs deeper.
-export const INSTALLER_PATH_ENV = "CAIRN_INSTALLER_PATH";
+export const INSTALLER_PATH_ENV = "FOREBAY_INSTALLER_PATH";
 
 function workerPath(): string {
   const override = process.env[INSTALLER_PATH_ENV];

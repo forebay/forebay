@@ -21,9 +21,9 @@ export interface MarketplaceDeps extends OrgScanDeps {
 
 // The one source every home starts with. Kept as a github-org source rather than a special
 // case so the built-in marketplace goes through exactly the same path as an added one, and
-// the existing cairn.marketplaceOrg setting keeps choosing which org that is.
+// the existing forebay.marketplaceOrg setting keeps choosing which org that is.
 export function builtInSource(): MarketplaceSource {
-  const configured = getConfigValue("cairn", "marketplaceOrg");
+  const configured = getConfigValue("forebay", "marketplaceOrg");
   const org = typeof configured === "string" && configured.trim() ? configured.trim() : ECOSYSTEM_ORG;
   return { id: org, label: org, type: "github-org", org };
 }

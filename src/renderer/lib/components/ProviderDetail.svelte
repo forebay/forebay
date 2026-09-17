@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
-  import type { ProviderRow as ProviderRowData, AccountView, HostApp, PluginConfigSchema } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ProviderRow as ProviderRowData, AccountView, HostApp, PluginConfigSchema } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import { accountLabel, accountStatusInfo } from "../util/accountStatus.js";
   import { fadeMotion, flyMotion } from "../util/motion.js";
@@ -16,10 +16,10 @@
   import PluginControls from "./PluginControls.svelte";
   import PluginIcon, { LOGO_SIZE } from "./PluginIcon.svelte";
 
-  // Providers are deployed under Cairn's own repos/plugin dirs (see
-  // sidecar/modules/providers.ts), so their settings always live in the "cairn"
+  // Providers are deployed under Forebay's own repos/plugin dirs (see
+  // sidecar/modules/providers.ts), so their settings always live in the "forebay"
   // plugin home regardless of which app(s) they're exposed to.
-  const PROVIDER_SETTINGS_HOME = "cairn";
+  const PROVIDER_SETTINGS_HOME = "forebay";
 
   let { provider, apps, onClose, onChanged }: {
     provider: ProviderRowData;
@@ -48,7 +48,7 @@
   }
 
   async function loadAccounts(): Promise<void> {
-    const result = await cairn.accountsList(provider.id);
+    const result = await forebay.accountsList(provider.id);
     if (result.ok) {
       accounts = result.data;
       accountsError = "";
@@ -58,14 +58,14 @@
   }
 
   async function handleToggleAccount(id: string, on: boolean): Promise<void> {
-    const result = await cairn.accountsEnable(provider.id, id, on);
+    const result = await forebay.accountsEnable(provider.id, id, on);
     if (!result.ok) toast.error(result.error);
     await loadAccounts();
     onChanged();
   }
 
   async function handleRemoveAccount(id: string): Promise<void> {
-    const result = await cairn.accountsRemove(provider.id, id);
+    const result = await forebay.accountsRemove(provider.id, id);
     if (result.ok) toast.success("Account removed");
     else toast.error(result.error);
     await loadAccounts();
@@ -83,13 +83,13 @@
 
   async function handleToggleExposure(appId: string, on: boolean): Promise<void> {
     exposure = { ...exposure, [appId]: on };
-    const result = await cairn.providersSetExposure(provider.id, appId, on);
+    const result = await forebay.providersSetExposure(provider.id, appId, on);
     if (!result.ok) toast.error(result.error);
     onChanged();
   }
 
   async function loadSettings(): Promise<void> {
-    const result = await cairn.configSchemas(PROVIDER_SETTINGS_HOME);
+    const result = await forebay.configSchemas(PROVIDER_SETTINGS_HOME);
     settingsSchema = result.ok ? (result.data.find((s) => s.plugin === provider.pluginName) ?? null) : null;
     settingsLoading = false;
   }

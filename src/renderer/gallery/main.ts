@@ -1,6 +1,6 @@
 import { mount } from "svelte";
 import "../app.css";
-import { stubCairn } from "../lib/testing.js";
+import { stubForebay } from "../lib/testing.js";
 import { screenFixtures } from "./fixtures.js";
 import Gallery from "./Gallery.svelte";
 import { SECTIONS } from "./sections.js";
@@ -13,7 +13,7 @@ const target = document.getElementById("gallery");
 if (!target) throw new Error("missing #gallery mount element");
 
 document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
-stubCairn(screenFixtures());
+stubForebay(screenFixtures());
 
 (window as unknown as { gallerySections: { id: string; viewportHeight?: number }[] }).gallerySections =
   SECTIONS.map((entry) => ({ id: entry.id, viewportHeight: entry.viewportHeight }));

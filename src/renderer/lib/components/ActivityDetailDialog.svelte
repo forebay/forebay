@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ActivityRecord } from "@cairn/shared";
-  import { formatDuration } from "@cairn/shared";
+  import type { ActivityRecord } from "@forebay/shared";
+  import { formatDuration } from "@forebay/shared";
   import Button from "./Button.svelte";
   import StatusPill, { type StatusVariant } from "./StatusPill.svelte";
   import { humanizeId } from "../util/appLabel.js";

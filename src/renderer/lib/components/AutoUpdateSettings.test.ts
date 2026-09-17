@@ -5,7 +5,7 @@ import { render, fireEvent, waitFor } from "@testing-library/svelte";
 const configWrite = vi.fn(async () => ({ ok: true as const, data: undefined }));
 
 vi.mock("../ipc.js", () => ({
-  cairn: {
+  forebay: {
     get configWrite() { return configWrite; },
   },
 }));
@@ -18,8 +18,8 @@ beforeEach(() => {
 // and the component must follow the schema rather than a name it knows.
 const SCHEMA = {
   plugin: "manager",
-  defaults: { auto_update_mode: "update", auto_update_triggers: { loader: true, app: true, cairn: true } },
-  current: { auto_update_mode: "check", auto_update_triggers: { loader: true, app: true, cairn: true } },
+  defaults: { auto_update_mode: "update", auto_update_triggers: { loader: true, app: true, forebay: true } },
+  current: { auto_update_mode: "check", auto_update_triggers: { loader: true, app: true, forebay: true } },
 };
 
 describe("AutoUpdateSettings", () => {
@@ -64,7 +64,7 @@ describe("AutoUpdateSettings", () => {
     const toggle = getByRole("switch", { name: "Check when this app starts" });
     await fireEvent.click(toggle);
     expect(configWrite).toHaveBeenCalledWith("claude", "manager", "auto_update_triggers", {
-      loader: true, app: false, cairn: true,
+      loader: true, app: false, forebay: true,
     });
   });
 

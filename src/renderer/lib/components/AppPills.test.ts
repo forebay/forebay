@@ -17,11 +17,11 @@ describe("AppPills", () => {
     expect(container.textContent?.trim()).toBe("");
   });
 
-  // Cairn's own mark carries CSS variables, which resolve only while the markup is part of
+  // Forebay's own mark carries CSS variables, which resolve only while the markup is part of
   // the page; behind an <img> they resolve to nothing and it renders blank.
   it("inlines an icon given as SVG markup instead of putting it behind an img", () => {
     const { container } = render(AppPills, {
-      props: { apps: [{ id: "cairn", label: "Cairn", icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="8" fill="var(--x)"/></svg>' }], values: { cairn: true } },
+      props: { apps: [{ id: "forebay", label: "Forebay", icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="8" fill="var(--x)"/></svg>' }], values: { forebay: true } },
     });
     expect(container.querySelector("img")).toBeNull();
     expect(container.querySelector(".glyph svg")).toBeTruthy();

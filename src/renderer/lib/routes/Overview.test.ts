@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { router } from "../router.js";
 import { dayKey } from "../charts/chartMath.js";
 import Overview from "./Overview.svelte";
@@ -24,7 +24,7 @@ function summaryWith(providerHealth: { provider: string; accounts: number; quota
 
 beforeEach(() => {
   router.set({ screen: "overview" });
-  stubCairn({
+  stubForebay({
     overviewSummary: async () => ({
       ok: true,
       data: {
@@ -83,7 +83,7 @@ describe("Overview dashboard", () => {
   });
 
   it("still renders stats when the usage read fails", async () => {
-    stubCairn({
+    stubForebay({
       overviewSummary: async () => ({
         ok: true,
         data: {
@@ -104,7 +104,7 @@ describe("Overview dashboard", () => {
   });
 
   it("hides the reasoning series from the usage chart when reasoning tokens are always zero", async () => {
-    stubCairn({
+    stubForebay({
       overviewSummary: async () => ({ ok: true, data: summaryWith([]) }),
       usageSnapshot: async () => ({
         ok: true,
@@ -134,7 +134,7 @@ describe("Overview dashboard", () => {
   });
 
   it("shows the reasoning series in the usage chart when reasoning tokens are non-zero", async () => {
-    stubCairn({
+    stubForebay({
       overviewSummary: async () => ({ ok: true, data: summaryWith([]) }),
       usageSnapshot: async () => ({
         ok: true,

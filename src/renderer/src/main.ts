@@ -1,5 +1,5 @@
 import { mount } from "svelte";
-import { cairnMarkDataUri } from "@cairn/shared";
+import { forebayMarkDataUri } from "@forebay/shared";
 import "../app.css";
 import App from "../App.svelte";
 import { initTheme } from "../lib/theme.js";
@@ -8,7 +8,7 @@ function setFavicon(): void {
   const link = document.querySelector<HTMLLinkElement>("link[rel='icon']") ?? document.createElement("link");
   link.rel = "icon";
   link.type = "image/svg+xml";
-  link.href = cairnMarkDataUri();
+  link.href = forebayMarkDataUri();
   document.head.appendChild(link);
 }
 

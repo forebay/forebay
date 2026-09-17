@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/svelte";
-import type { Job, ActivityRecord } from "@cairn/shared";
+import type { Job, ActivityRecord } from "@forebay/shared";
 import { resetDownloadsForTest, seedJobsForTest, seedTasksForTest } from "../downloads.js";
 
 const cancelled: string[] = [];
@@ -10,7 +10,7 @@ let historyRecords: ActivityRecord[] = [];
 let installedNames: string[] = ["config-ledger"];
 
 vi.mock("../ipc.js", () => ({
-  cairn: {
+  forebay: {
     jobsCancel: async (id: string) => { cancelled.push(id); return { ok: true, data: true }; },
     jobsClearFinished: async () => ({ ok: true, data: undefined }),
     jobsList: async () => ({ ok: true, data: [] }),
@@ -208,13 +208,13 @@ describe("Downloads screen", () => {
     historyRecords = [
       record({ id: "a", ts: 3, origin: { app: "claude", home: "/c" } } as Partial<ActivityRecord>),
       record({ id: "b", ts: 2, origin: { app: "opencode", home: "/o" } } as Partial<ActivityRecord>),
-      record({ id: "c", ts: 1, origin: { app: "cairn", home: "/k" } } as Partial<ActivityRecord>),
+      record({ id: "c", ts: 1, origin: { app: "forebay", home: "/k" } } as Partial<ActivityRecord>),
     ];
     const { container } = render(Downloads);
     await screen.findByText("config-ledger");
     const rows = container.querySelectorAll("[data-testid='history-row']");
     expect(rows).toHaveLength(1);
-    expect([...rows[0].querySelectorAll(".chip")].map((c) => c.textContent)).toEqual(["Claude", "Opencode", "Cairn"]);
+    expect([...rows[0].querySelectorAll(".chip")].map((c) => c.textContent)).toEqual(["Claude", "Opencode", "Forebay"]);
   });
 
   it("carries no column the log cannot fill", async () => {

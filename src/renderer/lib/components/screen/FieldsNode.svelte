@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ScreenNode, PluginConfigSchema, FieldSpec } from "@cairn/shared";
-  import { cairn } from "../../ipc.js";
+  import type { ScreenNode, PluginConfigSchema, FieldSpec } from "@forebay/shared";
+  import { forebay } from "../../ipc.js";
   import PluginControls from "../PluginControls.svelte";
   import Skeleton from "../Skeleton.svelte";
   import type { ScreenContext } from "./context.js";
@@ -18,7 +18,7 @@
   // nothing. `layout.fields` has no such fallback, and `hideContributed` is what reads it.
   async function load(homeId: string, plugin: string, fieldKeys: string[]): Promise<void> {
     loaded = false;
-    const result = await cairn.configSchemas(homeId);
+    const result = await forebay.configSchemas(homeId);
     loaded = true;
     const full = result.ok ? (result.data.find((s) => s.plugin === plugin) ?? null) : null;
     if (!full) { schema = null; return; }

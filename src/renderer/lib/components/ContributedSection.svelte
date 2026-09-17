@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { PluginConfigSchema, PluginSettingsSection } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { PluginConfigSchema, PluginSettingsSection } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import Card from "./Card.svelte";
   import PluginControls from "./PluginControls.svelte";
   import Skeleton from "./Skeleton.svelte";
 
-  // A settings section a plugin asked for. Cairn supplies the frame and the attribution;
+  // A settings section a plugin asked for. Forebay supplies the frame and the attribution;
   // everything inside it is the plugin's own declared controls.
   let { section, homeLabels = {} }: { section: PluginSettingsSection; homeLabels?: Record<string, string> } = $props();
 
@@ -23,7 +23,7 @@
   let loaded = $state(false);
 
   async function load(homeId: string): Promise<void> {
-    const result = await cairn.configSchemas(homeId);
+    const result = await forebay.configSchemas(homeId);
     if (selectedHome !== homeId) return;
     loaded = true;
     if (!result.ok) {

@@ -47,7 +47,7 @@ function offersByCapability(entries: CatalogEntry[]): Map<string, CatalogEntry> 
 /**
  * @remarks
  * Reads every home's OWN declared marketplace sources rather than seeding from one: a capability
- * offered only through a non-Cairn home's sources would otherwise never appear as a row, even
+ * offered only through a non-Forebay home's sources would otherwise never appear as a row, even
  * though installing it into that home would work. `catalogEntriesFor` caches per home, so this
  * costs one cached read per home rather than one fetch per home.
  */
@@ -71,8 +71,8 @@ export function enginesList(deps: EnginesDeps = {}): Promise<Result<EngineView[]
  * Installs the plugin providing a capability into ONE named home, when that home has none.
  *
  * @remarks
- * The home is resolved from every home Cairn manages rather than from a target list: a capability
- * that normally belongs to an app home is still needed in Cairn's own home once something there has
+ * The home is resolved from every home Forebay manages rather than from a target list: a capability
+ * that normally belongs to an app home is still needed in Forebay's own home once something there has
  * to be managed.
  */
 export function ensureEngineIn(capability: string, homeId: string, deps: EnginesDeps = {}): Promise<Result<void>> {

@@ -6,7 +6,7 @@ import { scanOrg, resetOrgScanCache } from "./orgScan.js";
 
 beforeEach(() => {
   resetOrgScanCache();
-  // resolveToken now falls through to a Cairn-config token, so isolate every test
+  // resolveToken now falls through to a Forebay-config token, so isolate every test
   // from whatever real config dir the developer/CI machine happens to have.
   process.env.HUB_CONFIG_DIR = mkdtempSync(join(tmpdir(), "dash-orgscan-"));
 });
@@ -59,7 +59,7 @@ describe("scanOrg", () => {
 
   it("prefers a configured token over an anonymous scan when there is no env token", async () => {
     const { setConfigValue } = await import("@intisy-ai/basekit");
-    setConfigValue("cairn", "githubToken", "cfg-token");
+    setConfigValue("forebay", "githubToken", "cfg-token");
     const result = await scanOrg({
       fetchFn: okFetch([]),
       env: {},

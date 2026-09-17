@@ -1,4 +1,4 @@
-import type { HomeLibraries, UnifiedLibrary } from "@cairn/shared";
+import type { HomeLibraries, UnifiedLibrary } from "@forebay/shared";
 
 // One row per library rather than one per home. A library installed in three homes was listed
 // three times, which read as three libraries; the homes belong beside it, the way a plugin's do.

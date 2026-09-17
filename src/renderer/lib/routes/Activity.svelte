@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ActivityRecord, Impact } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ActivityRecord, Impact } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { setActivityActive } from "../stores/activity.js";
   import Card from "../components/Card.svelte";
   import ActivityFilters from "../components/ActivityFilters.svelte";
@@ -85,7 +85,7 @@
   }
 
   async function load(): Promise<void> {
-    const result = await cairn.activityRead({ limit: PAGE_LIMIT });
+    const result = await forebay.activityRead({ limit: PAGE_LIMIT });
     if (result.ok) {
       records = mergeRecords(records, result.data.records);
       nextCursor = result.data.nextCursor;
@@ -103,7 +103,7 @@
     loadingOlder = true;
     capacity += PAGE_LIMIT;
     const oldest = records.length ? records[records.length - 1].ts : undefined;
-    const result = await cairn.activityRead({ limit: PAGE_LIMIT, cursor: nextCursor, until: oldest });
+    const result = await forebay.activityRead({ limit: PAGE_LIMIT, cursor: nextCursor, until: oldest });
     if (result.ok) {
       records = mergeRecords(records, result.data.records);
       nextCursor = result.data.nextCursor;
@@ -116,7 +116,7 @@
   onMount(() => {
     setActivityActive(true);
     void load();
-    const stopLive = cairn.onActivityEvent((record) => {
+    const stopLive = forebay.onActivityEvent((record) => {
       records = mergeRecords(records, [record]);
     });
     return () => {

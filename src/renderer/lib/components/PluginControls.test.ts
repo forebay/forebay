@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor, screen } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
-import type { PluginConfigSchema } from "@cairn/shared";
+import { stubForebay } from "../testing.js";
+import type { PluginConfigSchema } from "@forebay/shared";
 import PluginControls from "./PluginControls.svelte";
 
 // A plugin's own page shows everything it declared; a screen that also renders the
@@ -35,7 +35,7 @@ describe("PluginControls and contributed sections", () => {
   });
 
   it("names the home a spanning write failed in, since the others may have succeeded", async () => {
-    stubCairn({
+    stubForebay({
       configWrite: async (home: string) => (home === "opencode" ? { ok: false, error: "read-only home" } : { ok: true, data: undefined }),
     });
     const schema: PluginConfigSchema = { plugin: "p", defaults: { on: true }, current: {}, fields: [{ key: "on", type: "boolean" }] };
@@ -56,7 +56,7 @@ describe("PluginControls and contributed sections", () => {
 describe("PluginControls", () => {
   it("renders a declared select and writes the coerced value", async () => {
     const writes: unknown[][] = [];
-    stubCairn({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
+    stubForebay({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: { mode: "fast" }, current: {},
       fields: [{ key: "mode", type: "select", label: "Mode", group: "Routing", options: [{ value: "fast", label: "Fast" }, { value: "cheap", label: "Cheap" }] }],
@@ -71,7 +71,7 @@ describe("PluginControls", () => {
 
   it("renders a number field honoring bounds and writes a number", async () => {
     const writes: unknown[][] = [];
-    stubCairn({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
+    stubForebay({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: { level: 3 }, current: {},
       fields: [{ key: "level", type: "number", min: 1, max: 9, step: 1 }],
@@ -86,7 +86,7 @@ describe("PluginControls", () => {
 
   it("falls back to type-inference when no fields are declared", async () => {
     const writes: unknown[][] = [];
-    stubCairn({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
+    stubForebay({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
     const schema: PluginConfigSchema = { plugin: "p", defaults: { enabled: true }, current: {} };
     render(PluginControls, { homeId: "claude", schema });
     const toggle = await screen.findByRole("switch", { name: "p enabled" });
@@ -96,7 +96,7 @@ describe("PluginControls", () => {
 
   it("runs an action after confirming and shows its output", async () => {
     const action = vi.fn(async () => ({ ok: true, data: { stdout: "pinged", stderr: "" } }) as const);
-    stubCairn({ configAction: action });
+    stubForebay({ configAction: action });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: {}, current: {},
       actions: [{ id: "ping", label: "Ping", confirm: "Send a ping?" }],
@@ -114,7 +114,7 @@ describe("PluginControls", () => {
   // immediately now collects first.
   it("asks for a declared arg before running, and runs with what was typed", async () => {
     const action = vi.fn(async () => ({ ok: true, data: { stdout: "created", stderr: "" } }) as const);
-    stubCairn({ configAction: action });
+    stubForebay({ configAction: action });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: {}, current: {},
       actions: [{ id: "profileCreate", label: "Create", args: [{ key: "name", type: "string", label: "Profile name" }] }],
@@ -133,7 +133,7 @@ describe("PluginControls", () => {
 
   it("abandons a collection on cancel, without running", async () => {
     const action = vi.fn(async () => ({ ok: true, data: { stdout: "", stderr: "" } }) as const);
-    stubCairn({ configAction: action });
+    stubForebay({ configAction: action });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: {}, current: {},
       actions: [{ id: "profileCreate", label: "Create", args: [{ key: "name", type: "string", label: "Profile name" }] }],
@@ -149,7 +149,7 @@ describe("PluginControls", () => {
 
   it("resolves a dot-path field's initial value from nested current/defaults", async () => {
     const writes: unknown[][] = [];
-    stubCairn({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
+    stubForebay({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: { categories: { accounts: true } }, current: { categories: { accounts: false } },
       fields: [{ key: "categories.accounts", type: "boolean", label: "Accounts" }],
@@ -163,7 +163,7 @@ describe("PluginControls", () => {
 
   it("adds a list item and writes the grown array", async () => {
     const writes: unknown[][] = [];
-    stubCairn({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
+    stubForebay({ configWrite: async (...args: unknown[]) => { writes.push(args); return { ok: true, data: undefined }; } });
     const schema: PluginConfigSchema = {
       plugin: "p", defaults: { hooks: ["https://a"] }, current: {},
       fields: [{ key: "hooks", type: "list", itemType: "string", label: "Hooks" }],

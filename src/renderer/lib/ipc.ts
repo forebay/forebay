@@ -1,9 +1,9 @@
-import type { CairnAPI } from "@cairn/shared";
+import type { ForebayAPI } from "@forebay/shared";
 import { cached, invalidate } from "./cache.js";
 
 declare global {
   interface Window {
-    cairn: CairnAPI;
+    forebay: ForebayAPI;
   }
 }
 
@@ -88,18 +88,18 @@ export function classify(name: string): IpcKind {
 }
 
 // Exported so a test can check the opposite drift: a name placed in either table with
-// no matching INVOKE_CHANNELS entry resolves window.cairn[name] to undefined at runtime,
+// no matching INVOKE_CHANNELS entry resolves window.forebay[name] to undefined at runtime,
 // silently, since the proxy's own guard only skips non-functions rather than reporting them.
 export function classifiedReadNames(): string[] {
   return [...Object.keys(READ_TTL), ...LIVE_READS];
 }
 
-export const cairn: CairnAPI = new Proxy({} as CairnAPI, {
+export const forebay: ForebayAPI = new Proxy({} as ForebayAPI, {
   get(_target, property) {
     const name = property as string;
-    const real = (window.cairn as unknown as Record<string | symbol, unknown>)?.[property];
+    const real = (window.forebay as unknown as Record<string | symbol, unknown>)?.[property];
     if (typeof real !== "function") return real;
-    const bound = (real as (...args: unknown[]) => unknown).bind(window.cairn);
+    const bound = (real as (...args: unknown[]) => unknown).bind(window.forebay);
     switch (classify(name)) {
       case "cached":
         return (...args: unknown[]) => cached(name + ":" + JSON.stringify(args), READ_TTL[name], () => bound(...args) as Promise<unknown>);

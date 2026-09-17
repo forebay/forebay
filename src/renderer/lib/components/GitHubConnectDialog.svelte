@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cairn } from "../ipc.js";
+  import { forebay } from "../ipc.js";
   import { fadeMotion, flyMotion } from "../util/motion.js";
   import Button from "./Button.svelte";
 
@@ -70,8 +70,8 @@
     error = "";
     try {
       const result = mode === "add"
-        ? await cairn.githubAddAccount(token.trim(), star)
-        : await cairn.githubConnectGhCli(star);
+        ? await forebay.githubAddAccount(token.trim(), star)
+        : await forebay.githubConnectGhCli(star);
       if (result.ok) {
         onDone();
       } else {
@@ -86,7 +86,7 @@
     busy = true;
     error = "";
     try {
-      const result = await cairn.githubDeviceStart();
+      const result = await forebay.githubDeviceStart();
       if (!result.ok) {
         error = result.error;
         return;
@@ -105,7 +105,7 @@
 
   async function pollDevice(): Promise<void> {
     if (!devicePolling) return;
-    const result = await cairn.githubDevicePoll(star);
+    const result = await forebay.githubDevicePoll(star);
     if (!devicePolling) return;
     if (!result.ok) {
       stopPolling();
@@ -144,11 +144,11 @@
   <h3>{title}</h3>
 
   <div class="permissions">
-    <span class="permlabel">Cairn will use this token to</span>
+    <span class="permlabel">Forebay will use this token to</span>
     <ul>
       <li>Read repositories and metadata, to list and enrich the plugin marketplace (names, logos, versions), including private repositories your token can access.</li>
       <li>Read organization data, to discover available plugins and loaders.</li>
-      <li>Star repositories, used only to star Cairn, if you leave the box below checked.</li>
+      <li>Star repositories, used only to star Forebay, if you leave the box below checked.</li>
     </ul>
   </div>
 
@@ -182,7 +182,7 @@
 
   <label class="starrow">
     <input type="checkbox" bind:checked={star} />
-    <span>Star Cairn on GitHub to support the project</span>
+    <span>Star Forebay on GitHub to support the project</span>
   </label>
 
   {#if error}

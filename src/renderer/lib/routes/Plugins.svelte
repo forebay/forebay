@@ -1,8 +1,8 @@
 ﻿<script lang="ts">
   import { onMount } from "svelte";
-  import type { HomePlugins, CatalogEntry, PluginHome, UnifiedPlugin, PluginVersion, Result, InstallManyResult, InstallOutcome, RepoRef, EngineView, GithubStatus, MarketplaceSourceStatus, MarketplaceContribution, HomePluginData, QuarantineView } from "@cairn/shared";
-  import { classifyRepoName, matchesContribution, LIBRARY_KINDS, formatBytes } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { HomePlugins, CatalogEntry, PluginHome, UnifiedPlugin, PluginVersion, Result, InstallManyResult, InstallOutcome, RepoRef, EngineView, GithubStatus, MarketplaceSourceStatus, MarketplaceContribution, HomePluginData, QuarantineView } from "@forebay/shared";
+  import { classifyRepoName, matchesContribution, LIBRARY_KINDS, formatBytes } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { consumeParams } from "../router.js";
   import { enqueue, enqueueJob, jobSettled, activeByPlugin } from "../downloads.js";
   import { toast } from "../toast.js";
@@ -202,7 +202,7 @@
     favoritesOnly = false;
     updatableOnly = false;
   }
-  const addPluginHome = $derived(homes[0]?.id ?? "cairn");
+  const addPluginHome = $derived(homes[0]?.id ?? "forebay");
   // Only counts what an updater could actually pull, so the button never promises a
   // no-op for a plugin sitting behind in an unmanaged home.
   const anyUpdateAvailable = $derived(unified.some((p) => behindHomesFor(p).length > 0));
@@ -210,7 +210,7 @@
   const selectedPlugin = $derived(selectedName ? unified.find((p) => p.name === selectedName) ?? null : null);
   const showRateLimitBanner = $derived(catalogRateLimited && !!ghStatus && !ghStatus.connected && !rateLimitBannerDismissed);
 
-  function applyPlugins(result: Awaited<ReturnType<typeof cairn.pluginsList>>): void {
+  function applyPlugins(result: Awaited<ReturnType<typeof forebay.pluginsList>>): void {
     if (result.ok) {
       sections = result.data;
       pluginsError = "";
@@ -219,7 +219,7 @@
     }
   }
 
-  function applyCatalog(result: Awaited<ReturnType<typeof cairn.catalogList>>): void {
+  function applyCatalog(result: Awaited<ReturnType<typeof forebay.catalogList>>): void {
     if (result.ok) {
       catalog = result.data.entries;
       catalogOrg = result.data.org;
@@ -233,23 +233,23 @@
   }
 
   async function loadCatalog(): Promise<void> {
-    applyCatalog(await cairn.catalogList());
+    applyCatalog(await forebay.catalogList());
   }
 
   async function loadGithubStatus(): Promise<void> {
-    const result = await cairn.githubStatus();
+    const result = await forebay.githubStatus();
     if (result.ok) ghStatus = result.data;
   }
 
   async function loadFavorites(): Promise<void> {
-    const result = await cairn.favoritesList();
+    const result = await forebay.favoritesList();
     if (result.ok) favorites = result.data;
   }
 
   // A failed read degrades to showing nothing: the quarantine notice is a bonus warning,
   // never a reason the rest of the Plugins tab fails to render.
   async function loadQuarantine(): Promise<void> {
-    const result = await cairn.pluginQuarantine();
+    const result = await forebay.pluginQuarantine();
     quarantine = result.ok ? result.data : [];
   }
 
@@ -268,10 +268,10 @@
   // Local favorite is instant and authoritative; the GitHub star is a best-effort
   // mirror fired off afterward and never blocks or reverts the local toggle.
   async function applyFavorite(p: UnifiedPlugin): Promise<void> {
-    const result = await cairn.favoritesToggle(p.name);
+    const result = await forebay.favoritesToggle(p.name);
     if (!result.ok) return;
     favorites = result.data;
-    if (p.url) void cairn.githubSetStar(p.url, result.data.includes(p.name));
+    if (p.url) void forebay.githubSetStar(p.url, result.data.includes(p.name));
   }
 
   // Show cached versions instantly, then overwrite with the freshly computed ones
@@ -279,11 +279,11 @@
   // The fresh pass runs in parallel; the cache only fills in until it arrives.
   async function loadVersions(): Promise<void> {
     let freshDone = false;
-    const fresh = cairn.pluginVersionsAll().then((result) => {
+    const fresh = forebay.pluginVersionsAll().then((result) => {
       freshDone = true;
       if (result.ok) versions = result.data;
     });
-    const cached = await cairn.pluginVersionsCached();
+    const cached = await forebay.pluginVersionsCached();
     if (!freshDone && cached.ok && Object.keys(cached.data).length > 0) versions = cached.data;
     await fresh;
   }
@@ -293,9 +293,9 @@
   async function paintFromCache(): Promise<void> {
     if (sections.length > 0) return;
     const [rows, cached, cachedVersions] = await Promise.all([
-      cairn.pluginsListCached(),
-      cairn.catalogListCached(),
-      cairn.pluginVersionsCached(),
+      forebay.pluginsListCached(),
+      forebay.catalogListCached(),
+      forebay.pluginVersionsCached(),
     ]);
     if (sections.length > 0 || !rows.ok || rows.data.length === 0 || !cached.ok || !cached.data) return;
     sections = rows.data;
@@ -309,9 +309,9 @@
   async function reload(): Promise<void> {
     const painting = paintFromCache();
     const [plugins, catalogResult, enginesResult] = await Promise.all([
-      cairn.pluginsList(),
-      cairn.catalogList(),
-      cairn.enginesList(),
+      forebay.pluginsList(),
+      forebay.catalogList(),
+      forebay.enginesList(),
       loadFavorites(),
       loadGithubStatus(),
       loadQuarantine(),
@@ -334,7 +334,7 @@
       connectDialogOpen = true;
       return;
     }
-    const result = await cairn.githubConnectGhCli(false);
+    const result = await forebay.githubConnectGhCli(false);
     if (result.ok) await finishBannerConnect();
   }
 
@@ -459,7 +459,7 @@
   // The toggle is only true once the clone matches it, so the switch runs the update that
   // makes it so. Returns whether the write succeeded, so the switch can revert itself on failure.
   async function setChannel(p: UnifiedPlugin, homeId: string, channel: "inherit" | "stable" | "experimental"): Promise<boolean> {
-    const result = await cairn.pluginsSetChannel(homeId, p.name, channel);
+    const result = await forebay.pluginsSetChannel(homeId, p.name, channel);
     if (!result.ok) {
       toast.error(result.error);
       return false;
@@ -474,7 +474,7 @@
   async function removeHome(p: UnifiedPlugin, homeId: string, data: HomePluginData[] = []): Promise<void> {
     const queued = await enqueueJob("remove", p.name, p.url ?? "", homeId);
     if (queued.ok) await jobSettled(queued.data.id);
-    else await cairn.pluginsUninstall(homeId, p.name);
+    else await forebay.pluginsUninstall(homeId, p.name);
     await deleteData(p, data.filter((entry) => entry.home.id === homeId));
     await reload();
   }
@@ -484,7 +484,7 @@
   // and the direct remove-everywhere alike.
   async function deleteData(p: UnifiedPlugin, data: HomePluginData[]): Promise<void> {
     for (const entry of data) {
-      const result = await cairn.pluginsRemoveData(entry.home.id, entry.entries.map((file) => file.path));
+      const result = await forebay.pluginsRemoveData(entry.home.id, entry.entries.map((file) => file.path));
       if (!result.ok) toast.error(`${p.displayName}: ${result.error}`);
     }
   }
@@ -493,7 +493,7 @@
   // about "config data" in the abstract. A read that fails offers nothing rather than
   // blocking the uninstall.
   async function dataToOffer(p: UnifiedPlugin): Promise<HomePluginData[]> {
-    const result = await cairn.pluginsData(p.name);
+    const result = await forebay.pluginsData(p.name);
     return result.ok ? result.data : [];
   }
 
@@ -530,7 +530,7 @@
   // Only a home with an updater can check or pull, so nothing here is offered without one.
   const updatesEnabled = $derived(homes.some((h) => h.managesPlugins));
   function updatableHomes(): PluginHome[] {
-    return homes.filter((h) => h.managesPlugins && (h.id === "cairn" || h.present));
+    return homes.filter((h) => h.managesPlugins && (h.id === "forebay" || h.present));
   }
 
   // A check refreshes the update cache every badge is read from, so the rows are
@@ -539,8 +539,8 @@
     if (checking) return;
     checking = true;
     try {
-      for (const home of updatableHomes()) await cairn.updatesCheck(home.id);
-      applyPlugins(await cairn.pluginsList());
+      for (const home of updatableHomes()) await forebay.updatesCheck(home.id);
+      applyPlugins(await forebay.pluginsList());
     } finally {
       checking = false;
     }
@@ -550,8 +550,8 @@
     if (updatingAll) return;
     updatingAll = true;
     try {
-      for (const home of updatableHomes()) await cairn.updatesAll(home.id);
-      applyPlugins(await cairn.pluginsList());
+      for (const home of updatableHomes()) await forebay.updatesAll(home.id);
+      applyPlugins(await forebay.pluginsList());
     } finally {
       updatingAll = false;
     }
@@ -572,7 +572,7 @@
     const result = await enqueue({
       label: `Remove ${p.displayName} everywhere`,
       home: homesLabel(homeIds) || "all homes",
-      run: () => cairn.pluginsRemoveEverywhere(p.name),
+      run: () => forebay.pluginsRemoveEverywhere(p.name),
       summarizeFailure: (data) => outcomesError(data.outcomes),
     });
     if (result.ok) toast.success(`${p.displayName} removed`);
@@ -616,13 +616,13 @@
 
   async function toggleDeprecated(): Promise<void> {
     showDeprecated = !showDeprecated;
-    await cairn.setConfig("cairn", "showDeprecated", showDeprecated);
+    await forebay.setConfig("forebay", "showDeprecated", showDeprecated);
   }
 
   onMount(() => {
     reload();
     loadViewMode("plugins").then((mode) => { view = mode; viewLoaded = true; });
-    cairn.getConfig("cairn", "showDeprecated").then((r) => {
+    forebay.getConfig("forebay", "showDeprecated").then((r) => {
       showDeprecated = r.ok && r.data === true;
     });
   });
@@ -683,7 +683,7 @@
     {/if}
   </div>
 
-  <!-- Categories installed plugins asked for. Cairn names none of them itself. -->
+  <!-- Categories installed plugins asked for. Forebay names none of them itself. -->
   {#if contributions.length > 0}
     <div class="filters" data-testid="contributed-filters">
       <span class="fromlabel">From installed plugins</span>

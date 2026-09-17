@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor, within, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { toasts, toast } from "../toast.js";
 import { consumeParams } from "../router.js";
 import Routing from "./Routing.svelte";
@@ -24,7 +24,7 @@ describe("Routing screen", () => {
   });
 
   it("renders a tier with its current chain", async () => {
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,
@@ -45,7 +45,7 @@ describe("Routing screen", () => {
 
   it("calls routingSetChain with the current app when adding a model to an empty tier", async () => {
     const routingSetChain = vi.fn(async () => ({ ok: true, data: { warnings: [] } }) as const);
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,
@@ -73,7 +73,7 @@ describe("Routing screen", () => {
   });
 
   it("shows an inline error when routingGet fails", async () => {
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({ ok: false, error: "boom" }),
     });
@@ -82,7 +82,7 @@ describe("Routing screen", () => {
   });
 
   it("surfaces warnings returned from routingSetChain", async () => {
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,
@@ -103,7 +103,7 @@ describe("Routing screen", () => {
   });
 
   it("renders a switcher with all app labels when more than one app is available", async () => {
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: TWO_APPS }),
       routingGet: async () => ({
         ok: true,
@@ -124,9 +124,9 @@ describe("Routing screen", () => {
       ok: true,
       data: { tiers: [`${app}-tier`], map: { default: [] }, catalog: CATALOG },
     }));
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: TWO_APPS }),
-      routingGet: routingGet as unknown as Parameters<typeof stubCairn>[0]["routingGet"],
+      routingGet: routingGet as unknown as Parameters<typeof stubForebay>[0]["routingGet"],
     });
 
     const { getByText } = render(Routing);
@@ -141,7 +141,7 @@ describe("Routing screen", () => {
 
   it("confirms before removing a routing step from a chain", async () => {
     const routingSetChain = vi.fn(async () => ({ ok: true, data: { warnings: [] } }) as const);
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,
@@ -168,7 +168,7 @@ describe("Routing screen", () => {
 
   it("toasts an error when removing a routing step fails, without a success toast", async () => {
     const routingSetChain = vi.fn(async () => ({ ok: false, error: "chain boom" }) as const);
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,
@@ -193,7 +193,7 @@ describe("Routing screen", () => {
   });
 
   it("shows an empty state when no app has a proxy plugin installed", async () => {
-    stubCairn({ routingApps: async () => ({ ok: true, data: [] }) });
+    stubForebay({ routingApps: async () => ({ ok: true, data: [] }) });
 
     const { getByText } = render(Routing);
 
@@ -202,7 +202,7 @@ describe("Routing screen", () => {
   });
 
   it("navigates to Plugins filtered to proxies from the empty-state CTA", async () => {
-    stubCairn({ routingApps: async () => ({ ok: true, data: [] }) });
+    stubForebay({ routingApps: async () => ({ ok: true, data: [] }) });
 
     const { getByText } = render(Routing);
 
@@ -215,7 +215,7 @@ describe("Routing screen", () => {
 
   it("reorders chain entries with the up/down controls", async () => {
     const routingSetChain = vi.fn(async () => ({ ok: true, data: { warnings: [] } }) as const);
-    stubCairn({
+    stubForebay({
       routingApps: async () => ({ ok: true, data: ONE_APP }),
       routingGet: async () => ({
         ok: true,

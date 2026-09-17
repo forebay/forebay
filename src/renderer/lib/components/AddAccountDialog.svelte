@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { LoginBegin } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { LoginBegin } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { toast } from "../toast.js";
   import Button from "./Button.svelte";
   import { fadeMotion, flyMotion } from "../util/motion.js";
@@ -26,7 +26,7 @@
   }
 
   async function cancelAndClose(): Promise<void> {
-    await cairn.accountsLoginCancel(provider.id);
+    await forebay.accountsLoginCancel(provider.id);
     onClose();
   }
 
@@ -46,7 +46,7 @@
     if (busy || !code.trim()) return;
     busy = true;
     completeError = "";
-    const result = await cairn.accountsLoginComplete(provider.id, code);
+    const result = await forebay.accountsLoginComplete(provider.id, code);
     busy = false;
     if (!result.ok) {
       completeError = result.error;
@@ -64,7 +64,7 @@
   // on the event bus. Watching for that is what lets the dialog finish on its own, instead of
   // waiting for a paste that is no longer needed.
   function watchForAutoLogin(): () => void {
-    return cairn.onActivityEvent((record) => {
+    return forebay.onActivityEvent((record) => {
       if (record.action !== "account_added") return;
       if (record.details?.provider !== provider.id) return;
       toast.success(record.subject?.label ? `Added account: ${record.subject.label}` : "Account added");
@@ -75,7 +75,7 @@
   onMount(() => {
     let stop: (() => void) | undefined;
     void (async () => {
-      const result = await cairn.accountsLoginBegin(provider.id);
+      const result = await forebay.accountsLoginBegin(provider.id);
       if (result.ok) {
         begin = result.data;
         if (result.data.loopback) stop = watchForAutoLogin();

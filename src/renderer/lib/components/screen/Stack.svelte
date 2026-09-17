@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode } from "@cairn/shared";
+  import type { ScreenNode } from "@forebay/shared";
   import ScreenRenderer from "./ScreenRenderer.svelte";
   import { styleOf } from "./registry.js";
   import type { ScreenContext } from "./context.js";

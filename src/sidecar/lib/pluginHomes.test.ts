@@ -4,7 +4,7 @@ import { tmpdir, homedir } from "node:os";
 import { join, dirname } from "node:path";
 import { appRealHome, pluginHomes, loaderInstalled, homeById } from "./pluginHomes.js";
 import { resolveStoreDir } from "../../main/lib/storeDir.js";
-import type { AppDescriptor } from "@intisy-ai/basekit";
+import { resolveAppsFile, type AppDescriptor } from "@intisy-ai/basekit";
 
 // getApps()/getAppDescriptor() now read solely from the apps.json registry (see
 // libs/basekit/src/apps.ts), so tests exercising real descriptor lookups need a
@@ -65,8 +65,9 @@ describe("appRealHome", () => {
     mkdirSync(join(tempDir, ".claude"));
     // appRealHome is called with an explicit env object (not process.env) below,
     // so getAppDescriptor falls back to the home-relative apps.json default path.
-    mkdirSync(join(tempDir, ".config", "cairn"), { recursive: true });
-    writeFileSync(join(tempDir, ".config", "cairn", "apps.json"), JSON.stringify({ claude: claudeApp, opencode: opencodeApp }));
+    const registry = resolveAppsFile({}, tempDir);
+    mkdirSync(dirname(registry), { recursive: true });
+    writeFileSync(registry, JSON.stringify({ claude: claudeApp, opencode: opencodeApp }));
 
     expect(appRealHome("claude", {}, tempDir).replaceAll("\\", "/")).toContain("/.claude");
     expect(appRealHome("opencode", { XDG_CONFIG_HOME: "/cfg" }, tempDir).replaceAll("\\", "/")).toBe("/cfg/opencode");
@@ -74,23 +75,23 @@ describe("appRealHome", () => {
 });
 
 describe("pluginHomes", () => {
-  // Cairn's own home is the store dir it was launched against, which is where its
+  // Forebay's own home is the store dir it was launched against, which is where its
   // config, repos and accounts are. Naming an APP's home instead made "install into
-  // Cairn" write into Claude's home and listed its plugins twice; naming the app
+  // Forebay" write into Claude's home and listed its plugins twice; naming the app
   // registry's directory instead pointed the plugin list at a directory nothing wrote to,
   // so an installed plugin read as absent.
-  it("takes cairn's home from the store dir it was launched against", async () => {
-    process.env.HUB_CONFIG_DIR = join(tmpdir(), "cairn-store");
+  it("takes forebay's home from the store dir it was launched against", async () => {
+    process.env.HUB_CONFIG_DIR = join(tmpdir(), "forebay-store");
     const homes = await pluginHomes({
       detect: async () => ({ ok: true, data: {} }),
       appHome: () => "/home/app",
       managesPlugins: () => false,
     });
-    expect(homes[0].id).toBe("cairn");
-    expect(homes[0].dir).toBe(join(tmpdir(), "cairn-store"));
+    expect(homes[0].id).toBe("forebay");
+    expect(homes[0].dir).toBe(join(tmpdir(), "forebay-store"));
   });
 
-  // Without the launcher's env the fallback still has to be Cairn's own store dir: the
+  // Without the launcher's env the fallback still has to be Forebay's own store dir: the
   // app registry sits at a fixed global path shared with the loaders, so it cannot stand
   // in for it, and an app's home is another app's territory.
   it("falls back to the platform store dir rather than an app home or the registry's dir", async () => {
@@ -105,26 +106,26 @@ describe("pluginHomes", () => {
     expect(homes[0].dir).not.toBe(dirname(process.env.HUB_APPS_FILE!));
   });
 
-  it("always lists cairn first (present, managesPlugins), then only detected apps", async () => {
+  it("always lists forebay first (present, managesPlugins), then only detected apps", async () => {
     const homes = await pluginHomes({
       detect: async () => ({ ok: true, data: { claude: true, opencode: false } }),
-      cairnDir: "/store",
+      forebayDir: "/store",
       appHome: (app) => (app === "claude" ? "/home/claude" : "/home/opencode"),
       managesPlugins: () => true,
     });
-    expect(homes[0]).toMatchObject({ id: "cairn", present: true, managesPlugins: true, dir: "/store" });
-    expect(homes.map((h) => h.id)).toEqual(["cairn", "claude", "opencode"]);
+    expect(homes[0]).toMatchObject({ id: "forebay", present: true, managesPlugins: true, dir: "/store" });
+    expect(homes.map((h) => h.id)).toEqual(["forebay", "claude", "opencode"]);
     expect(homes.find((h) => h.id === "opencode")?.present).toBe(false);
   });
 
   it("managesPlugins reflects whether plugin-updater is actually installed in a home", async () => {
     const homes = await pluginHomes({
       detect: async () => ({ ok: true, data: { claude: true, opencode: true } }),
-      cairnDir: "/store",
+      forebayDir: "/store",
       appHome: (app) => (app === "claude" ? "/home/claude/.claude" : "/home/opencode"),
       managesPlugins: (dir) => dir.replaceAll("\\", "/").includes("/.claude"),
     });
-    expect(homes.find((h) => h.id === "cairn")?.managesPlugins).toBe(false);
+    expect(homes.find((h) => h.id === "forebay")?.managesPlugins).toBe(false);
     expect(homes.find((h) => h.id === "claude")?.managesPlugins).toBe(true);
     expect(homes.find((h) => h.id === "opencode")?.managesPlugins).toBe(false);
   });
@@ -137,15 +138,15 @@ describe("pluginHomes", () => {
     }));
     const homes = await pluginHomes({
       detect: async () => ({ ok: true, data: { claude: true, opencode: true } }),
-      cairnDir: "/store",
+      forebayDir: "/store",
       appHome: (app) => "/home/" + app,
       managesPlugins: () => true,
       hasLoader: (dir, loaderId) => !!loaderId && dir === "/home/claude",
     });
     expect(homes.find((h) => h.id === "claude")?.loaderInstalled).toBe(true);
     expect(homes.find((h) => h.id === "opencode")?.loaderInstalled).toBe(false);
-    // Cairn has no loader to install, so it never claims one.
-    expect(homes.find((h) => h.id === "cairn")?.loaderInstalled).toBeUndefined();
+    // Forebay has no loader to install, so it never claims one.
+    expect(homes.find((h) => h.id === "forebay")?.loaderInstalled).toBeUndefined();
   });
 });
 

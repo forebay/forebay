@@ -26,7 +26,7 @@ export function onStatusChange(listener: StatusListener): () => void {
   return () => { statusListeners.delete(listener); };
 }
 
-// The daemon's own handle is Cairn's single source of truth for "running": a health
+// The daemon's own handle is Forebay's single source of truth for "running": a health
 // probe would also report true for any other process holding the port, which is not
 // the lifecycle the dashboard controls.
 function currentStatus(): ProxyStatus {

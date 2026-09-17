@@ -17,9 +17,9 @@ let root: string;
 let homes: PluginHome[];
 
 beforeAll(() => {
-  root = mkdtempSync(join(tmpdir(), "cairn-jobs-"));
+  root = mkdtempSync(join(tmpdir(), "forebay-jobs-"));
   homes = [
-    { id: "cairn", label: "Cairn", dir: join(root, "cairn"), present: true, managesPlugins: false },
+    { id: "forebay", label: "Forebay", dir: join(root, "forebay"), present: true, managesPlugins: false },
     { id: "claude", label: "Claude Code", dir: join(root, "claude"), present: true, managesPlugins: false },
   ];
   process.env.HUB_CONFIG_DIR = homes[0].dir;

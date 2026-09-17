@@ -44,9 +44,9 @@ let homes: PluginHome[];
 let manager: { id: string; url: string };
 
 beforeAll(async () => {
-  root = mkdtempSync(join(tmpdir(), "cairn-install-flow-"));
+  root = mkdtempSync(join(tmpdir(), "forebay-install-flow-"));
   homes = [
-    { id: "cairn", label: "Cairn", dir: join(root, "cairn"), present: true, managesPlugins: false },
+    { id: "forebay", label: "Forebay", dir: join(root, "forebay"), present: true, managesPlugins: false },
     { id: "claude", label: "Claude Code", dir: join(root, "claude"), present: true, managesPlugins: false },
     { id: "opencode", label: "OpenCode", dir: join(root, "opencode"), present: true, managesPlugins: false },
   ];
@@ -123,7 +123,7 @@ describe("the app's own registration", () => {
 
 describe("the activity chain", () => {
   it("records the request and chains what followed to it", () => {
-    const busPath = join(root, "cairn", "events", "bus.jsonl");
+    const busPath = join(root, "forebay", "events", "bus.jsonl");
     expect(existsSync(busPath), "an activity log was written").toBe(true);
     const records = readFileSync(busPath, "utf8").trim().split("\n").filter(Boolean)
       .map((line) => JSON.parse(line) as { id: string; payload: { action?: string; trace?: { id?: string; causedBy?: string } } });

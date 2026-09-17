@@ -59,7 +59,7 @@ async function run(job: JobMessage): Promise<void> {
 
   // An app loads the manager through its own config, so a clone alone would leave a manager that
   // is installed but never runs.
-  if (job.isPluginManager && job.home !== "cairn") {
+  if (job.isPluginManager && job.home !== "forebay") {
     report(job.jobId, "registering with the app", 90);
     registerPluginWithApp(job.homeDir, getAppDescriptor(job.home) ?? null, job.plugin);
   }

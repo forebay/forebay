@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import Usage from "./Usage.svelte";
-import type { UsageSession } from "@cairn/shared";
+import type { UsageSession } from "@forebay/shared";
 
 function session(over: Partial<UsageSession> & { id: string; updated: number }): UsageSession {
   return {
@@ -22,7 +22,7 @@ const now = Date.now();
 const day = 86_400_000;
 
 beforeEach(() => {
-  stubCairn({
+  stubForebay({
     usageSnapshot: async () => ({
       ok: true,
       data: {
@@ -75,7 +75,7 @@ describe("Usage screen", () => {
   });
 
   it("shows the estimated cost and a priced footnote when pricing data is available", async () => {
-    stubCairn({
+    stubForebay({
       usageSnapshot: async () => ({
         ok: true,
         data: {

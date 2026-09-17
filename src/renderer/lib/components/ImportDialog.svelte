@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { ImportPreview, ImportSelection } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { ImportPreview, ImportSelection } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { track } from "../downloads.js";
   import Button from "./Button.svelte";
   import { fadeMotion, flyMotion } from "../util/motion.js";
@@ -23,7 +23,7 @@
     if (busy) return;
     busy = true;
     error = "";
-    const result = await track(`Import ${label}`, app, () => cairn.importRun(app, selection));
+    const result = await track(`Import ${label}`, app, () => forebay.importRun(app, selection));
     busy = false;
     if (result.ok) {
       onDone(result.data.notes);
@@ -36,7 +36,7 @@
   onMount(() => panel?.focus());
 
   onMount(async () => {
-    const result = await cairn.importPreview(app);
+    const result = await forebay.importPreview(app);
     if (result.ok) preview = result.data;
     else error = result.error;
   });
@@ -51,7 +51,7 @@
   {:else if !preview}
     <p class="hint">Reading {label} config…</p>
   {:else}
-    <p class="hint">Choose what to merge into Cairn.</p>
+    <p class="hint">Choose what to merge into Forebay.</p>
     <label class="opt">
       <input type="checkbox" bind:checked={selection.accounts} />
       <span>Accounts</span>

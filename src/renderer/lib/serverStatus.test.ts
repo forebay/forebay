@@ -7,7 +7,7 @@ let statusResult: { ok: true; data: { running: boolean; port: number } } | { ok:
 };
 
 vi.mock("./ipc.js", () => ({
-  cairn: {
+  forebay: {
     proxyStatus: async () => statusResult,
     onServerStatus: (listener: (status: unknown) => void) => { pushed.push(listener); return () => {}; },
   },

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AccountQuota } from "@cairn/shared";
+  import type { AccountQuota } from "@forebay/shared";
   import ItemBox from "./ItemBox.svelte";
   import StatusPill from "./StatusPill.svelte";
   import type { StatusVariant } from "./StatusPill.svelte";

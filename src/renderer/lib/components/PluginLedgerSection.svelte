@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HomeLedger, LedgerRowView, PluginHome, QuarantineView } from "@cairn/shared";
+  import type { HomeLedger, LedgerRowView, PluginHome, QuarantineView } from "@forebay/shared";
   import Chip from "./Chip.svelte";
 
   let { groups, plugin, quarantine = [] }: { groups: HomeLedger[]; plugin: string; quarantine?: QuarantineView[] } = $props();

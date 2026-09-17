@@ -5,7 +5,7 @@ import { join } from "node:path";
 interface Plugin { name: string; url: string; enabled: boolean }
 import type { PluginHome } from "../../../packages/shared/src/domain.js";
 
-function makeHome(id: "cairn" | "claude" | "opencode", label: string): { dir: string; home: PluginHome } {
+function makeHome(id: "forebay" | "claude" | "opencode", label: string): { dir: string; home: PluginHome } {
   const dir = mkdtempSync(join(tmpdir(), `dash-appconfig-${id}-`));
   mkdirSync(join(dir, "config"), { recursive: true });
   mkdirSync(join(dir, "plugin"), { recursive: true });
@@ -208,15 +208,15 @@ describe("appConfig sidecar module", () => {
     const { dir, home } = makeHome("claude", "Claude Code");
     seedPlugins(dir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     writeFileSync(join(dir, "config", "plugin-a.json"), JSON.stringify({ logging: true }), "utf8");
-    const cairnHome = mkdtempSync(join(tmpdir(), "dash-appconfig-own-"));
-    vi.stubEnv("HUB_CONFIG_DIR", cairnHome);
+    const forebayHome = mkdtempSync(join(tmpdir(), "dash-appconfig-own-"));
+    vi.stubEnv("HUB_CONFIG_DIR", forebayHome);
     try {
       const { configWrite } = await import("./appConfig.js");
       const result = await configWrite("claude", "plugin-a", "logging", false, { homes: [home], listPlugins: listedFromSeed(home.dir) });
       expect(result.ok).toBe(true);
 
       const { readActivity } = await import("@intisy-ai/basekit");
-      const { records } = readActivity([cairnHome], { topics: ["config.changed"] });
+      const { records } = readActivity([forebayHome], { topics: ["config.changed"] });
       const rec = records.find((r) => r.details.key === "logging");
       expect(rec).toBeDefined();
       expect(rec!.changes).toEqual([{ key: "logging", from: true, to: false }]);
@@ -474,13 +474,13 @@ describe("what each schema declares it provides", () => {
 // settings have to be reachable there too: that is what makes the update controls per-app.
 describe("engine-contributed settings", () => {
   it("reads the values that home has on disk, not another home's", async () => {
-    const { dir, home } = makeHome("cairn", "Cairn");
+    const { dir, home } = makeHome("forebay", "Forebay");
     writeFileSync(join(dir, "plugin", "manager.js"), "// bundle placeholder", "utf8");
     seedPlugins(dir, [{ name: "manager", url: "https://github.com/forebay/manager", enabled: true }]);
     writeFileSync(join(dir, "config", "manager.json"), JSON.stringify({ auto_update_mode: "check" }), "utf8");
 
     const { configSchemas } = await import("./appConfig.js");
-    const result = await configSchemas("cairn", { homes: [home], settingsProviders: async () => [],
+    const result = await configSchemas("forebay", { homes: [home], settingsProviders: async () => [],
       manifests: async () => [manifestOf("manager", { auto_update_mode: "update" })] });
 
     expect(result.ok).toBe(true);
@@ -517,11 +517,11 @@ describe("engine-contributed settings", () => {
   });
 
   it("writes an engine's setting even though it is not a plugins.json entry", async () => {
-    const { dir, home } = makeHome("cairn", "Cairn");
+    const { dir, home } = makeHome("forebay", "Forebay");
     writeFileSync(join(dir, "plugin", "plugin-updater.json"), JSON.stringify({ id: "plugin-updater", api: 1, entry: "dist/index.js", capabilities: ["plugin-management"] }));
 
     const { configWrite } = await import("./appConfig.js");
-    const result = await configWrite("cairn", "plugin-updater", "auto_update_mode", "check", { homes: [home], listPlugins: listedFromSeed(home.dir) });
+    const result = await configWrite("forebay", "plugin-updater", "auto_update_mode", "check", { homes: [home], listPlugins: listedFromSeed(home.dir) });
 
     expect(result.ok).toBe(true);
     const onDisk = JSON.parse(readFileSync(join(dir, "config", "plugin-updater.json"), "utf8"));
@@ -531,30 +531,30 @@ describe("engine-contributed settings", () => {
   // The triggers are declared as dot-path fields, so a generic control edits one of them
   // without rewriting its siblings.
   it("writes one nested trigger and reads the whole object back", async () => {
-    const { dir, home } = makeHome("cairn", "Cairn");
+    const { dir, home } = makeHome("forebay", "Forebay");
     writeFileSync(join(dir, "plugin", "plugin-updater.json"), JSON.stringify({ id: "plugin-updater", api: 1, entry: "dist/index.js", capabilities: ["plugin-management"] }));
-    writeFileSync(join(dir, "config", "plugin-updater.json"), JSON.stringify({ auto_update_triggers: { loader: true, app: true, cairn: true } }), "utf8");
+    writeFileSync(join(dir, "config", "plugin-updater.json"), JSON.stringify({ auto_update_triggers: { loader: true, app: true, forebay: true } }), "utf8");
 
     writeFileSync(join(dir, "plugin", "plugin-updater.js"), "// bundle placeholder", "utf8");
     seedPlugins(dir, [{ name: "plugin-updater", url: "https://github.com/forebay/plugin-updater", enabled: true }]);
 
     const { configWrite, configSchemas } = await import("./appConfig.js");
-    expect((await configWrite("cairn", "plugin-updater", "auto_update_triggers.app", false, { homes: [home], listPlugins: listedFromSeed(home.dir) })).ok).toBe(true);
+    expect((await configWrite("forebay", "plugin-updater", "auto_update_triggers.app", false, { homes: [home], listPlugins: listedFromSeed(home.dir) })).ok).toBe(true);
 
-    const result = await configSchemas("cairn", { homes: [home], settingsProviders: async () => [],
+    const result = await configSchemas("forebay", { homes: [home], settingsProviders: async () => [],
       manifests: async () => [manifestOf("plugin-updater", {})] });
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error("unreachable");
     expect(result.data.find((s) => s.plugin === "plugin-updater")!.current.auto_update_triggers).toEqual({
-      loader: true, app: false, cairn: true,
+      loader: true, app: false, forebay: true,
     });
   });
 
   it("still refuses a plugin that is neither installed nor an engine", async () => {
-    const { home } = makeHome("cairn", "Cairn");
+    const { home } = makeHome("forebay", "Forebay");
 
     const { configWrite } = await import("./appConfig.js");
-    const result = await configWrite("cairn", "not-a-thing", "k", 1, { homes: [home], listPlugins: listedFromSeed(home.dir), managed: async () => true });
+    const result = await configWrite("forebay", "not-a-thing", "k", 1, { homes: [home], listPlugins: listedFromSeed(home.dir), managed: async () => true });
 
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("unreachable");
@@ -564,21 +564,21 @@ describe("engine-contributed settings", () => {
 
 describe("configWrite accepts a plugin the home deployed but never listed", () => {
   it("writes for a plugin present as a sidecar and absent from the plugin list", async () => {
-    const home = mkdtempSync(join(tmpdir(), "cairn-cw-"));
+    const home = mkdtempSync(join(tmpdir(), "forebay-cw-"));
     mkdirSync(join(home, "plugin"), { recursive: true });
     writeFileSync(join(home, "plugin", "engine.json"), JSON.stringify({ id: "engine", api: 1, entry: "dist/index.js", capabilities: [] }));
     writeFileSync(join(home, "plugin", "engine.js"), "export default {};");
-    const homes = [{ id: "cairn", label: "Cairn", dir: home, present: true, managesPlugins: true }];
+    const homes = [{ id: "forebay", label: "Forebay", dir: home, present: true, managesPlugins: true }];
     const { configWrite } = await import("./appConfig.js");
-    const result = await configWrite("cairn", "engine", "flag", true, { homes });
+    const result = await configWrite("forebay", "engine", "flag", true, { homes });
     expect(result.ok).toBe(true);
   });
 
   it("refuses a plugin that is neither listed nor deployed", async () => {
-    const home = mkdtempSync(join(tmpdir(), "cairn-cw-"));
-    const homes = [{ id: "cairn", label: "Cairn", dir: home, present: true, managesPlugins: true }];
+    const home = mkdtempSync(join(tmpdir(), "forebay-cw-"));
+    const homes = [{ id: "forebay", label: "Forebay", dir: home, present: true, managesPlugins: true }];
     const { configWrite } = await import("./appConfig.js");
-    const result = await configWrite("cairn", "ghost", "flag", true, { homes, managed: async () => true });
+    const result = await configWrite("forebay", "ghost", "flag", true, { homes, managed: async () => true });
     expect(result).toEqual({ ok: false, error: "plugin not found: ghost" });
   });
 });

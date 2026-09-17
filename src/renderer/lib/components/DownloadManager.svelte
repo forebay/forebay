@@ -1,7 +1,7 @@
 <script lang="ts">
   import { downloads, toggleDownloads, closeDownloads, cancelRow, type DownloadRow } from "../downloads.js";
   import { navigate } from "../router.js";
-  import { formatRate } from "@cairn/shared";
+  import { formatRate } from "@forebay/shared";
 
   const LIVE = ["pending", "installing", "cancelling"];
   const inFlight = $derived($downloads.tasks.filter((t) => LIVE.includes(t.status)).length);
@@ -311,7 +311,7 @@
     border: 1px solid var(--border);
     color: var(--muted);
   }
-  .src-cairn {
+  .src-forebay {
     color: var(--accent);
     border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   }

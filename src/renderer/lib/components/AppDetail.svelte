@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HostApp, AppSummary, AppConnection } from "@cairn/shared";
+  import type { HostApp, AppSummary, AppConnection } from "@forebay/shared";
   import Button from "./Button.svelte";
   import Chip from "./Chip.svelte";
   import Spinner from "./Spinner.svelte";

@@ -12,7 +12,7 @@ const { emitted, repoProvidingCapabilityMock, defaultRepoProvidingCapability } =
   };
 });
 vi.mock("../activity.js", () => ({
-  emitCairnAction: async (spec: { action: string }) => { emitted.push(spec.action); },
+  emitForebayAction: async (spec: { action: string }) => { emitted.push(spec.action); },
 }));
 
 // A from-scratch bootstrap installs the manager into a home before anything is deployed there, so
@@ -32,21 +32,21 @@ import type { PluginUpdateCache as UpdateCache } from "@intisy-ai/basekit";
 interface Plugin { name: string; url: string; enabled: boolean; autoUpdate?: boolean; branch?: string }
 import type { PluginHome } from "../../../packages/shared/src/domain.js";
 
-let cairnDir: string;
+let forebayDir: string;
 let claudeDir: string;
 let opencodeDir: string;
 let fakeHomes: PluginHome[];
 
 beforeEach(() => {
-  cairnDir = mkdtempSync(join(tmpdir(), "dash-plugins-cairn-"));
+  forebayDir = mkdtempSync(join(tmpdir(), "dash-plugins-forebay-"));
   claudeDir = mkdtempSync(join(tmpdir(), "dash-plugins-claude-"));
   opencodeDir = mkdtempSync(join(tmpdir(), "dash-plugins-opencode-"));
-  mkdirSync(join(cairnDir, "config"), { recursive: true });
+  mkdirSync(join(forebayDir, "config"), { recursive: true });
   mkdirSync(join(claudeDir, "config"), { recursive: true });
   mkdirSync(join(opencodeDir, "config"), { recursive: true });
-  process.env.HUB_CONFIG_DIR = cairnDir;
+  process.env.HUB_CONFIG_DIR = forebayDir;
   fakeHomes = [
-    { id: "cairn", label: "Cairn", dir: cairnDir, present: true, managesPlugins: true },
+    { id: "forebay", label: "Forebay", dir: forebayDir, present: true, managesPlugins: true },
     { id: "claude", label: "Claude Code", dir: claudeDir, present: true, managesPlugins: true },
     { id: "opencode", label: "OpenCode", dir: opencodeDir, present: true, managesPlugins: false },
   ];
@@ -129,7 +129,7 @@ const fromSeed = {
 
 describe("plugins sidecar module", () => {
   it("lists plugins per home, tagging each section with its home", async () => {
-    seedPlugins(cairnDir, [{ name: "claude-code-proxy", url: "https://github.com/forebay/claude-code-proxy", enabled: true }]);
+    seedPlugins(forebayDir, [{ name: "claude-code-proxy", url: "https://github.com/forebay/claude-code-proxy", enabled: true }]);
     seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { pluginsList } = await import("./plugins.js");
@@ -138,7 +138,7 @@ describe("plugins sidecar module", () => {
     if (!result.ok) throw new Error("unreachable");
 
     const sections = result.data;
-    expect(sections.map((s) => s.home.id)).toEqual(["cairn", "claude", "opencode"]);
+    expect(sections.map((s) => s.home.id)).toEqual(["forebay", "claude", "opencode"]);
     expect(sections[0].rows.map((r) => r.name)).toContain("claude-code-proxy");
     expect(sections[1].rows.map((r) => r.name)).toContain("plugin-a");
     expect(sections[2].rows).toEqual([]);
@@ -249,7 +249,7 @@ describe("plugins sidecar module", () => {
     expect(scopes[0]).toBe(fakeHomes[1].dir);
   });
 
-  it("install syncs across apps for an app home, but never for the cairn home", async () => {
+  it("install syncs across apps for an app home, but never for the forebay home", async () => {
     const syncPluginsAcrossApps = vi.fn().mockResolvedValue(undefined);
     const { pluginsInstall } = await import("./plugins.js");
 
@@ -263,7 +263,7 @@ describe("plugins sidecar module", () => {
     expect(syncPluginsAcrossApps).toHaveBeenCalledWith(claudeDir, "claude");
 
     syncPluginsAcrossApps.mockClear();
-    await pluginsInstall("cairn", "plugin-c", "https://github.com/forebay/plugin-c", {
+    await pluginsInstall("forebay", "plugin-c", "https://github.com/forebay/plugin-c", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -274,7 +274,7 @@ describe("plugins sidecar module", () => {
   });
 
   it("setEnabled writes the target home's plugins.json, not another home's", async () => {
-    seedPlugins(cairnDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
+    seedPlugins(forebayDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
     seedPlugins(claudeDir, [{ name: "plugin-a", url: "https://github.com/forebay/plugin-a", enabled: true }]);
 
     const { pluginsSetEnabled } = await import("./plugins.js");
@@ -284,8 +284,8 @@ describe("plugins sidecar module", () => {
     const claudeOnDisk = JSON.parse(readFileSync(join(claudeDir, "config", "plugins.json"), "utf8")) as Plugin[];
     expect(claudeOnDisk.find((p) => p.name === "plugin-a")?.enabled).toBe(false);
 
-    const cairnOnDisk = JSON.parse(readFileSync(join(cairnDir, "config", "plugins.json"), "utf8")) as Plugin[];
-    expect(cairnOnDisk.find((p) => p.name === "plugin-a")?.enabled).toBe(true);
+    const forebayOnDisk = JSON.parse(readFileSync(join(forebayDir, "config", "plugins.json"), "utf8")) as Plugin[];
+    expect(forebayOnDisk.find((p) => p.name === "plugin-a")?.enabled).toBe(true);
   });
 
   it("setAutoUpdate writes the target home's plugins.json entry", async () => {
@@ -441,7 +441,7 @@ describe("plugins sidecar module", () => {
   it("does not bootstrap when the plugin being installed is the updater itself", async () => {
     let bootstraps = 0;
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/forebay/plugin-updater", {
+    const result = await pluginsInstall("forebay", "plugin-updater", "https://github.com/forebay/plugin-updater", {
       installPlugin: async () => {},
       ...fromSeed,
       homes: fakeHomes,
@@ -538,11 +538,11 @@ describe("plugins sidecar module", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("installs the manager into the cairn home by cloning only, never registering it with an app", async () => {
+  it("installs the manager into the forebay home by cloning only, never registering it with an app", async () => {
     const registrations: string[] = [];
     const installed: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "plugin-updater", "https://github.com/forebay/plugin-updater", {
+    const result = await pluginsInstall("forebay", "plugin-updater", "https://github.com/forebay/plugin-updater", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => false,
@@ -555,10 +555,10 @@ describe("plugins sidecar module", () => {
     expect(installed).toEqual(["plugin-updater"]);
   });
 
-  it("brings the updater into Cairn's own home too, so a plugin can be installed there", async () => {
+  it("brings the updater into Forebay's own home too, so a plugin can be installed there", async () => {
     const order: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "some-provider", "u", {
+    const result = await pluginsInstall("forebay", "some-provider", "u", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => false,
@@ -567,15 +567,15 @@ describe("plugins sidecar module", () => {
       syncPluginsAcrossApps: async () => {},
     });
     expect(result.ok).toBe(true);
-    expect(order).toEqual(["updater:cairn", "install:some-provider"]);
+    expect(order).toEqual(["updater:forebay", "install:some-provider"]);
   });
 
   it("new installs honor the autoUpdateDefault setting", async () => {
     const { pluginsInstall } = await import("./plugins.js");
 
-    mkdirSync(join(cairnDir, "config"), { recursive: true });
-    writeFileSync(join(cairnDir, "config", "cairn.json"), JSON.stringify({ autoUpdateDefault: false }, null, 2), "utf8");
-    process.env.HUB_CONFIG_DIR = cairnDir;
+    mkdirSync(join(forebayDir, "config"), { recursive: true });
+    writeFileSync(join(forebayDir, "config", "forebay.json"), JSON.stringify({ autoUpdateDefault: false }, null, 2), "utf8");
+    process.env.HUB_CONFIG_DIR = forebayDir;
 
     const result = await pluginsInstall("claude", "plugin-new", "https://github.com/forebay/plugin-new", {
       installPlugin: async () => {},
@@ -611,7 +611,7 @@ describe("plugins sidecar module", () => {
   });
 
   it("pluginsList surfaces a description from the deployed clone package.json", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "cairn-plugins-"));
+    const dir = mkdtempSync(join(tmpdir(), "forebay-plugins-"));
     const repo = join(dir, "repos", "demo");
     mkdirSync(repo, { recursive: true });
     writeFileSync(join(repo, "package.json"), JSON.stringify({ name: "demo", description: "A demo plugin" }));
@@ -747,7 +747,7 @@ describe("plugin versions", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error("unreachable");
     expect(result.data.claude).toEqual({ kind: "git", label: "v1.2.3 +5", updateState: "behind", autoUpdate: true, checkedAt: "", onExperimental: false, experimentalAvailable: null });
-    expect(result.data.cairn).toBeUndefined();
+    expect(result.data.forebay).toBeUndefined();
   });
 
   it("reports an npm plugin's installed version from the cache", async () => {
@@ -805,17 +805,17 @@ describe("plugin versions", () => {
       getPlugins: async (dir: string) => (dir === claudeDir ? [{ id: "plugin-a", url: "u", enabled: true, version: "" }] : []),
       npmPlugins: async () => [],
       missingArtifacts: async () => [],
-      cacheDir: cairnDir,
+      cacheDir: forebayDir,
     } as never;
 
     const live = await pluginsList(deps);
     expect(live.ok).toBe(true);
     resetCacheForTests();
 
-    const cached = await pluginsListCached({ cacheDir: cairnDir });
+    const cached = await pluginsListCached({ cacheDir: forebayDir });
     expect(cached.ok).toBe(true);
     if (!cached.ok) throw new Error("unreachable");
-    expect(cached.data.map((s) => s.home.id)).toEqual(["cairn", "claude", "opencode"]);
+    expect(cached.data.map((s) => s.home.id)).toEqual(["forebay", "claude", "opencode"]);
     expect(cached.data.find((s) => s.home.id === "claude")?.rows.map((r) => r.name)).toEqual(["plugin-a"]);
   });
 
@@ -823,7 +823,7 @@ describe("plugin versions", () => {
     const { resetCacheForTests } = await import("../lib/cache.js");
     resetCacheForTests();
     const { pluginsListCached } = await import("./plugins.js");
-    const cached = await pluginsListCached({ cacheDir: cairnDir });
+    const cached = await pluginsListCached({ cacheDir: forebayDir });
     expect(cached.ok).toBe(true);
     if (cached.ok) expect(cached.data).toEqual([]);
   });
@@ -839,11 +839,11 @@ describe("plugin versions", () => {
       npmPlugins: async () => [],
       describe: () => "v3.1.0",
       exists: () => true,
-      cacheDir: cairnDir,
+      cacheDir: forebayDir,
     };
     await pluginVersionsAll(deps);
     resetCacheForTests();
-    const cached = await pluginVersionsCached({ cacheDir: cairnDir });
+    const cached = await pluginVersionsCached({ cacheDir: forebayDir });
     expect(cached.ok).toBe(true);
     if (!cached.ok) throw new Error("unreachable");
     // No cache entry was seeded, so nothing is known about this home's update state. It used
@@ -889,10 +889,10 @@ describe("pluginsInstall for the plugin manager", () => {
       .some((p: Plugin) => p.name === "plugin-updater")).toBe(true);
   });
 
-  it("does not register with an app for Cairn's own home", async () => {
+  it("does not register with an app for Forebay's own home", async () => {
     const calls: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const res = await pluginsInstall("cairn", "plugin-updater", "https://example/plugin-updater", {
+    const res = await pluginsInstall("forebay", "plugin-updater", "https://example/plugin-updater", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => false,
@@ -936,13 +936,13 @@ describe("pluginsInstall for the plugin manager", () => {
 
 describe("pluginsInstall when the marketplace catalog is unreachable", () => {
   it("still recognizes an already-deployed manager as the manager, via its manifest", async () => {
-    mkdirSync(join(cairnDir, "plugin"), { recursive: true });
-    writeFileSync(join(cairnDir, "plugin", "plugin-updater.json"), JSON.stringify({ id: "plugin-updater", api: 1, entry: "dist/index.js", capabilities: ["plugin-management"] }));
+    mkdirSync(join(forebayDir, "plugin"), { recursive: true });
+    writeFileSync(join(forebayDir, "plugin", "plugin-updater.json"), JSON.stringify({ id: "plugin-updater", api: 1, entry: "dist/index.js", capabilities: ["plugin-management"] }));
     repoProvidingCapabilityMock.current = async () => { throw new Error("catalog unreachable"); };
 
     const ensureUpdater = vi.fn(async () => ({ ok: true, data: undefined }));
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("cairn", "plugin-updater", "https://example/plugin-updater", {
+    const result = await pluginsInstall("forebay", "plugin-updater", "https://example/plugin-updater", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => false,

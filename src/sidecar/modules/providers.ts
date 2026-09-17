@@ -10,7 +10,7 @@ import { exposureFor, readExposureMap, setExposure } from "../lib/exposure.js";
 import { readPluginManifest, providerIcon } from "../lib/pluginManifest.js";
 import type { ProviderRow, Result } from "../../../packages/shared/src/domain.js";
 import { wrap } from "../result.js";
-import { emitCairnAction } from "../activity.js";
+import { emitForebayAction } from "../activity.js";
 
 /** One lane as the deployed inventory describes it, before any capability has spoken for it. */
 interface DeployedLane {
@@ -67,7 +67,7 @@ async function describedLanes(
 export function providersList(deps: ProvidersDeps = {}): Promise<Result<ProviderRow[]>> {
   return wrap(async () => {
     const homeDir = deps.homeDir ?? getConfigDir();
-    const appId = deps.appId ?? "cairn";
+    const appId = deps.appId ?? "forebay";
     const deployed = (deps.deployed ?? ((dir: string) => readDeployedProviders(reposDir(dir), dir) as DeployedLane[]))(homeDir);
     const exposureMap = (deps.exposure ?? readExposureMap)();
     const accountsFor = deps.accountsFor ?? ((pool: string) => listAccounts(pool, undefined));
@@ -140,7 +140,7 @@ export function providersList(deps: ProvidersDeps = {}): Promise<Result<Provider
 export function providersSetEnabled(id: string, on: boolean): Promise<Result<void>> {
   return wrap(async () => {
     for (const app of getApps()) setExposure(id, app.id, on);
-    await emitCairnAction({
+    await emitForebayAction({
       action: on ? "provider_enabled" : "provider_disabled",
       subject: { kind: "provider", id, label: id },
       topic: "provider.state",
@@ -152,7 +152,7 @@ export function providersSetEnabled(id: string, on: boolean): Promise<Result<voi
 export function providersSetExposure(id: string, appId: string, on: boolean): Promise<Result<void>> {
   return wrap(async () => {
     setExposure(id, appId, on);
-    await emitCairnAction({
+    await emitForebayAction({
       action: "provider_exposure_changed",
       subject: { kind: "provider", id, label: id },
       topic: "provider.state",

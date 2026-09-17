@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { PluginConfigSchema, FieldSpec, FieldType, ActionSpec } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { PluginConfigSchema, FieldSpec, FieldType, ActionSpec } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import ToggleSwitch from "./ToggleSwitch.svelte";
   import Button from "./Button.svelte";
   import Spinner from "./Spinner.svelte";
@@ -118,7 +118,7 @@
     // A write spanning homes can fail in one and succeed in the rest, so a failure names the
     // home it happened in; with a single home that prefix would only be noise.
     const failures = (await Promise.all(homes.map(async (home) => {
-      const result = await cairn.configWrite(home, schema.plugin, field.key, toWrite);
+      const result = await forebay.configWrite(home, schema.plugin, field.key, toWrite);
       if (result.ok) return "";
       return homes.length > 1 ? `${home}: ${result.error}` : result.error;
     }))).filter(Boolean);
@@ -152,7 +152,7 @@
     actionErr = { ...actionErr, [action.id]: "" };
     actionOut = { ...actionOut, [action.id]: "" };
     try {
-      const result = await cairn.configAction(homeId, schema.plugin, action.id, collected);
+      const result = await forebay.configAction(homeId, schema.plugin, action.id, collected);
       if (result.ok) actionOut = { ...actionOut, [action.id]: result.data.stdout || "Done." };
       else actionErr = { ...actionErr, [action.id]: result.error };
     } finally {

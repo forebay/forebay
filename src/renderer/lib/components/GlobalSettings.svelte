@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { formatBytes } from "@cairn/shared";
+  import { formatBytes } from "@forebay/shared";
   import { onMount } from "svelte";
-  import type { FieldSpec } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { FieldSpec } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import Card from "./Card.svelte";
   import ToggleSwitch from "./ToggleSwitch.svelte";
   import SettingRow from "./SettingRow.svelte";
@@ -29,7 +29,7 @@
 
   async function load(): Promise<void> {
     try {
-      const result = await cairn.globalSettingsRead();
+      const result = await forebay.globalSettingsRead();
       if (!result.ok) {
         loadError = result.error;
         return;
@@ -37,7 +37,7 @@
       loadError = "";
       fields = result.data.fields;
       values = { ...result.data.defaults, ...result.data.current };
-      const storage = await cairn.activityStats();
+      const storage = await forebay.activityStats();
       if (storage.ok) stats = storage.data;
     } catch (e) {
       loadError = (e as { message?: string }).message ?? String(e);
@@ -47,7 +47,7 @@
   async function write(key: string, value: unknown): Promise<void> {
     values = { ...values, [key]: value };
     try {
-      await cairn.setConfig("settings", key, value);
+      await forebay.setConfig("settings", key, value);
     } catch (e) {
       loadError = (e as { message?: string }).message ?? String(e);
     }

@@ -26,7 +26,7 @@
   function loadRoute(screen: ScreenId): Promise<{ default: unknown }> {
     return (ROUTES[screen] ?? ROUTES.overview)();
   }
-  import { cairn } from "./lib/ipc.js";
+  import { forebay } from "./lib/ipc.js";
   import { fadeMotion } from "./lib/util/motion.js";
   import { watchDownloadProgress } from "./lib/downloadProgress.js";
   import { watchJobs } from "./lib/downloads.js";
@@ -58,13 +58,13 @@
     stopJobs = watchJobs();
     stopActivityWatch = watchActivityErrors();
     // Brand tag lists the managed apps from registry data, never hardcoded names.
-    const apps = await cairn.appsList();
+    const apps = await forebay.appsList();
     if (apps.ok && apps.data.length > 0) brandTag = apps.data.map((a) => a.label).join(" · ");
   });
 </script>
 
 <div class="window">
-  <Titlebar title="Cairn" subtitle={activeLabel} />
+  <Titlebar title="Forebay" subtitle={activeLabel} />
   <div class="shell">
     <Sidebar {brandTag} />
     <main class="main">

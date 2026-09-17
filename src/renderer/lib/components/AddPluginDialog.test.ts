@@ -1,15 +1,15 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import TestWrapper from "./AddPluginDialog.test.svelte";
 
 describe("AddPluginDialog", () => {
   it("derives the repo name and kind from a pasted url and installs it", async () => {
     const pluginsInstall = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({ pluginsInstall });
+    stubForebay({ pluginsInstall });
 
-    const { getByPlaceholderText, getByText, getByRole } = render(TestWrapper, { props: { home: "cairn" } });
+    const { getByPlaceholderText, getByText, getByRole } = render(TestWrapper, { props: { home: "forebay" } });
 
     await fireEvent.input(getByPlaceholderText("owner/repo or GitHub URL"), {
       target: { value: "https://github.com/forebay/some-proxy" },
@@ -21,11 +21,11 @@ describe("AddPluginDialog", () => {
 
     await fireEvent.click(getByRole("button", { name: /install/i }));
 
-    await waitFor(() => expect(pluginsInstall).toHaveBeenCalledWith("cairn", "some-proxy", "https://github.com/forebay/some-proxy"));
+    await waitFor(() => expect(pluginsInstall).toHaveBeenCalledWith("forebay", "some-proxy", "https://github.com/forebay/some-proxy"));
   });
 
   it("disables install for a malformed reference", async () => {
-    stubCairn({});
+    stubForebay({});
     const { getByPlaceholderText, getByRole } = render(TestWrapper);
     await fireEvent.input(getByPlaceholderText("owner/repo or GitHub URL"), { target: { value: "not a ref" } });
     expect((getByRole("button", { name: /install/i }) as HTMLButtonElement).disabled).toBe(true);

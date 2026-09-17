@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode } from "@cairn/shared";
+  import type { ScreenNode } from "@forebay/shared";
   import CollapsibleGroup from "../CollapsibleGroup.svelte";
   import ScreenRenderer from "./ScreenRenderer.svelte";
   import type { ScreenContext } from "./context.js";

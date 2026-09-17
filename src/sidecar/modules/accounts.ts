@@ -2,7 +2,7 @@ import type { AccountController } from "@intisy-ai/basekit/auth";
 import type { AccountView, Result } from "../../../packages/shared/src/domain.js";
 import { importProviderHandler } from "../lib/providerHandler.js";
 import { ok, err } from "../result.js";
-import { emitCairnAction } from "../activity.js";
+import { emitForebayAction } from "../activity.js";
 
 async function guarded<T>(fn: () => Promise<T> | T): Promise<Result<T>> {
   try {
@@ -27,7 +27,7 @@ export function accountsList(provider: string): Promise<Result<AccountView[]>> {
 export function accountsEnable(provider: string, id: string, on: boolean): Promise<Result<void>> {
   return guarded(async () => {
     (await requireController(provider)).enable(id, on);
-    await emitCairnAction({
+    await emitForebayAction({
       action: on ? "account_enabled" : "account_disabled",
       subject: { kind: "account", id, label: id },
       topic: "account.state",

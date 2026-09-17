@@ -1,5 +1,5 @@
-import { PLUGIN_MANAGEMENT } from "@cairn/shared";
-import type { EngineView, PluginHome } from "@cairn/shared";
+import { PLUGIN_MANAGEMENT } from "@forebay/shared";
+import type { EngineView, PluginHome } from "@forebay/shared";
 
 export interface PrerequisiteInstall {
   homeId: string;
@@ -7,8 +7,8 @@ export interface PrerequisiteInstall {
   url: string;
 }
 
-// A home cannot manage a plugin before it has a plugin manager, so Cairn installs the
-// manager first, as its own download. Selected by capability: Cairn names no plugin.
+// A home cannot manage a plugin before it has a plugin manager, so Forebay installs the
+// manager first, as its own download. Selected by capability: Forebay names no plugin.
 export function prerequisiteInstalls(
   name: string,
   homeIds: string[],

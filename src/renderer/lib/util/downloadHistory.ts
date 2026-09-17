@@ -1,4 +1,4 @@
-import type { ActivityRecord } from "@cairn/shared";
+import type { ActivityRecord } from "@forebay/shared";
 
 // The log records one entry per plugin per home per version, so a plugin installed in three
 // homes and updated twice produced six near-identical rows. Recent shows the CURRENT state

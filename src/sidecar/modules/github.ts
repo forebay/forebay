@@ -69,12 +69,12 @@ async function resolveGhCli(
 }
 
 function storedAccounts(): StoredGithubAccount[] {
-  const accounts = getConfigValue("cairn", "githubAccounts");
+  const accounts = getConfigValue("forebay", "githubAccounts");
   return Array.isArray(accounts) ? (accounts as StoredGithubAccount[]) : [];
 }
 
 function activeLoginOf(accounts: StoredGithubAccount[]): string | null {
-  const configured = getConfigValue("cairn", "githubActiveLogin");
+  const configured = getConfigValue("forebay", "githubActiveLogin");
   if (typeof configured === "string" && accounts.some((a) => a.login === configured)) return configured;
   return accounts[0]?.login ?? null;
 }
@@ -82,8 +82,8 @@ function activeLoginOf(accounts: StoredGithubAccount[]): string | null {
 function storeAccount(user: GithubUser, token: string): void {
   const accounts = storedAccounts().filter((a) => a.login !== user.login);
   accounts.push({ login: user.login, token, name: user.name, avatarUrl: user.avatarUrl });
-  setConfigValue("cairn", "githubAccounts", accounts);
-  setConfigValue("cairn", "githubActiveLogin", user.login);
+  setConfigValue("forebay", "githubAccounts", accounts);
+  setConfigValue("forebay", "githubActiveLogin", user.login);
   resetOrgScanCache();
 }
 
@@ -100,17 +100,17 @@ async function starRepo(fetchFn: typeof fetch, token: string, owner: string, rep
   }
 }
 
-async function starCairn(fetchFn: typeof fetch, token: string): Promise<void> {
-  await starRepo(fetchFn, token, ECOSYSTEM_ORG, "cairn", true);
+async function starForebay(fetchFn: typeof fetch, token: string): Promise<void> {
+  await starRepo(fetchFn, token, ECOSYSTEM_ORG, "forebay", true);
 }
 
-const CAIRN_REPO_URL = `https://github.com/${ECOSYSTEM_ORG}/cairn`;
+const FOREBAY_REPO_URL = `https://github.com/${ECOSYSTEM_ORG}/forebay`;
 
-// Whether the active account has starred Cairn: 204 starred, 404 not; null when
+// Whether the active account has starred Forebay: 204 starred, 404 not; null when
 // unknown (no token or a transient error) so the UI can leave the toggle neutral.
-async function checkCairnStarred(fetchFn: typeof fetch, token: string): Promise<boolean | null> {
+async function checkForebayStarred(fetchFn: typeof fetch, token: string): Promise<boolean | null> {
   try {
-    const response = await fetchFn(`https://api.github.com/user/starred/${ECOSYSTEM_ORG}/cairn`, {
+    const response = await fetchFn(`https://api.github.com/user/starred/${ECOSYSTEM_ORG}/forebay`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.status === 204) return true;
@@ -152,7 +152,7 @@ export function githubStatus(deps: GithubDeps = {}): Promise<Result<GithubStatus
     }
 
     const ghCli = await resolveGhCli(execFn, fetchFn);
-    const cairnStarred = token ? await checkCairnStarred(fetchFn, token) : null;
+    const forebayStarred = token ? await checkForebayStarred(fetchFn, token) : null;
 
     return {
       source,
@@ -164,8 +164,8 @@ export function githubStatus(deps: GithubDeps = {}): Promise<Result<GithubStatus
       ghCli: ghCli.account,
       accounts: accounts.map(toView),
       activeLogin,
-      cairnRepoUrl: CAIRN_REPO_URL,
-      cairnStarred,
+      forebayRepoUrl: FOREBAY_REPO_URL,
+      forebayStarred,
     };
   });
 }
@@ -173,18 +173,18 @@ export function githubStatus(deps: GithubDeps = {}): Promise<Result<GithubStatus
 // One-way: only ever stars, never unstars. Stars with every stored account's
 // token (best-effort each) so all connected accounts back the project, falling
 // back to the single resolved token (env/gh) when no account is stored.
-export async function githubStarCairn(deps: GithubDeps = {}): Promise<Result<void>> {
+export async function githubStarForebay(deps: GithubDeps = {}): Promise<Result<void>> {
   const fetchFn = deps.fetchFn ?? fetch;
   const accounts = storedAccounts();
   if (accounts.length > 0) {
-    await Promise.all(accounts.map((a) => starRepo(fetchFn, a.token, ECOSYSTEM_ORG, "cairn", true)));
+    await Promise.all(accounts.map((a) => starRepo(fetchFn, a.token, ECOSYSTEM_ORG, "forebay", true)));
     return ok(undefined);
   }
   const env = deps.env ?? process.env;
   const execFn = deps.execFn ?? realExec;
   const { token } = await resolveToken(env, execFn);
   if (!token) return err("connect a GitHub account first");
-  await starRepo(fetchFn, token, ECOSYSTEM_ORG, "cairn", true);
+  await starRepo(fetchFn, token, ECOSYSTEM_ORG, "forebay", true);
   return ok(undefined);
 }
 
@@ -195,7 +195,7 @@ export async function githubAddAccount(token: string, star: boolean, deps: Githu
   const validated = await validateToken(fetchFn, trimmed);
   if (!validated.ok) return validated;
   storeAccount(validated.data, trimmed);
-  if (star) await starCairn(fetchFn, trimmed);
+  if (star) await starForebay(fetchFn, trimmed);
   return ok({ login: validated.data.login });
 }
 
@@ -212,14 +212,14 @@ export async function githubConnectGhCli(star: boolean, deps: GithubDeps = {}): 
   const validated = await validateToken(fetchFn, token);
   if (!validated.ok) return validated;
   storeAccount(validated.data, token);
-  if (star) await starCairn(fetchFn, token);
+  if (star) await starForebay(fetchFn, token);
   return ok({ login: validated.data.login });
 }
 
 export async function githubSwitchAccount(login: string, _deps: GithubDeps = {}): Promise<Result<void>> {
   const accounts = storedAccounts();
   if (!accounts.some((a) => a.login === login)) return err("unknown account");
-  setConfigValue("cairn", "githubActiveLogin", login);
+  setConfigValue("forebay", "githubActiveLogin", login);
   resetOrgScanCache();
   return ok(undefined);
 }
@@ -227,9 +227,9 @@ export async function githubSwitchAccount(login: string, _deps: GithubDeps = {})
 export async function githubRemoveAccount(login: string, _deps: GithubDeps = {}): Promise<Result<void>> {
   const accounts = storedAccounts();
   const remaining = accounts.filter((a) => a.login !== login);
-  setConfigValue("cairn", "githubAccounts", remaining);
-  const activeLogin = getConfigValue("cairn", "githubActiveLogin");
-  if (activeLogin === login) setConfigValue("cairn", "githubActiveLogin", remaining[0]?.login ?? "");
+  setConfigValue("forebay", "githubAccounts", remaining);
+  const activeLogin = getConfigValue("forebay", "githubActiveLogin");
+  if (activeLogin === login) setConfigValue("forebay", "githubActiveLogin", remaining[0]?.login ?? "");
   resetOrgScanCache();
   return ok(undefined);
 }
@@ -319,7 +319,7 @@ export async function githubDevicePoll(
       deviceFlowState = null;
       if (!validated.ok) return ok({ status: "error", message: validated.error });
       storeAccount(validated.data, token);
-      if (star) await starRepo(fetchFn, token, ECOSYSTEM_ORG, "cairn", true);
+      if (star) await starRepo(fetchFn, token, ECOSYSTEM_ORG, "forebay", true);
       return ok({ status: "authorized", login: validated.data.login });
     }
     if (json.error === "authorization_pending") return ok({ status: "pending", intervalSeconds: state.intervalMs / 1000 });

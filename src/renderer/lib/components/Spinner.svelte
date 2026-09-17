@@ -11,9 +11,9 @@
   .spin {
     display: inline-block;
     vertical-align: -2px;
-    animation: cairn-spin 0.7s linear infinite;
+    animation: forebay-spin 0.7s linear infinite;
   }
-  @keyframes cairn-spin {
+  @keyframes forebay-spin {
     to { transform: rotate(360deg); }
   }
   @media (prefers-reduced-motion: reduce) {

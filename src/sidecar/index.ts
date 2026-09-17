@@ -1,6 +1,7 @@
 ﻿import type { Result } from "../../packages/shared/src/domain.js";
 import { isReadOnlyChannel } from "../../packages/shared/src/ipc.js";
 import { initCoreProxy } from "@intisy-ai/basekit/proxy";
+import type { UpdateTrigger } from "@intisy-ai/basekit";
 import { ok, err } from "./result.js";
 import { configGet, configSet } from "./modules/config.js";
 import { overviewSummary } from "./modules/overview.js";
@@ -28,16 +29,17 @@ import { librariesList, librariesRemove } from "./modules/libraries.js";
 import { appStorageGet, appStorageSet } from "./modules/appPaths.js";
 import { invokePluginManagement } from "./lib/pluginManager.js";
 import { stopAllHosts } from "./lib/pluginHost.js";
+import { migrateLegacySettings } from "../main/lib/legacySettings.js";
 import type { PluginHomeId } from "../../packages/shared/src/domain.js";
 import type { ActivityQuery } from "@intisy-ai/basekit";
 import { setActivityContext, withCause } from "@intisy-ai/basekit";
-import { cairnHome } from "./lib/pluginHomes.js";
+import { forebayHome } from "./lib/pluginHomes.js";
 import { usageSnapshot } from "./modules/usage.js";
 import { discoverApps } from "./lib/appDiscovery.js";
 import { importApps, importPreview, importRun } from "./modules/import.js";
 import type { ImportSelection } from "../../packages/shared/src/domain.js";
 import { catalogList, catalogListCached } from "./modules/catalog.js";
-import { githubStatus, githubAddAccount, githubSwitchAccount, githubRemoveAccount, githubConnectGhCli, githubSetStar, githubStarCairn, githubDeviceStart, githubDevicePoll } from "./modules/github.js";
+import { githubStatus, githubAddAccount, githubSwitchAccount, githubRemoveAccount, githubConnectGhCli, githubSetStar, githubStarForebay, githubDeviceStart, githubDevicePoll } from "./modules/github.js";
 import { customEndpointsList, customEndpointsUpsert, customEndpointsRemove, customEndpointsSaveKey, customEndpointsFormats } from "./modules/customEndpoints.js";
 import { marketplaceSourcesList, marketplaceSourcesSave } from "./modules/marketplaceSources.js";
 import type { CustomEndpoint } from "../../packages/shared/src/domain.js";
@@ -53,8 +55,12 @@ const handlers: Record<string, SidecarHandler> = {};
 // The home an event is written to has to be the same home the Activity view reads,
 // so this states the one value pluginHomes already calls this app's own dir. Deriving
 // it a second way is how they drift apart.
+// Before the first settings read, and again here rather than only in main, because the sidecar
+// also runs on its own under the e2e harness and the CLI.
+migrateLegacySettings(forebayHome());
+
 try {
-  setActivityContext({ app: "cairn", entry: "sidecar", home: cairnHome() });
+  setActivityContext({ app: "forebay", entry: "sidecar", home: forebayHome() });
 } catch { /* attribution is never worth failing to start over */ }
 
 export function registerHandler(channel: string, handler: SidecarHandler): void {
@@ -63,22 +69,22 @@ export function registerHandler(channel: string, handler: SidecarHandler): void 
 
 export interface BackgroundUpdateDeps {
   home?: string;
-  runUpdates?: (dir: string, trigger: string) => Promise<unknown>;
+  runUpdates?: (dir: string, trigger: UpdateTrigger) => Promise<unknown>;
 }
 
 // The trigger, not a bare "update everything": the home's own policy decides whether a dashboard
 // launch is an occasion it wants updates on, and only the manager holding that policy can say.
-const LAUNCH_TRIGGER = "cairn";
+const LAUNCH_TRIGGER: UpdateTrigger = "dashboard";
 
 // Fire and forget on purpose: the dashboard must open whether or not an update run
 // works, and must not wait on ls-remote before answering its first request.
 export function startBackgroundUpdates(deps: BackgroundUpdateDeps = {}): void {
-  const home = deps.home ?? cairnHome();
+  const home = deps.home ?? forebayHome();
   void (async () => {
     try {
-      const run = deps.runUpdates ?? ((dir: string, trigger: string) =>
+      const run = deps.runUpdates ?? ((dir: string, trigger: UpdateTrigger) =>
         invokePluginManagement(dir, LAUNCH_TRIGGER, "runUpdates", null, (capability) =>
-          capability.runUpdates(trigger as "cairn")));
+          capability.runUpdates(trigger as UpdateTrigger)));
       await run(home, LAUNCH_TRIGGER);
     } catch { /* an update run is never worth a dashboard that will not start */ }
   })();
@@ -208,7 +214,7 @@ registerHandler("github:switch-account", (login) => githubSwitchAccount(login as
 registerHandler("github:remove-account", (login) => githubRemoveAccount(login as string));
 registerHandler("github:connect-gh", (star) => githubConnectGhCli(star as boolean));
 registerHandler("github:set-star", (url, starred) => githubSetStar(url as string, starred as boolean));
-registerHandler("github:star-cairn", () => githubStarCairn());
+registerHandler("github:star-forebay", () => githubStarForebay());
 registerHandler("github:device-start", () => githubDeviceStart());
 registerHandler("github:device-poll", (star) => githubDevicePoll(star as boolean));
 registerHandler("favorites:list", () => favoritesList());

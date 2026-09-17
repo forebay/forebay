@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildUnifiedLibraries, isOrphan, orphanHomeIds } from "./unifiedLibraries.js";
-import type { HomeLibraries, InstalledLibrary, PluginHome } from "@cairn/shared";
+import type { HomeLibraries, InstalledLibrary, PluginHome } from "@forebay/shared";
 
 function home(id: string, label: string): PluginHome {
   return { id, label, dir: `/${id}`, present: true, managesPlugins: true };

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode } from "@cairn/shared";
+  import type { ScreenNode } from "@forebay/shared";
   import QuotaBar from "../QuotaBar.svelte";
   import type { ScreenContext } from "./context.js";
 

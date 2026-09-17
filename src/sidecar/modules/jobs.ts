@@ -25,7 +25,7 @@ export function setJobListener(listener: (job: Job) => void): void {
 }
 
 function autoUpdateDefault(): boolean {
-  const value = getConfigValue("cairn", "autoUpdateDefault");
+  const value = getConfigValue("forebay", "autoUpdateDefault");
   return typeof value === "boolean" ? value : true;
 }
 

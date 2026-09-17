@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { GithubStatus } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { GithubStatus } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { githubChanged, bumpGithub } from "../githubStore.js";
   import Button from "./Button.svelte";
   import GitHubConnectDialog from "./GitHubConnectDialog.svelte";
@@ -12,7 +12,7 @@
   let starDismissed = $state(false);
 
   async function refresh(): Promise<void> {
-    const result = await cairn.githubStatus();
+    const result = await forebay.githubStatus();
     if (result.ok) status = result.data;
   }
 
@@ -56,7 +56,7 @@
     if (!status?.activeLogin || busy) return;
     busy = true;
     try {
-      await cairn.githubRemoveAccount(status.activeLogin);
+      await forebay.githubRemoveAccount(status.activeLogin);
       await refresh();
       bumpGithub();
     } finally {
@@ -68,7 +68,7 @@
     if (busy || login === status?.activeLogin) return;
     busy = true;
     try {
-      await cairn.githubSwitchAccount(login);
+      await forebay.githubSwitchAccount(login);
       await refresh();
       bumpGithub();
     } finally {
@@ -80,7 +80,7 @@
     if (busy) return;
     busy = true;
     try {
-      await cairn.githubRemoveAccount(login);
+      await forebay.githubRemoveAccount(login);
       await refresh();
       bumpGithub();
     } finally {
@@ -108,12 +108,12 @@
 
   // One-way: starring is never undone from here, so the button is dismissed the
   // instant it's clicked rather than waiting on the round-trip to settle.
-  async function starCairn(): Promise<void> {
+  async function starForebay(): Promise<void> {
     if (busy || !status?.connected) return;
     starDismissed = true;
     busy = true;
     try {
-      await cairn.githubStarCairn();
+      await forebay.githubStarForebay();
       await refresh();
     } finally {
       busy = false;
@@ -122,7 +122,7 @@
 
   function openOnGitHub(): void {
     // The main process routes http(s) window.open through the external browser.
-    if (status?.cairnRepoUrl) window.open(status.cairnRepoUrl, "_blank");
+    if (status?.forebayRepoUrl) window.open(status.forebayRepoUrl, "_blank");
   }
 </script>
 
@@ -157,7 +157,7 @@
 
     {#if ghCliPrompt}
       <div class="ghcli">
-        <span>Signed in to GitHub CLI as @{ghCliPrompt.login}. Connect it to Cairn?</span>
+        <span>Signed in to GitHub CLI as @{ghCliPrompt.login}. Connect it to Forebay?</span>
         <Button disabled={busy} onclick={() => openConnectDialog(ghCliPrompt.login)}>Connect</Button>
       </div>
     {/if}
@@ -201,16 +201,16 @@
       <Button onclick={openAddDialog}>Add account</Button>
     </div>
 
-    <div class="cairnrow">
-      <button class="ghlink" onclick={openOnGitHub}>Open Cairn on GitHub</button>
-      {#if status.connected && status.cairnStarred === false && !starDismissed}
+    <div class="forebayrow">
+      <button class="ghlink" onclick={openOnGitHub}>Open Forebay on GitHub</button>
+      {#if status.connected && status.forebayStarred === false && !starDismissed}
         <button
-          class="starcairn"
+          class="starforebay"
           disabled={busy}
-          title="Star Cairn"
-          onclick={starCairn}
+          title="Star Forebay"
+          onclick={starForebay}
         >
-          ☆ Star Cairn
+          ☆ Star Forebay
         </button>
       {/if}
     </div>
@@ -390,7 +390,7 @@
     border-top: 1px solid var(--border);
     margin-top: 2px;
   }
-  .cairnrow {
+  .forebayrow {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -409,7 +409,7 @@
     color: var(--text);
     text-decoration: underline;
   }
-  .starcairn {
+  .starforebay {
     all: unset;
     cursor: pointer;
     font-size: 11.5px;
@@ -419,11 +419,11 @@
     border-radius: 7px;
     padding: 5px 9px;
   }
-  .starcairn:hover:not(:disabled) {
+  .starforebay:hover:not(:disabled) {
     color: var(--text);
     border-color: var(--border-strong);
   }
-  .starcairn:disabled {
+  .starforebay:disabled {
     opacity: .5;
     cursor: default;
   }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScreenNode, Column } from "@cairn/shared";
+  import type { ScreenNode, Column } from "@forebay/shared";
   import EmptyState from "../EmptyState.svelte";
   import ActionButton from "./ActionButton.svelte";
   import type { ScreenContext } from "./context.js";

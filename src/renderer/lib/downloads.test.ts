@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { get } from "svelte/store";
 import { downloads, rows, activeByPlugin, activeByPluginHome, enqueue, track, toggleDownloads, closeDownloads, clearFinished, setStep, resetDownloadsForTest, seedJobsForTest, jobKey, watchJobs } from "./downloads.js";
-import type { Job } from "@cairn/shared";
+import type { Job } from "@forebay/shared";
 
 const pushed = vi.hoisted(() => ({ listener: undefined as ((job: Job) => void) | undefined }));
 const cache = vi.hoisted(() => ({ invalidate: vi.fn() }));
 
 vi.mock("./ipc.js", () => ({
-  cairn: {
+  forebay: {
     jobsCancel: async () => ({ ok: true, data: true }),
     jobsClearFinished: async () => ({ ok: true, data: undefined }),
     jobsList: async () => ({ ok: true, data: [] }),

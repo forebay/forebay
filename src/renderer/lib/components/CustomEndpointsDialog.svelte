@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { CustomEndpointView } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { CustomEndpointView } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { navigate } from "../router.js";
   import { track } from "../downloads.js";
   import Button from "./Button.svelte";
@@ -30,11 +30,11 @@
 
 
   async function refresh(): Promise<void> {
-    const engines = await cairn.enginesList();
+    const engines = await forebay.enginesList();
     const engine = engines.ok ? engines.data.find((e) => e.capability === "custom-endpoints") : undefined;
     installed = !!engine && Object.values(engine.homes).some((h) => h.installed);
     if (!installed) { endpoints = []; return; }
-    const [list, supported] = await Promise.all([cairn.customEndpointsList(), cairn.customEndpointsFormats()]);
+    const [list, supported] = await Promise.all([forebay.customEndpointsList(), forebay.customEndpointsFormats()]);
     if (list.ok) endpoints = list.data;
     else error = list.error;
     if (supported.ok) {
@@ -47,7 +47,7 @@
     if (busy) return;
     busy = true;
     error = "";
-    const result = await track("Install engine", "cairn", () => cairn.enginesEnsure("custom-endpoints"));
+    const result = await track("Install engine", "forebay", () => forebay.enginesEnsure("custom-endpoints"));
     busy = false;
     if (result.ok) await refresh();
     else error = result.error;
@@ -64,7 +64,7 @@
       format: form.format,
       models: form.models.split(",").map((m) => m.trim()).filter(Boolean),
     };
-    const result = await cairn.customEndpointsUpsert(endpoint);
+    const result = await forebay.customEndpointsUpsert(endpoint);
     busy = false;
     if (result.ok) {
       form = { id: "", label: "", baseUrl: "", format: formats[0] ?? "", models: "" };
@@ -77,7 +77,7 @@
 
   async function removeEndpoint(id: string): Promise<void> {
     error = "";
-    const result = await cairn.customEndpointsRemove(id);
+    const result = await forebay.customEndpointsRemove(id);
     if (result.ok) { dirtyHint = true; await refresh(); }
     else error = result.error;
   }
@@ -86,7 +86,7 @@
     error = "";
     const key = keyDraft[id];
     if (!key) return;
-    const result = await cairn.customEndpointsSaveKey(id, key);
+    const result = await forebay.customEndpointsSaveKey(id, key);
     if (result.ok) { keyDraft = { ...keyDraft, [id]: "" }; await refresh(); }
     else error = result.error;
   }

@@ -1,4 +1,4 @@
-import { cairn } from "./ipc.js";
+import { forebay } from "./ipc.js";
 
 export type ViewMode = "list" | "grid";
 
@@ -16,7 +16,7 @@ export function knownViewMode(screen: string): ViewMode | null {
 
 export async function loadViewMode(screen: string): Promise<ViewMode> {
   try {
-    const result = await cairn.getConfig("cairn", keyFor(screen));
+    const result = await forebay.getConfig("forebay", keyFor(screen));
     const mode: ViewMode = result.ok && result.data === "grid" ? "grid" : "list";
     known.set(screen, mode);
     return mode;
@@ -28,7 +28,7 @@ export async function loadViewMode(screen: string): Promise<ViewMode> {
 export async function saveViewMode(screen: string, mode: ViewMode): Promise<void> {
   known.set(screen, mode);
   try {
-    await cairn.setConfig("cairn", keyFor(screen), mode);
+    await forebay.setConfig("forebay", keyFor(screen), mode);
   } catch {
     // preference persistence is best-effort
   }

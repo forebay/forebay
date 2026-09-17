@@ -1,4 +1,4 @@
-import type { AccountStatus, AccountView } from "@cairn/shared";
+import type { AccountStatus, AccountView } from "@forebay/shared";
 
 // Duplicated from StatusPill's module context: a plain .ts file can't import a
 // type from a .svelte file's module block through tsc's project build.

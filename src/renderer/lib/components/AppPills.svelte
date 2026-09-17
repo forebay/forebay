@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HostApp } from "@cairn/shared";
+  import type { HostApp } from "@forebay/shared";
   import PluginIcon from "./PluginIcon.svelte";
 
   let { apps, values, onToggle, size = 22 }: {

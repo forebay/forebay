@@ -2,14 +2,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/svelte";
 import ScreenRenderer from "./ScreenRenderer.svelte";
-import { stubCairn } from "../../testing.js";
+import { stubForebay } from "../../testing.js";
 
 function ctx(sources: Record<string, unknown>, invoke = vi.fn(async () => {})) {
   return { plugin: "p", screenId: "s", homeId: "claude", sources, invoke, busy: false };
 }
 
 beforeEach(() => {
-  stubCairn();
+  stubForebay();
 });
 
 describe("data leaves", () => {
@@ -66,7 +66,7 @@ describe("data leaves", () => {
 
 describe("data leaves backed by the plugin's own schema", () => {
   it("does not fall back to every declared or inferred field when none of them match the node's keys", async () => {
-    stubCairn({
+    stubForebay({
       configSchemas: async () => ({
         ok: true,
         data: [{
@@ -85,7 +85,7 @@ describe("data leaves backed by the plugin's own schema", () => {
 
   it("routes a declared confirm through ConfirmDialog and invokes only after confirming", async () => {
     const invoke = vi.fn(async () => {});
-    stubCairn({
+    stubForebay({
       configSchemas: async () => ({
         ok: true,
         data: [{
@@ -109,7 +109,7 @@ describe("data leaves backed by the plugin's own schema", () => {
 
   it("routes a list row action's declared confirm through ConfirmDialog before invoking", async () => {
     const invoke = vi.fn(async () => {});
-    stubCairn({
+    stubForebay({
       configSchemas: async () => ({
         ok: true,
         data: [{
@@ -134,7 +134,7 @@ describe("data leaves backed by the plugin's own schema", () => {
 
   it("routes a table row action's declared confirm through ConfirmDialog before invoking", async () => {
     const invoke = vi.fn(async () => {});
-    stubCairn({
+    stubForebay({
       configSchemas: async () => ({
         ok: true,
         data: [{

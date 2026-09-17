@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { OverviewSummary, UsageSnapshot, UsageSession } from "@cairn/shared";
-  import { cairn } from "../ipc.js";
+  import type { OverviewSummary, UsageSnapshot, UsageSession } from "@forebay/shared";
+  import { forebay } from "../ipc.js";
   import { humanizeId } from "../util/appLabel.js";
   import { navigate } from "../router.js";
   import StatCard from "../components/StatCard.svelte";
@@ -61,7 +61,7 @@
   }
 
   async function load(): Promise<void> {
-    const summaryResult = await cairn.overviewSummary();
+    const summaryResult = await forebay.overviewSummary();
     if (summaryResult.ok) {
       summary = summaryResult.data;
       loadError = "";
@@ -69,7 +69,7 @@
       loadError = summaryResult.error;
     }
 
-    const usageResult = await cairn.usageSnapshot();
+    const usageResult = await forebay.usageSnapshot();
     if (usageResult.ok) snapshot = usageResult.data;
   }
 

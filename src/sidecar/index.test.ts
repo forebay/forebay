@@ -49,7 +49,7 @@ describe("shutdown", () => {
     const { hostFor, resetPluginHostsForTests } = await import("./lib/pluginHost.js");
     resetPluginHostsForTests();
     let stopped = false;
-    await hostFor("/tmp/cairn-shutdown-home", "cairn", {
+    await hostFor("/tmp/forebay-shutdown-home", "forebay", {
       start: async () => ({
         started: [],
         quarantined: [],
@@ -69,7 +69,7 @@ describe("activity home", () => {
   let savedHubConfigDir: string | undefined;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "cairn-activity-home-"));
+    tempDir = mkdtempSync(join(tmpdir(), "forebay-activity-home-"));
     savedHubConfigDir = process.env.HUB_CONFIG_DIR;
     process.env.HUB_CONFIG_DIR = tempDir;
   });
@@ -80,22 +80,22 @@ describe("activity home", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  // The home an event lands under and the home the Activity view scans for "cairn"
-  // must be the exact same value. pluginHomes leaves cairnDir at its default here,
+  // The home an event lands under and the home the Activity view scans for "forebay"
+  // must be the exact same value. pluginHomes leaves forebayDir at its default here,
   // so it exercises the real derivation on both sides instead of an injected stand-in.
   // HUB_APPS_FILE is deliberately left unset: the supervisor only forces HUB_CONFIG_DIR,
   // and it's that gap between the two env vars that let the two derivations drift apart.
-  it("stamps the same home pluginHomes reports for cairn's own entry", async () => {
+  it("stamps the same home pluginHomes reports for forebay's own entry", async () => {
     vi.resetModules();
     await import("./index.js");
     const { getActivityContext } = await import("@intisy-ai/basekit");
     const { pluginHomes } = await import("./lib/pluginHomes.js");
 
     const homes = await pluginHomes({ detect: async () => ({ ok: true, data: {} }), managesPlugins: () => false });
-    const cairnHome = homes.find((h) => h.id === "cairn");
-    if (!cairnHome) throw new Error("unreachable");
+    const forebayHome = homes.find((h) => h.id === "forebay");
+    if (!forebayHome) throw new Error("unreachable");
 
-    expect(getActivityContext().home).toBe(cairnHome.dir);
+    expect(getActivityContext().home).toBe(forebayHome.dir);
   });
 });
 
@@ -105,7 +105,7 @@ describe("background updates on launch", () => {
     const calls: { dir: string; trigger: string }[] = [];
 
     const returned = startBackgroundUpdates({
-      home: "/tmp/cairn-home",
+      home: "/tmp/forebay-home",
       runUpdates: async (dir: string, trigger: string) => { calls.push({ dir, trigger }); return {}; },
     });
 
@@ -113,13 +113,13 @@ describe("background updates on launch", () => {
     // there is no queue to serialize ambient-home mutation through and the run starts at once.
     expect(returned).toBeUndefined();
     for (let i = 0; i < 50 && calls.length === 0; i++) await new Promise((r) => setTimeout(r, 10));
-    expect(calls).toEqual([{ dir: "/tmp/cairn-home", trigger: "cairn" }]);
+    expect(calls).toEqual([{ dir: "/tmp/forebay-home", trigger: "dashboard" }]);
   });
 
   it("survives an engine that throws, because the dashboard still has to open", async () => {
     const { startBackgroundUpdates } = await import("./index.js");
     expect(() => startBackgroundUpdates({
-      home: "/tmp/cairn-home",
+      home: "/tmp/forebay-home",
       runUpdates: async () => { throw new Error("boom"); },
     })).not.toThrow();
     await new Promise((r) => setTimeout(r, 0));

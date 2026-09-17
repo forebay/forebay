@@ -28,7 +28,7 @@ export interface DeployedManifest {
  *
  * @remarks
  * Reads the sidecars deploy writes beside each bundle, so it answers without importing anything and
- * without a running host. An unreadable home is an empty list rather than a throw: Cairn renders
+ * without a running host. An unreadable home is an empty list rather than a throw: Forebay renders
  * several homes at once and one broken home must not blank the others.
  */
 export function deployedManifests(homeDir: string): DeployedManifest[] {

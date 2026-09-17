@@ -1,15 +1,15 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import Activity from "./Activity.svelte";
-import type { ActivityRecord, Result } from "@cairn/shared";
+import type { ActivityRecord, Result } from "@forebay/shared";
 
 function record(over: Partial<ActivityRecord> & { id: string }): ActivityRecord {
   return {
     id: over.id,
     ts: over.ts ?? Date.now(),
-    home: over.home ?? "cairn",
+    home: over.home ?? "forebay",
     topic: over.topic ?? "config.changed",
     action: over.action ?? "config_changed",
     actor: over.actor ?? "user",
@@ -24,7 +24,7 @@ function record(over: Partial<ActivityRecord> & { id: string }): ActivityRecord 
 }
 
 beforeEach(() => {
-  stubCairn({
+  stubForebay({
     activityRead: async () => ({
       ok: true,
       data: {
@@ -59,7 +59,7 @@ describe("Activity screen", () => {
   });
 
   it("filters by the app an event ran in", async () => {
-    stubCairn({
+    stubForebay({
       activityRead: async () => ({
         ok: true,
         data: {
@@ -79,7 +79,7 @@ describe("Activity screen", () => {
   });
 
   it("filters by cause kind and by actor", async () => {
-    stubCairn({
+    stubForebay({
       activityRead: async () => ({
         ok: true,
         data: {
@@ -106,7 +106,7 @@ describe("Activity screen", () => {
     const NEWER_TS = Date.now() - 60_000;
     const OLDER_TS = Date.now() - 120_000;
     const calls: Record<string, unknown>[] = [];
-    stubCairn({
+    stubForebay({
       activityRead: async (query: Record<string, unknown>) => {
         calls.push(query);
         if (!query.cursor) {
@@ -132,7 +132,7 @@ describe("Activity screen", () => {
 
   it("hides an event's cascade until the group is expanded", async () => {
     const now = Date.now();
-    stubCairn({
+    stubForebay({
       activityRead: async () => ({
         ok: true,
         data: {
@@ -159,7 +159,7 @@ describe("Activity screen", () => {
       resolveLoad = resolve;
     });
     let liveHandler: ((r: ActivityRecord) => void) | undefined;
-    stubCairn({
+    stubForebay({
       activityRead: async () => pending,
       onActivityEvent: (listener) => {
         liveHandler = listener;

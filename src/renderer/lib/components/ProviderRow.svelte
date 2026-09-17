@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HostApp } from "@cairn/shared";
+  import type { HostApp } from "@forebay/shared";
   import StatusPill from "./StatusPill.svelte";
   import type { StatusVariant } from "./StatusPill.svelte";
   import AppPills from "./AppPills.svelte";

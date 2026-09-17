@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import PluginDetail from "./PluginDetail.svelte";
-import type { UnifiedPlugin } from "@cairn/shared";
+import type { UnifiedPlugin } from "@forebay/shared";
 
 const PLUGIN: UnifiedPlugin = {
   name: "wakatime-sync",
@@ -46,7 +46,7 @@ function stubVersions(
   experimentalAvailable: boolean | null,
   channel?: "inherit" | "stable" | "experimental",
 ) {
-  stubCairn({
+  stubForebay({
     pluginVersions: async () => ({
       ok: true,
       data: {

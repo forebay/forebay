@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { toasts, toast } from "../toast.js";
 import { router, consumeParams } from "../router.js";
 import LocalApi from "./LocalApi.svelte";
@@ -14,7 +14,7 @@ describe("LocalApi screen", () => {
 
   it("shows a start affordance when stopped and calls proxyStart on click", async () => {
     const proxyStart = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxyStart,
     });
@@ -30,7 +30,7 @@ describe("LocalApi screen", () => {
 
   it("shows the running state and calls proxyStop on click", async () => {
     const proxyStop = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: true, port: 34567 } }),
       proxyStop,
     });
@@ -52,7 +52,7 @@ describe("LocalApi screen", () => {
           resolveStart = () => resolve({ ok: true, data: undefined });
         }),
     );
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxyStart: proxyStart as unknown as () => Promise<{ ok: true; data: undefined }>,
     });
@@ -69,7 +69,7 @@ describe("LocalApi screen", () => {
   });
 
   it("shows an inline error when proxyStatus fails", async () => {
-    stubCairn({ proxyStatus: async () => ({ ok: false, error: "boom" }) });
+    stubForebay({ proxyStatus: async () => ({ ok: false, error: "boom" }) });
     const { getByText } = render(LocalApi);
     await waitFor(() => expect(getByText(/boom/i)).toBeTruthy());
   });
@@ -79,7 +79,7 @@ describe("LocalApi screen", () => {
       .fn()
       .mockResolvedValueOnce({ ok: false, error: "boom" })
       .mockResolvedValueOnce({ ok: true, data: { running: false, port: 34567 } });
-    stubCairn({ proxyStatus });
+    stubForebay({ proxyStatus });
 
     const { getByText, getByRole } = render(LocalApi);
     await waitFor(() => expect(getByText(/boom/i)).toBeTruthy());
@@ -93,7 +93,7 @@ describe("LocalApi screen", () => {
 
   it("shows the start error when proxyStart fails", async () => {
     const proxyStart = vi.fn(async () => ({ ok: false, error: "no proxy plugin installed" }) as const);
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxyStart,
     });
@@ -109,7 +109,7 @@ describe("LocalApi screen", () => {
   });
 
   it("toasts an error when saving the port fails", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       setConfig: async () => ({ ok: false, error: "boom" }),
     });
@@ -125,7 +125,7 @@ describe("LocalApi screen", () => {
   });
 
   it("toasts success when saving the port succeeds", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       setConfig: async () => ({ ok: true, data: undefined }),
     });
@@ -141,7 +141,7 @@ describe("LocalApi screen", () => {
   });
 
   it("shows a muted message when no proxies are installed", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxiesList: async () => ({ ok: true, data: [] }),
     });
@@ -151,7 +151,7 @@ describe("LocalApi screen", () => {
   });
 
   it("navigates to the Plugins proxy filter when Add proxy is clicked", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxiesList: async () => ({ ok: true, data: [] }),
     });
@@ -164,7 +164,7 @@ describe("LocalApi screen", () => {
   });
 
   it("renders each installed proxy with its own setup instructions and toggle", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxiesList: async () => ({
         ok: true,
@@ -190,7 +190,7 @@ describe("LocalApi screen", () => {
 
   it("calls proxiesSetEnabled when a proxy toggle is flipped", async () => {
     const proxiesSetEnabled = vi.fn(async () => ({ ok: true, data: undefined }) as const);
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxiesList: async () => ({
         ok: true,
@@ -207,7 +207,7 @@ describe("LocalApi screen", () => {
   });
 
   it("toasts an error when toggling a proxy fails", async () => {
-    stubCairn({
+    stubForebay({
       proxyStatus: async () => ({ ok: true, data: { running: false, port: 34567 } }),
       proxiesList: async () => ({
         ok: true,

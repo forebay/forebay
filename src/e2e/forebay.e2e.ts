@@ -20,7 +20,7 @@ interface ScreenResult {
 
 const SHOTS_DIR = join(repoRoot, "out", "e2e-shots");
 
-describe("Cairn end-to-end", () => {
+describe("Forebay end-to-end", () => {
   let sandbox: SandboxedApp;
   let page: SandboxedPage;
   let events: LogEvent[];
@@ -42,8 +42,8 @@ describe("Cairn end-to-end", () => {
   });
 
   afterAll(async () => {
-    console.log("[cairn-e2e] per-screen results:", JSON.stringify(screenResults, null, 2));
-    console.log("[cairn-e2e] captured log events:", JSON.stringify(events, null, 2));
+    console.log("[forebay-e2e] per-screen results:", JSON.stringify(screenResults, null, 2));
+    console.log("[forebay-e2e] captured log events:", JSON.stringify(events, null, 2));
     await sandbox?.dispose();
   });
 
@@ -103,7 +103,7 @@ describe("Cairn end-to-end", () => {
 
   it("writes into the sandboxed store dir rather than merely having it configured", async () => {
     const fileCount = await waitForFileUnder(sandbox.storeDir);
-    console.log("[cairn-e2e] files written under sandboxed store dir:", listFilesUnder(sandbox.storeDir));
+    console.log("[forebay-e2e] files written under sandboxed store dir:", listFilesUnder(sandbox.storeDir));
     expect(fileCount).toBeGreaterThan(0);
   });
 

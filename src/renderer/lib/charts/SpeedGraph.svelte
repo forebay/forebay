@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { JobSample } from "@cairn/shared";
+  import type { JobSample } from "@forebay/shared";
   import { linePath, niceMax, type Pt } from "./chartMath.js";
-  import { formatRate } from "@cairn/shared";
+  import { formatRate } from "@forebay/shared";
 
   // A live transfer trace. Unlike AreaChart this has no labelled columns and no hover: the
   // x axis is just "recently", so the shape and the current figure are the whole story.

@@ -48,7 +48,7 @@ const hosts = new Map<string, Promise<LoadedHost | null>>();
  * The running host for one plugin home, started on first ask and cached afterwards.
  *
  * @remarks
- * Null rather than a throw when a home cannot be hosted: Cairn renders several homes side by side
+ * Null rather than a throw when a home cannot be hosted: Forebay renders several homes side by side
  * and one unreadable home must cost its own capabilities, never the others'. A rejected start is
  * cached as null for the life of the sidecar, which matches how the rest of the dashboard treats a
  * home it could not read.
@@ -81,7 +81,7 @@ export function hostFor(homeDir: string, appId: string, deps: PluginHostDeps = {
  * screen's per-surface layout override is resolved against the same id. Two literals would let a
  * plugin's override for this surface go unrendered.
  */
-export const SURFACE = "cairn";
+export const SURFACE = "forebay";
 
 /** Every plugin providing a capability in one home, in activation order. */
 export async function capabilityProviders(

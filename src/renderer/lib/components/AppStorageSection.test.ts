@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
-import { stubCairn } from "../testing.js";
+import { stubForebay } from "../testing.js";
 import { toasts } from "../toast.js";
 import AppStorageSection from "./AppStorageSection.svelte";
 
@@ -23,7 +23,7 @@ function storage(names = NAMES) {
 
 describe("AppStorageSection", () => {
   it("shows the home and its four subdirectory names", async () => {
-    stubCairn({ appStorageGet: async () => storage() });
+    stubForebay({ appStorageGet: async () => storage() });
     render(AppStorageSection, { props: { app: "claude" } });
 
     expect(await screen.findByText("/home/jane/.claude")).toBeInTheDocument();
@@ -32,7 +32,7 @@ describe("AppStorageSection", () => {
   });
 
   it("only offers fields once Change is pressed", async () => {
-    stubCairn({ appStorageGet: async () => storage() });
+    stubForebay({ appStorageGet: async () => storage() });
     render(AppStorageSection, { props: { app: "claude" } });
     await screen.findByText("/home/jane/.claude");
 
@@ -46,7 +46,7 @@ describe("AppStorageSection", () => {
       ok: true as const,
       data: { names: { ...NAMES, repos: "clones" }, moves: [{ kind: "repos" as const, from: "repos", to: "clones", status: "moved" as const }] },
     }));
-    stubCairn({ appStorageGet: async () => storage(), appStorageSet });
+    stubForebay({ appStorageGet: async () => storage(), appStorageSet });
     render(AppStorageSection, { props: { app: "claude" } });
     await screen.findByText("/home/jane/.claude");
     await fireEvent.click(screen.getByRole("button", { name: "Change" }));
@@ -61,7 +61,7 @@ describe("AppStorageSection", () => {
   // Nothing to save is not a state worth offering a button for, and pressing it would
   // rename four directories onto themselves.
   it("keeps Save unavailable until a name actually changes", async () => {
-    stubCairn({ appStorageGet: async () => storage() });
+    stubForebay({ appStorageGet: async () => storage() });
     render(AppStorageSection, { props: { app: "claude" } });
     await screen.findByText("/home/jane/.claude");
     await fireEvent.click(screen.getByRole("button", { name: "Change" }));
@@ -74,7 +74,7 @@ describe("AppStorageSection", () => {
   // The rules live in core, so whatever it refuses is shown as it came back rather than
   // being second-guessed here.
   it("surfaces the reason a save was refused", async () => {
-    stubCairn({
+    stubForebay({
       appStorageGet: async () => storage(),
       appStorageSet: async () => ({ ok: false as const, error: "repos: clones already exists in this home" }),
     });
@@ -89,7 +89,7 @@ describe("AppStorageSection", () => {
   });
 
   it("drops the edits on cancel", async () => {
-    stubCairn({ appStorageGet: async () => storage() });
+    stubForebay({ appStorageGet: async () => storage() });
     render(AppStorageSection, { props: { app: "claude" } });
     await screen.findByText("/home/jane/.claude");
     await fireEvent.click(screen.getByRole("button", { name: "Change" }));

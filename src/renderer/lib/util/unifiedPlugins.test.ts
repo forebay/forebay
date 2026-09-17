@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { buildUnifiedPlugins, applicableHomeIds } from "./unifiedPlugins.js";
-import type { HomePlugins, CatalogEntry, PluginHome } from "@cairn/shared";
+import type { HomePlugins, CatalogEntry, PluginHome } from "@forebay/shared";
 
 const homes: PluginHome[] = [
-  { id: "cairn", label: "Cairn", dir: "/cairn", present: true, managesPlugins: true },
+  { id: "forebay", label: "Forebay", dir: "/forebay", present: true, managesPlugins: true },
   { id: "claude", label: "Claude Code", dir: "/c", present: true, managesPlugins: true },
   { id: "opencode", label: "OpenCode", dir: "/o", present: true, managesPlugins: true },
 ];
@@ -22,7 +22,7 @@ describe("buildUnifiedPlugins", () => {
     const wk = out.find((p) => p.name === "wakatime-sync")!;
     expect(wk.kind).toBe("plugin");
     expect(wk.description).toBe("Tracks time");
-    // plugin kind applies to host apps only (not cairn)
+    // plugin kind applies to host apps only (not forebay)
     expect(Object.keys(wk.homes).sort()).toEqual(["claude", "opencode"]);
     expect(wk.homes.claude.installed).toBe(true);
     expect(wk.homes.opencode.installed).toBe(false);
@@ -32,7 +32,7 @@ describe("buildUnifiedPlugins", () => {
     const out = buildUnifiedPlugins([], [], homes, [{ name: "plugin-updater", url: "https://github.com/forebay/plugin-updater" }]);
     const pu = out.find((p) => p.name === "plugin-updater")!;
     expect(pu.url).toBe("https://github.com/forebay/plugin-updater");
-    expect(Object.keys(pu.homes).sort()).toEqual(["cairn", "claude", "opencode"]);
+    expect(Object.keys(pu.homes).sort()).toEqual(["claude", "forebay", "opencode"]);
   });
 
   it("marks a plugin external when its installed repo owner is not the marketplace org", () => {
@@ -53,14 +53,14 @@ describe("buildUnifiedPlugins", () => {
     expect(noOrg.find((p) => p.name === "x")!.external).toBe(false);
   });
 
-  it("routes a provider to host apps + cairn and a proxy to cairn only", () => {
+  it("routes a provider to host apps + forebay and a proxy to forebay only", () => {
     const catalog: CatalogEntry[] = [
       { name: "antigravity-auth", url: "u", kind: "provider", description: "prov", deprecated: false },
       { name: "claude-code-proxy", url: "u", kind: "proxy", description: "px", deprecated: false },
     ];
     const out = buildUnifiedPlugins([], catalog, homes);
-    expect(Object.keys(out.find((p) => p.name === "antigravity-auth")!.homes).sort()).toEqual(["cairn", "claude", "opencode"]);
-    expect(Object.keys(out.find((p) => p.name === "claude-code-proxy")!.homes)).toEqual(["cairn"]);
+    expect(Object.keys(out.find((p) => p.name === "antigravity-auth")!.homes).sort()).toEqual(["claude", "forebay", "opencode"]);
+    expect(Object.keys(out.find((p) => p.name === "claude-code-proxy")!.homes)).toEqual(["forebay"]);
   });
 
   it("falls back to the catalog description when the installed row has none", () => {
@@ -153,7 +153,7 @@ describe("a declared but absent plugin", () => {
 // One app's plugins ending up installed in another is what this declaration prevents.
 describe("a plugin that declares which apps it suits", () => {
   const withLoaders: PluginHome[] = [
-    { id: "cairn", label: "Cairn", dir: "/k", present: true, managesPlugins: true },
+    { id: "forebay", label: "Forebay", dir: "/k", present: true, managesPlugins: true },
     { id: "claude", label: "Claude Code", dir: "/c", present: true, managesPlugins: true, loaderId: "claude-code-loader" },
     { id: "opencode", label: "OpenCode", dir: "/o", present: true, managesPlugins: true, loaderId: "opencode-loader" },
   ];
@@ -169,7 +169,7 @@ describe("a plugin that declares which apps it suits", () => {
 
   // The declaration narrows; it cannot widen into a home the kind rules exclude.
   it("cannot claim a home its kind is not allowed in", () => {
-    expect(applicableHomeIds("plugin", withLoaders, "some-plugin", ["cairn", "claude"])).toEqual(["claude"]);
+    expect(applicableHomeIds("plugin", withLoaders, "some-plugin", ["forebay", "claude"])).toEqual(["claude"]);
   });
 
   it("gives a plugin naming an app that is not here no home at all", () => {
@@ -180,14 +180,14 @@ describe("a plugin that declares which apps it suits", () => {
 // An app is reached through its loader, so an app without one cannot run what is installed there.
 describe("an app whose loader is not installed", () => {
   const homes: PluginHome[] = [
-    { id: "cairn", label: "Cairn", dir: "/k", present: true, managesPlugins: true },
+    { id: "forebay", label: "Forebay", dir: "/k", present: true, managesPlugins: true },
     { id: "claude", label: "Claude Code", dir: "/c", present: true, managesPlugins: true, loaderId: "claude-code-loader", loaderInstalled: true },
     { id: "opencode", label: "OpenCode", dir: "/o", present: true, managesPlugins: true, loaderId: "opencode-loader", loaderInstalled: false },
   ];
 
   it("is not offered as a target for other plugins", () => {
     expect(applicableHomeIds("plugin", homes, "some-plugin")).toEqual(["claude"]);
-    expect(applicableHomeIds("provider", homes, "some-provider")).toEqual(["cairn", "claude"]);
+    expect(applicableHomeIds("provider", homes, "some-provider")).toEqual(["forebay", "claude"]);
   });
 
   // Otherwise the loader could never be installed: the one home that needs it would be hidden.
@@ -199,9 +199,9 @@ describe("an app whose loader is not installed", () => {
     expect(applicableHomeIds("plugin", homes, "some-plugin", ["opencode"])).toEqual([]);
   });
 
-  // Cairn's own home has no loader to require, and the whole list must not vanish for it.
+  // Forebay's own home has no loader to require, and the whole list must not vanish for it.
   it("does not affect a home that has no loader at all", () => {
-    expect(applicableHomeIds("provider", homes, "some-provider")).toContain("cairn");
+    expect(applicableHomeIds("provider", homes, "some-provider")).toContain("forebay");
   });
 
   // A sidecar predating this field sends no answer, and reading that as "absent" would
@@ -214,7 +214,7 @@ describe("an app whose loader is not installed", () => {
 
 describe("a loader's applicable homes", () => {
   const withLoaders: PluginHome[] = [
-    { id: "cairn", label: "Cairn", dir: "/k", present: true, managesPlugins: true },
+    { id: "forebay", label: "Forebay", dir: "/k", present: true, managesPlugins: true },
     { id: "claude", label: "Claude Code", dir: "/c", present: true, managesPlugins: true, loaderId: "claude-code-loader" },
     { id: "opencode", label: "OpenCode", dir: "/o", present: true, managesPlugins: true, loaderId: "opencode-loader" },
   ];
@@ -226,8 +226,8 @@ describe("a loader's applicable homes", () => {
 
   it("leaves every other kind on the generic rule", () => {
     expect(applicableHomeIds("plugin", withLoaders, "wakatime-sync")).toEqual(["claude", "opencode"]);
-    expect(applicableHomeIds("provider", withLoaders, "stub-auth")).toEqual(["cairn", "claude", "opencode"]);
-    expect(applicableHomeIds("proxy", withLoaders, "claude-code-proxy")).toEqual(["cairn"]);
+    expect(applicableHomeIds("provider", withLoaders, "stub-auth")).toEqual(["forebay", "claude", "opencode"]);
+    expect(applicableHomeIds("proxy", withLoaders, "claude-code-proxy")).toEqual(["forebay"]);
   });
 
   it("falls back to the generic rule for a loader whose app is not registered here", () => {

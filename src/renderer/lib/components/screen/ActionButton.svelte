@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ActionSpec } from "@cairn/shared";
-  import { cairn } from "../../ipc.js";
+  import type { ActionSpec } from "@forebay/shared";
+  import { forebay } from "../../ipc.js";
   import Button from "../Button.svelte";
   import ConfirmDialog from "../ConfirmDialog.svelte";
   import type { ScreenContext } from "./context.js";
@@ -10,7 +10,7 @@
   let declared = $state<ActionSpec[]>([]);
 
   async function load(homeId: string, plugin: string): Promise<void> {
-    const result = await cairn.configSchemas(homeId);
+    const result = await forebay.configSchemas(homeId);
     const full = result.ok ? (result.data.find((s) => s.plugin === plugin) ?? null) : null;
     declared = full?.actions ?? [];
   }

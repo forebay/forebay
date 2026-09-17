@@ -1,5 +1,5 @@
-import type { HomePlugins, CatalogEntry, PluginHome, UnifiedPlugin, CatalogKind } from "@cairn/shared";
-import { classifyRepoName } from "@cairn/shared";
+import type { HomePlugins, CatalogEntry, PluginHome, UnifiedPlugin, CatalogKind } from "@forebay/shared";
+import { classifyRepoName } from "@forebay/shared";
 
 function kindOf(name: string, catalog: CatalogEntry[]): CatalogKind {
   const hit = catalog.find((e) => e.name === name);
@@ -14,7 +14,7 @@ function kindOf(name: string, catalog: CatalogEntry[]): CatalogKind {
 // loader is still offered to its own app while it is the thing not yet installed.
 //
 // An app whose loader is absent loads nothing the ecosystem installs, so it is not a target for
-// anything else either. Cairn's own home has no loader and is unaffected.
+// anything else either. Forebay's own home has no loader and is unaffected.
 //
 // Any other plugin may declare the apps it suits, and that declaration is honoured as given:
 // an app-specific plugin offered everywhere is how one app's plugins ended up installed in
@@ -24,7 +24,7 @@ export function applicableHomeIds(kind: CatalogKind, homes: PluginHome[], plugin
   const ownApp = pluginName ? homes.find((h) => h.loaderId === pluginName) : undefined;
   if (ownApp) return [ownApp.id];
   const generic = homes
-    .filter((h) => (h.id === "cairn" ? kind !== "plugin" && kind !== "loader" : kind !== "proxy"))
+    .filter((h) => (h.id === "forebay" ? kind !== "plugin" && kind !== "loader" : kind !== "proxy"))
     .filter((h) => !h.loaderId || h.loaderInstalled !== false)
     .map((h) => h.id);
   if (!apps || apps.length === 0) return generic;
@@ -61,7 +61,7 @@ export function buildUnifiedPlugins(
     const kind = kindOf(name, catalog);
     const catEntry = catalog.find((e) => e.name === name);
     const engineUrl = engineUrls.get(name);
-    // Engines are Cairn-installable into every home (bootstrap) and carry their
+    // Engines are Forebay-installable into every home (bootstrap) and carry their
     // clone URL from the engine registry when the catalog has none.
     const homeIds = engineUrl !== undefined ? homes.map((h) => h.id) : applicableHomeIds(kind, homes, name, catEntry?.apps);
     const rows = sections.flatMap((s) => s.rows.filter((r) => r.name === name).map((r) => ({ home: s.home.id, r })));
