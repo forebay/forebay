@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import type { AppDescriptor } from "@intisy-ai/basekit";
 
 const stubHandlerPath = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth/dist/handler.js", import.meta.url));
+const providersDir = fileURLToPath(new URL("../../../../../plugins/providers", import.meta.url));
+const workspaceIsPresent = existsSync(providersDir);
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
 const ENV_KEYS = [
@@ -145,6 +147,14 @@ function seedMultiModelClaudeSession(): { day1: number; day2: number } {
 }
 
 describe("usage sidecar module", () => {
+  // A skip cannot tell "no sibling checkout" from "the path moved", and it already hid the second
+  // once: the migration broke this path and the suite stayed green at 6 passed, 2 skipped. So the
+  // workspace's presence is checked separately from the fixture's, and only the first licenses a
+  // skip.
+  it.skipIf(!workspaceIsPresent)("finds the sibling stub provider, because the workspace is present", () => {
+    expect(stubIsCheckedOut, `expected a built stub provider at ${stubHandlerPath}; the workspace is present, so this path is wrong rather than absent`).toBe(true);
+  });
+
 // The sibling provider checkout is there in the workspace and absent when this repo is cloned on
 // its own, which is what CI does. Skipped rather than failed there: a deployed provider bundle is
 // what this asserts against, and no stand-in would be asserting the same thing.
