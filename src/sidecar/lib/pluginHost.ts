@@ -59,6 +59,10 @@ export function hostFor(homeDir: string, appId: string, deps: PluginHostDeps = {
   const start = deps.start ?? startPlugins;
   const loading = start({
     app: appId,
+    // `app` is the home this host sits in; this is the product, which is what an artifact's
+    // `targets` is matched against. One product in four homes declares the same application in all
+    // four, so a plugin built for forebay loads wherever forebay drives it.
+    applications: [APPLICATION],
     pluginDir: pluginDir(homeDir),
     surfaces: [SURFACE],
     // Behaviour a plugin may not link for itself: basekit/auth's provider helpers, linked once here
@@ -82,6 +86,17 @@ export function hostFor(homeDir: string, appId: string, deps: PluginHostDeps = {
  * plugin's override for this surface go unrendered.
  */
 export const SURFACE = "forebay";
+
+/**
+ * The spisor application this host IS, which an artifact's `targets` is matched against.
+ *
+ * @remarks
+ * Deliberately separate from the home id a host is loaded into and from {@link SURFACE}, which
+ * happen to share this spelling: a home is which AI CLI's directory this host drives, a surface is
+ * where a plugin renders, and this is which product the plugin was built for. Three questions, one
+ * word, and only the third decides compatibility.
+ */
+export const APPLICATION = "forebay";
 
 /** Every plugin providing a capability in one home, in activation order. */
 export async function capabilityProviders(

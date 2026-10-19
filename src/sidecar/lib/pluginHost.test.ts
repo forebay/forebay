@@ -28,6 +28,24 @@ describe("the per-home plugin host", () => {
     expect(calls).toEqual([join("/home/a", "plugin"), join("/home/b", "plugin")]);
   });
 
+  // The home a host is loaded into and the application it hosts are different things: a plugin's
+  // `targets` is matched against the application, so passing the home there would compare an
+  // artifact's product against whichever AI CLI it happens to sit beside.
+  it("declares the application it hosts, not the home it is loaded into", async () => {
+    const seen: Array<{ app: string; applications?: string[] }> = [];
+    const start = async (options: { app: string; applications?: string[] }) => {
+      seen.push({ app: options.app, applications: options.applications });
+      return fakeLoaded(["p"], []) as never;
+    };
+    await hostFor("/home/claude", "claude", { start });
+    await hostFor("/home/own", "forebay", { start });
+
+    expect(seen).toEqual([
+      { app: "claude", applications: ["forebay"] },
+      { app: "forebay", applications: ["forebay"] },
+    ]);
+  });
+
   it("answers empty for a home whose host failed to start, and never throws", async () => {
     const start = async () => { throw new Error("boom"); };
     expect(await hostFor("/home/c", "app-c", { start })).toBeNull();
