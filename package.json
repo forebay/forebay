@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@intisy/bayonet": "^1.8.0",
-    "@intisy-ai/basekit": "^5.0.0"
+    "@intisy-ai/basekit": "^7.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
