@@ -64,7 +64,7 @@ export function hostFor(homeDir: string, appId: string, deps: PluginHostDeps = {
     // Behaviour a plugin may not link for itself: basekit/auth's provider helpers, linked once here
     // rather than copied into every provider bundle.
     services: [{ id: PROVIDER_SUPPORT, implementation: providerSupport() }],
-    runtimeFor: (manifest) => createPluginRuntime(manifest.id, homeDir),
+    runtimeFor: (manifest) => createPluginRuntime(manifest, homeDir),
   }).catch((error: unknown) => {
     process.stderr.write(`[plugin-api] host for ${homeDir} failed to start: ${String(error)}\n`);
     return null;

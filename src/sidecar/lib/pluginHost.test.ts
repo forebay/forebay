@@ -1,3 +1,5 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it, expect, beforeEach } from "vitest";
 import { hostFor, capabilityProviders, ledgerFor, quarantinedIn, resetPluginHostsForTests, stopAllHosts } from "./pluginHost.js";
@@ -40,6 +42,19 @@ describe("the per-home plugin host", () => {
     expect(await quarantinedIn("/home/d", "app-d", { start })).toEqual([
       { pluginId: "bad", detail: "activate threw", fix: "fix the error" },
     ]);
+  });
+
+  it("builds each plugin's runtime from its manifest", async () => {
+    const homeDir = mkdtempSync(join(tmpdir(), "forebay-runtime-"));
+    try {
+      let runtimeFor: ((manifest: unknown) => { config: { get(key: string): unknown } }) | undefined;
+      const start = async (options: { runtimeFor: typeof runtimeFor }) => { runtimeFor = options.runtimeFor; return fakeLoaded(["p"], []) as never; };
+      await hostFor(homeDir, "app-f", { start: start as never });
+      const runtime = runtimeFor!({ id: "renamed-plugin", config: { name: "renamed", defaults: { interval: 30 } } });
+      expect(runtime.config.get("interval")).toBe(30);
+    } finally {
+      rmSync(homeDir, { recursive: true, force: true });
+    }
   });
 
   it("stops every started host once", async () => {
