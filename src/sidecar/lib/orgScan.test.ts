@@ -102,6 +102,24 @@ describe("scanOrg", () => {
     expect(result.entries[0].methods).toEqual(["marketplace"]);
   });
 
+  it("defaults methods to marketplace when there is no manifest or the manifest declares none", async () => {
+    const manifestWithoutMethods = { displayName: "Plain" };
+    const withManifest = (async (url: string) => {
+      if (url.includes("/contents/plugin.json")) return { ok: true, status: 200, json: async () => ({ encoding: "base64", content: Buffer.from(JSON.stringify(manifestWithoutMethods)).toString("base64") }) };
+      return { ok: true, status: 200, json: async () => [repo("plain", ["plugin"])] };
+    }) as unknown as typeof fetch;
+    const enriched = await scanOrg({ fetchFn: withManifest, env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    expect(enriched.entries[0].methods).toEqual(["marketplace"]);
+
+    resetOrgScanCache();
+    const noManifest = (async (url: string) => {
+      if (url.includes("/contents/")) return { ok: false, status: 404, json: async () => ({}) };
+      return { ok: true, status: 200, json: async () => [repo("bare", ["plugin"])] };
+    }) as unknown as typeof fetch;
+    const bare = await scanOrg({ fetchFn: noManifest, env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    expect(bare.entries[0].methods).toEqual(["marketplace"]);
+  });
+
   it("maps an archived installable repo to a deprecated entry instead of skipping it", async () => {
     const result = await scanOrg({
       fetchFn: okFetch([repo("stub-auth", ["ai-provider"]), repo("old-plugin", ["plugin"], true)]),
