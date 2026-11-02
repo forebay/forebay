@@ -26,7 +26,7 @@ function emptyScan(): Promise<CatalogResult> {
 function scanWithLoader(app: AppDescriptor): () => Promise<CatalogResult> {
   return () =>
     Promise.resolve({
-      entries: [{ name: app.loader!.id, url: `https://github.com/acme-org/${app.loader!.id}`, kind: "loader", description: "", deprecated: false, topics: ["app-loader"], app }],
+      entries: [{ name: app.loader!.id, url: `https://github.com/acme-org/${app.loader!.id}`, kind: "host", description: "", deprecated: false, topics: ["app-loader"], app }],
       source: "env",
       org: "acme-org",
     });
@@ -74,7 +74,7 @@ describe("discoverApps", () => {
   it("registers nothing for a loader-kind entry without an app block", async () => {
     const scan = () =>
       Promise.resolve({
-        entries: [{ name: "gamma-loader", url: "https://github.com/acme-org/gamma-loader", kind: "loader" as const, description: "", deprecated: false, topics: ["app-loader"] }],
+        entries: [{ name: "gamma-loader", url: "https://github.com/acme-org/gamma-loader", kind: "host" as const, description: "", deprecated: false, topics: ["app-loader"] }],
         source: "env" as const,
         org: "acme-org",
       });
@@ -100,7 +100,7 @@ describe("discoverApps", () => {
     const dataUri = "data:image/svg+xml;base64," + Buffer.from(svg, "utf-8").toString("base64");
     const scan = () =>
       Promise.resolve({
-        entries: [{ name: gammaApp.loader!.id, url: `https://github.com/acme-org/${gammaApp.loader!.id}`, kind: "loader" as const, description: "", deprecated: false, topics: ["app-loader"], app: gammaApp, icon: dataUri }],
+        entries: [{ name: gammaApp.loader!.id, url: `https://github.com/acme-org/${gammaApp.loader!.id}`, kind: "host" as const, description: "", deprecated: false, topics: ["app-loader"], app: gammaApp, icon: dataUri }],
         source: "env" as const,
         org: "acme-org",
       });
@@ -132,7 +132,7 @@ describe("discoverApps", () => {
     const registered: AppDescriptor[] = [];
     const existing = { id: "app-a", label: "App A", home: "~/.app-a", loader: { id: "app-a-loader", url: "https://example/l" } } as AppDescriptor;
     await discoverApps({
-      scanOrgFn: async () => ({ entries: [{ kind: "loader", app: { ...existing, accent: "#5fafaf" } }] } as never),
+      scanOrgFn: async () => ({ entries: [{ kind: "host", app: { ...existing, accent: "#5fafaf" } }] } as never),
       getAppsFn: () => [existing],
       registerAppFn: (desc) => { registered.push(desc); },
       exists: () => false,
@@ -145,7 +145,7 @@ describe("discoverApps", () => {
     const registered: AppDescriptor[] = [];
     const existing = { id: "app-a", label: "App A", home: "~/.app-a", accent: "#5fafaf", loader: { id: "app-a-loader", url: "https://example/l" } } as AppDescriptor;
     await discoverApps({
-      scanOrgFn: async () => ({ entries: [{ kind: "loader", app: { ...existing } }] } as never),
+      scanOrgFn: async () => ({ entries: [{ kind: "host", app: { ...existing } }] } as never),
       getAppsFn: () => [existing],
       registerAppFn: (desc) => { registered.push(desc); },
       exists: () => false,

@@ -192,7 +192,7 @@ describe("an app whose loader is not installed", () => {
 
   // Otherwise the loader could never be installed: the one home that needs it would be hidden.
   it("is still offered its own loader", () => {
-    expect(applicableHomeIds("loader", homes, "opencode-loader")).toEqual(["opencode"]);
+    expect(applicableHomeIds("host", homes, "opencode-loader")).toEqual(["opencode"]);
   });
 
   it("cannot be reached by a plugin that names it either", () => {
@@ -220,8 +220,8 @@ describe("a loader's applicable homes", () => {
   ];
 
   it("offers a loader only to the app that names it", () => {
-    expect(applicableHomeIds("loader", withLoaders, "claude-code-loader")).toEqual(["claude"]);
-    expect(applicableHomeIds("loader", withLoaders, "opencode-loader")).toEqual(["opencode"]);
+    expect(applicableHomeIds("host", withLoaders, "claude-code-loader")).toEqual(["claude"]);
+    expect(applicableHomeIds("host", withLoaders, "opencode-loader")).toEqual(["opencode"]);
   });
 
   it("leaves every other kind on the generic rule", () => {
@@ -231,6 +231,6 @@ describe("a loader's applicable homes", () => {
   });
 
   it("falls back to the generic rule for a loader whose app is not registered here", () => {
-    expect(applicableHomeIds("loader", withLoaders, "some-other-loader")).toEqual(["claude", "opencode"]);
+    expect(applicableHomeIds("host", withLoaders, "some-other-loader")).toEqual(["claude", "opencode"]);
   });
 });

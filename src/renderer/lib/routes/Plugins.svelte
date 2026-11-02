@@ -85,8 +85,8 @@
     run: (optedIn: boolean) => Promise<void>;
   } | null>(null);
 
-  type KindFilter = "all" | "provider" | "proxy" | "plugin" | "loader" | "translator" | "engine";
-  const KIND_FILTERS: KindFilter[] = ["all", "provider", "proxy", "plugin", "loader", "translator", "engine"];
+  type KindFilter = "all" | "provider" | "proxy" | "plugin" | "host" | "translator" | "engine";
+  const KIND_FILTERS: KindFilter[] = ["all", "provider", "proxy", "plugin", "host", "translator", "engine"];
   const startKind: KindFilter =
     startParams?.kind && (KIND_FILTERS as string[]).includes(startParams.kind) ? (startParams.kind as KindFilter) : "plugin";
   let kindFilter = $state<KindFilter>(startKind);
@@ -101,7 +101,7 @@
   // A plugin can be external and a kind at once, so the badge prefixes its kind
   // (the .chip style upper-cases it), e.g. "external provider" -> "EXTERNAL PROVIDER".
   function badgeLabel(p: UnifiedPlugin): string {
-    const kind = p.kind === "provider" || p.kind === "proxy" || p.kind === "loader" ? p.kind : "";
+    const kind = p.kind === "provider" || p.kind === "proxy" || p.kind === "host" ? p.kind : "";
     if (p.deprecated) return kind ? `deprecated ${kind}` : "deprecated";
     if (p.external) return kind ? `external ${kind}` : "external";
     return kind;
@@ -128,7 +128,7 @@
     provider: unified.filter((p) => p.kind === "provider").length,
     proxy: unified.filter((p) => p.kind === "proxy").length,
     plugin: unified.filter((p) => p.kind === "plugin").length,
-    loader: unified.filter((p) => p.kind === "loader").length,
+    host: unified.filter((p) => p.kind === "host").length,
     engine: unified.filter((p) => engineIds.has(p.name)).length,
     installed: unified.filter(isInstalled).length,
     external: unified.filter((p) => p.external).length,
@@ -671,7 +671,7 @@
     <Chip label={`Providers ${counts.provider}`} on={kindFilter === "provider"} onclick={() => setKind("provider")} />
     <Chip label={`Proxies ${counts.proxy}`} on={kindFilter === "proxy"} onclick={() => setKind("proxy")} />
     <Chip label={`Plugins ${counts.plugin}`} on={kindFilter === "plugin"} onclick={() => setKind("plugin")} />
-    <Chip label={`Loaders ${counts.loader}`} on={kindFilter === "loader"} onclick={() => setKind("loader")} />
+    <Chip label={`Hosts ${counts.host}`} on={kindFilter === "host"} onclick={() => setKind("host")} />
     <Chip label={`Engines ${counts.engine}`} on={kindFilter === "engine"} onclick={() => setKind("engine")} />
     <span class="sep"></span>
     <Chip label={`Installed ${counts.installed}`} on={installedOnly} onclick={() => (installedOnly = !installedOnly)} />

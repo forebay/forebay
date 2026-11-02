@@ -116,6 +116,30 @@ describe("scanMarketplaces", () => {
     expect(result.entries[0].sourceId).toBe("acme");
   });
 
+  it("reads version, methods and installMethod, and always lists the marketplace method", async () => {
+    const body = JSON.stringify({ entries: [
+      { name: "acme-host", url: "https://acme.test/host", kind: "host", version: "1.2.0", methods: ["npm", "marketplace"], installMethod: "npm" },
+      { name: "acme-plain", url: "https://acme.test/plain", kind: "plugin" },
+    ] });
+    const result = await scanMarketplaces({
+      sources: [{ id: "acme", label: "Acme", type: "manifest", url: "https://acme.test/marketplace.json" }],
+      fetchFn: async () => new Response(body, { status: 200 }),
+    });
+
+    const host = result.entries.find((e) => e.name === "acme-host");
+    expect(host).toMatchObject({ kind: "host", version: "1.2.0", methods: ["npm", "marketplace"], installMethod: "npm" });
+    expect(result.entries.find((e) => e.name === "acme-plain")?.methods).toEqual(["marketplace"]);
+  });
+
+  it("refuses the retired loader kind", async () => {
+    const body = JSON.stringify({ entries: [{ name: "old", url: "https://acme.test/old", kind: "loader" }] });
+    const result = await scanMarketplaces({
+      sources: [{ id: "acme", label: "Acme", type: "manifest", url: "https://acme.test/marketplace.json" }],
+      fetchFn: async () => new Response(body, { status: 200 }),
+    });
+    expect(result.entries).toEqual([]);
+  });
+
   // Config order is precedence, so a name two marketplaces both publish renders once.
   it("lets the first source claim a name both marketplaces publish", async () => {
     const other = mkdtempSync(join(tmpdir(), "dash-mkt-other-"));

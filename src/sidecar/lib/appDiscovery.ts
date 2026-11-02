@@ -107,7 +107,7 @@ export async function discoverApps(deps: AppDiscoveryDeps = {}): Promise<void> {
   try {
     const catalog = await scan(deps.orgScanDeps);
     for (const entry of catalog.entries) {
-      if (entry.kind !== "loader" || !entry.app) continue;
+      if (entry.kind !== "host" || !entry.app) continue;
       const icon = entry.app.icon ?? rawSvgFromDataUri(entry.icon);
       candidates.set(entry.app.id, icon ? { ...entry.app, icon } : entry.app);
     }

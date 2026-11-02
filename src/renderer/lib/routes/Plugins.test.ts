@@ -794,11 +794,11 @@ describe("Plugins screen", () => {
     expect(screen.queryByText("demo")).toBeNull();
   });
 
-  it("shows loaders under the Loaders filter, hidden by default", async () => {
+  it("shows hosts under the Hosts filter, hidden by default", async () => {
     stubForebay({
       pluginsList: async () => ({ ok: true, data: [] }),
       catalogList: async () => ({ ok: true, data: { entries: [
-        { name: "opencode-loader", url: "u", kind: "loader" as const, description: "a loader", deprecated: false, topics: [] },
+        { name: "opencode-loader", url: "u", kind: "host" as const, description: "a loader", deprecated: false, topics: [] },
         { name: "demo", url: "u", kind: "plugin" as const, description: "a plugin", deprecated: false, topics: [] },
       ], source: "gh" as const } }),
     });
@@ -806,7 +806,7 @@ describe("Plugins screen", () => {
     await waitFor(() => expect(getByText("demo")).toBeTruthy());
     expect(queryByText("opencode-loader")).toBeNull();
     const filters = within(container.querySelector(".filters")!);
-    await fireEvent.click(filters.getByRole("button", { name: /Loaders/ }));
+    await fireEvent.click(filters.getByRole("button", { name: /Hosts/ }));
     await waitFor(() => expect(getByText("opencode-loader")).toBeTruthy());
     expect(queryByText("demo")).toBeNull();
   });

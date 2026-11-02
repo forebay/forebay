@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { svgIconDataUri } from "./pluginIcon.js";
-import { classifyRepoTopics } from "../../../packages/shared/src/repoRef.js";
+import { classifyRepoTopics, withMarketplaceMethod } from "../../../packages/shared/src/repoRef.js";
 import type { CatalogEntry, CatalogResult } from "../../../packages/shared/src/domain.js";
 import { ECOSYSTEM_ORG, getConfigValue } from "@intisy-ai/basekit";
 import type { AppDescriptor } from "@intisy-ai/basekit";
@@ -8,7 +8,7 @@ import type { AppDescriptor } from "@intisy-ai/basekit";
 const TTL_MS = 60_000;
 
 interface RepoJson { name?: string; html_url?: string; description?: string | null; archived?: boolean; topics?: string[] }
-interface Manifest { displayName?: string; icon?: string; app?: AppDescriptor; apps?: string[] }
+interface Manifest { displayName?: string; icon?: string; app?: AppDescriptor; apps?: string[]; kind?: "plugin" | "host"; methods?: string[]; installMethod?: string; version?: string }
 
 let cache: { at: number; result: CatalogResult } | null = null;
 const MANIFEST_TTL_MS = 1_800_000;
@@ -116,6 +116,10 @@ async function fetchManifestUncached(
     // Which apps a plugin suits. Declaring none means it suits any, which is what most do;
     // one that only works in a particular app says so and is then offered nowhere else.
     if (Array.isArray(manifest.apps)) out.apps = (manifest.apps as unknown[]).filter((a): a is string => typeof a === "string" && !!a);
+    if (typeof manifest.version === "string" && manifest.version) out.version = manifest.version;
+    if (manifest.kind === "plugin" || manifest.kind === "host") out.kind = manifest.kind;
+    if (Array.isArray(manifest.methods)) out.methods = (manifest.methods as unknown[]).filter((m): m is string => typeof m === "string" && !!m);
+    if (typeof manifest.installMethod === "string" && manifest.installMethod) out.installMethod = manifest.installMethod;
     return out;
   } catch {
     return {};
@@ -147,7 +151,7 @@ export async function scanOrg(deps: OrgScanDeps = {}): Promise<CatalogResult> {
         const topics = Array.isArray(repo.topics) ? repo.topics : [];
         const kind = classifyRepoTopics(topics);
         if (!kind) continue;
-        entries.push({ name: repo.name, url: repo.html_url ?? `https://github.com/${org}/${repo.name}`, kind, description: repo.description ?? "", deprecated: repo.archived === true, topics });
+        entries.push({ name: repo.name, url: repo.html_url ?? `https://github.com/${org}/${repo.name}`, kind, description: repo.description ?? "", deprecated: repo.archived === true, topics, methods: withMarketplaceMethod(undefined) });
       }
       if (repos.length < 100) break;
     }
@@ -163,6 +167,10 @@ export async function scanOrg(deps: OrgScanDeps = {}): Promise<CatalogResult> {
             if (manifest.icon) entry.icon = manifest.icon;
             if (manifest.app) entry.app = manifest.app;
             if (manifest.apps) entry.apps = manifest.apps;
+            if (manifest.kind === "host") entry.kind = "host";
+            if (manifest.version) entry.version = manifest.version;
+            if (manifest.methods) entry.methods = withMarketplaceMethod(manifest.methods);
+            if (manifest.installMethod) entry.installMethod = manifest.installMethod;
           }),
         );
       } catch {

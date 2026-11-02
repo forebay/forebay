@@ -24,7 +24,7 @@ export function applicableHomeIds(kind: CatalogKind, homes: PluginHome[], plugin
   const ownApp = pluginName ? homes.find((h) => h.loaderId === pluginName) : undefined;
   if (ownApp) return [ownApp.id];
   const generic = homes
-    .filter((h) => (h.id === "forebay" ? kind !== "plugin" && kind !== "loader" : kind !== "proxy"))
+    .filter((h) => (h.id === "forebay" ? kind !== "plugin" && kind !== "host" : kind !== "proxy"))
     .filter((h) => !h.loaderId || h.loaderInstalled !== false)
     .map((h) => h.id);
   if (!apps || apps.length === 0) return generic;

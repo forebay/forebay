@@ -86,6 +86,22 @@ describe("scanOrg", () => {
     expect(entry?.icon).toContain("data:image/svg+xml;base64,");
   });
 
+  it("classifies app-host as a host and reads kind, methods and installMethod from the manifest", async () => {
+    const manifest = { kind: "host", methods: ["npm"], installMethod: "npm" };
+    const fetchFn = (async (url: string) => {
+      if (url.includes("/contents/plugin.json")) return { ok: true, status: 200, json: async () => ({ encoding: "base64", content: Buffer.from(JSON.stringify(manifest)).toString("base64") }) };
+      return { ok: true, status: 200, json: async () => [repo("some-host", ["app-host"]), repo("tagged", ["plugin"])] };
+    }) as unknown as typeof fetch;
+    const result = await scanOrg({ fetchFn, env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    expect(result.entries.find((e) => e.name === "some-host")).toMatchObject({ kind: "host", methods: ["marketplace", "npm"], installMethod: "npm" });
+    expect(result.entries.find((e) => e.name === "tagged")?.kind).toBe("host");
+  });
+
+  it("gives an entry with no declared methods the marketplace method", async () => {
+    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["ai-provider"])]), env: {}, execFn: async () => "" });
+    expect(result.entries[0].methods).toEqual(["marketplace"]);
+  });
+
   it("maps an archived installable repo to a deprecated entry instead of skipping it", async () => {
     const result = await scanOrg({
       fetchFn: okFetch([repo("stub-auth", ["ai-provider"]), repo("old-plugin", ["plugin"], true)]),

@@ -26,12 +26,12 @@ import type { ModelMap, CatalogEntry as ModelCatalogEntry } from "@intisy-ai/bas
 import type { AppDescriptor } from "@intisy-ai/basekit";
 // A translator is installable in its own right, not only a library a plugin vendors: a
 // provider that speaks a vendor wire format resolves it from the home's shared store.
-export type CatalogKind = "provider" | "proxy" | "plugin" | "loader" | "translator";
+export type CatalogKind = "provider" | "proxy" | "plugin" | "host" | "translator";
 // Kinds that exist to be CONSUMED by another plugin rather than installed for their own sake.
 // Nothing surfaces them on its own: they appear only under a category an installed plugin
 // contributed, so a home with nothing that consumes them is not offered them at all.
 export const LIBRARY_KINDS: CatalogKind[] = ["translator"];
-export type CatalogEntry = { name: string; url: string; kind: CatalogKind; description: string; deprecated: boolean; topics: string[]; displayName?: string; icon?: string; app?: AppDescriptor; apps?: string[]; sourceId?: string };
+export type CatalogEntry = { name: string; url: string; kind: CatalogKind; description: string; deprecated: boolean; topics: string[]; displayName?: string; icon?: string; app?: AppDescriptor; apps?: string[]; sourceId?: string; version?: string; methods?: string[]; installMethod?: string };
 export type RepoMeta = { owner: string; repo: string; htmlUrl: string; stars: number | null; description: string; topics: string[]; readme: string | null };
 export type CatalogTokenSource = "env" | "config" | "anonymous";
 

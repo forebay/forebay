@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join, isAbsolute } from "node:path";
 import { ECOSYSTEM_ORG, getConfigValue } from "@intisy-ai/basekit";
+import { withMarketplaceMethod } from "../../../packages/shared/src/repoRef.js";
 import { scanOrg, type OrgScanDeps } from "./orgScan.js";
 import type {
   CatalogEntry,
@@ -12,7 +13,7 @@ import type {
 } from "../../../packages/shared/src/domain.js";
 
 const CONFIG_NAME = "marketplaces";
-const KINDS: CatalogKind[] = ["provider", "proxy", "plugin", "loader", "translator"];
+const KINDS: CatalogKind[] = ["provider", "proxy", "plugin", "host", "translator"];
 
 export interface MarketplaceDeps extends OrgScanDeps {
   sources?: MarketplaceSource[];
@@ -62,6 +63,14 @@ export function resolveSources(deps: MarketplaceDeps = {}): MarketplaceSource[] 
   return deps.sources ?? parseSources(getConfigValue(CONFIG_NAME, "sources"));
 }
 
+function stringList(raw: unknown): string[] | undefined {
+  return Array.isArray(raw) ? raw.filter((item): item is string => typeof item === "string" && item !== "") : undefined;
+}
+
+function optionalString(raw: unknown): string | undefined {
+  return typeof raw === "string" && raw !== "" ? raw : undefined;
+}
+
 function parseEntries(raw: unknown, sourceId: string): CatalogEntry[] {
   const manifest = raw as { entries?: unknown };
   if (!Array.isArray(manifest?.entries)) throw new Error("no entries array");
@@ -81,6 +90,9 @@ function parseEntries(raw: unknown, sourceId: string): CatalogEntry[] {
       deprecated: entry.deprecated === true,
       topics: Array.isArray(entry.topics) ? (entry.topics as unknown[]).filter((t): t is string => typeof t === "string") : [],
       displayName: typeof entry.displayName === "string" ? entry.displayName : undefined,
+      version: optionalString(entry.version),
+      methods: withMarketplaceMethod(stringList(entry.methods)),
+      installMethod: optionalString(entry.installMethod),
       sourceId,
     });
   }

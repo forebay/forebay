@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseRepoRef, classifyRepoName, classifyRepoTopics } from "./repoRef.js";
+import { parseRepoRef, classifyRepoName, classifyRepoTopics, withMarketplaceMethod } from "./repoRef.js";
 
 describe("parseRepoRef", () => {
   it("parses a full github url", () => {
@@ -33,7 +33,7 @@ describe("classifyRepoName", () => {
   it("classifies by suffix", () => {
     expect(classifyRepoName("foo-proxy")).toBe("proxy");
     expect(classifyRepoName("foo-auth")).toBe("provider");
-    expect(classifyRepoName("claude-code-loader")).toBe("loader");
+    expect(classifyRepoName("claude-code-loader")).toBe("host");
     expect(classifyRepoName("some-plugin")).toBe("plugin");
   });
   it("returns null for core libraries, which are never installed on their own", () => {
@@ -53,7 +53,8 @@ describe("classifyRepoTopics", () => {
   it("maps an installable category topic to its kind", () => {
     expect(classifyRepoTopics(["forebay", "ai-provider"])).toBe("provider");
     expect(classifyRepoTopics(["app-proxy"])).toBe("proxy");
-    expect(classifyRepoTopics(["app-loader"])).toBe("loader");
+    expect(classifyRepoTopics(["app-loader"])).toBe("host");
+    expect(classifyRepoTopics(["app-host"])).toBe("host");
     expect(classifyRepoTopics(["plugin", "typescript"])).toBe("plugin");
   });
   it("maps the vendor-translator topic to the translator kind", () => {
@@ -64,5 +65,13 @@ describe("classifyRepoTopics", () => {
     expect(classifyRepoTopics([])).toBeNull();
     expect(classifyRepoTopics(["core-library"])).toBeNull();
     expect(classifyRepoTopics(["runtime", "dashboard"])).toBeNull();
+  });
+});
+
+describe("withMarketplaceMethod", () => {
+  it("adds the marketplace method when absent and never duplicates it", () => {
+    expect(withMarketplaceMethod(undefined)).toEqual(["marketplace"]);
+    expect(withMarketplaceMethod(["npm"])).toEqual(["marketplace", "npm"]);
+    expect(withMarketplaceMethod(["npm", "marketplace"])).toEqual(["npm", "marketplace"]);
   });
 });
