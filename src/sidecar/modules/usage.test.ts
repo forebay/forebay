@@ -2,13 +2,13 @@ import { workspaceRepo } from "./workspace-repo.js";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync, copyFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import type { AppDescriptor } from "@intisy-ai/basekit";
 
 const stubCloneDir = workspaceRepo("stub-auth") ?? "";
 const stubHandlerPath = join(stubCloneDir, "dist", "handler.js");
-const providersDir = dirname(workspaceRepo("stub-auth") ?? "");
-const workspaceIsPresent = existsSync(providersDir);
+const stubRepo = workspaceRepo("stub-auth");
+const workspaceIsPresent = stubRepo !== undefined;
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
 const ENV_KEYS = [

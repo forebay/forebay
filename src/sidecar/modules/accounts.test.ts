@@ -2,7 +2,7 @@ import { workspaceRepo } from "./workspace-repo.js";
 import { describe, it, expect, beforeEach } from "vitest";
 import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { materializeLibraries } from "@intisy-ai/basekit";
 
 const stubHandlerPath = join(workspaceRepo("stub-auth") ?? "", "dist", "handler.js");
@@ -12,8 +12,8 @@ beforeEach(() => {
 });
 
 const stubCloneDir = workspaceRepo("stub-auth") ?? "";
-const providersDir = dirname(workspaceRepo("stub-auth") ?? "");
-const workspaceIsPresent = existsSync(providersDir);
+const stubRepo = workspaceRepo("stub-auth");
+const workspaceIsPresent = stubRepo !== undefined;
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
 // Stands in for `npm install --prefix <home>`, copying out of the sibling checkouts this
