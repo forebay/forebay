@@ -1,18 +1,18 @@
+import { workspaceRepo } from "./workspace-repo.js";
 import { describe, it, expect, beforeEach } from "vitest";
 import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { materializeLibraries } from "@intisy-ai/basekit";
 
-const stubHandlerPath = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth/dist/handler.js", import.meta.url));
+const stubHandlerPath = join(workspaceRepo("stub-auth") ?? "", "dist", "handler.js");
 
 beforeEach(() => {
   process.env.HUB_CONFIG_DIR = mkdtempSync(join(tmpdir(), "dash-accounts-"));
 });
 
-const stubCloneDir = fileURLToPath(new URL("../../../../../plugins/providers/stub-auth", import.meta.url));
-const providersDir = fileURLToPath(new URL("../../../../../plugins/providers", import.meta.url));
+const stubCloneDir = workspaceRepo("stub-auth") ?? "";
+const providersDir = dirname(workspaceRepo("stub-auth") ?? "");
 const workspaceIsPresent = existsSync(providersDir);
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
