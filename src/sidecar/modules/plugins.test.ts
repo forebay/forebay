@@ -410,7 +410,7 @@ describe("plugins sidecar module", () => {
     const order: string[] = [];
     const steps: string[] = [];
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-provider", "https://github.com/forebay/custom-provider", {
       installPlugin: async (_dir, name) => { order.push("install:" + name); },
       ...fromSeed,
       homes: fakeHomes,
@@ -420,13 +420,13 @@ describe("plugins sidecar module", () => {
       report: (step) => steps.push(step),
     });
     expect(result.ok).toBe(true);
-    expect(order).toEqual(["updater:claude", "install:custom-auth"]);
+    expect(order).toEqual(["updater:claude", "install:custom-provider"]);
     expect(steps[0]).toBe("Installing the plugin manager");
   });
 
   it("stops at a failed bootstrap instead of installing into a home that cannot manage it", async () => {
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-provider", "https://github.com/forebay/custom-provider", {
       installPlugin: async () => { throw new Error("must not run"); },
       ...fromSeed,
       homes: fakeHomes,
@@ -958,7 +958,7 @@ describe("pluginsInstall when the marketplace catalog is unreachable", () => {
     repoProvidingCapabilityMock.current = async () => { throw new Error("catalog unreachable"); };
 
     const { pluginsInstall } = await import("./plugins.js");
-    const result = await pluginsInstall("claude", "custom-auth", "https://github.com/forebay/custom-auth", {
+    const result = await pluginsInstall("claude", "custom-provider", "https://github.com/forebay/custom-provider", {
       ...fromSeed,
       homes: fakeHomes,
       managesPlugins: () => true,

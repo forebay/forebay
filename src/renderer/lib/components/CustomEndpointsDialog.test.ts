@@ -4,8 +4,8 @@ import { render, fireEvent, waitFor } from "@testing-library/svelte";
 import { stubForebay } from "../testing.js";
 import TestWrapper from "./CustomEndpointsDialog.test.svelte";
 
-const INSTALLED_ENGINE = { id: "engine-a", capability: "custom-endpoints", url: "https://github.com/forebay/custom-auth", homes: { forebay: { installed: true, enabled: true } } };
-const UNINSTALLED_ENGINE = { id: "engine-a", capability: "custom-endpoints", url: "https://github.com/forebay/custom-auth", homes: { forebay: { installed: false, enabled: false } } };
+const INSTALLED_ENGINE = { id: "engine-a", capability: "custom-endpoints", url: "https://github.com/forebay/custom-provider", homes: { forebay: { installed: true, enabled: true } } };
+const UNINSTALLED_ENGINE = { id: "engine-a", capability: "custom-endpoints", url: "https://github.com/forebay/custom-provider", homes: { forebay: { installed: false, enabled: false } } };
 
 describe("CustomEndpointsDialog", () => {
   it("lists endpoints with a key-set badge", async () => {

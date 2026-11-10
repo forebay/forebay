@@ -30,7 +30,7 @@ async function fakeDefs(): Promise<LoadedProxyDef[]> {
 const proxyDeps = { defs: fakeDefs };
 
 function deployStubProvider(configDir: string): void {
-  const repo = join(configDir, "repos", "stub-auth");
+  const repo = join(configDir, "repos", "provider-stub");
   mkdirSync(repo, { recursive: true });
   writeFileSync(
     join(repo, "package.json"),

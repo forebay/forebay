@@ -106,7 +106,7 @@ describe("a running job and the sidecar", () => {
   it("reports real byte throughput read from git during a clone", async () => {
     const { jobsEnqueue, jobsList } = await import("../modules/jobs.js");
     const target = homes[1];
-    const queued = await jobsEnqueue("install", "stub-auth", "https://github.com/forebay/stub-auth", target.id, { homes });
+    const queued = await jobsEnqueue("install", "provider-stub", "https://github.com/forebay/provider-stub", target.id, { homes });
     expect(queued.ok).toBe(true);
     if (!queued.ok) return;
 

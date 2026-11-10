@@ -50,7 +50,7 @@
   <Specimen label="PluginRow" wide>
     <Card>
       <PluginRow name="wakatime-sync" kind="git" installedVersion="1.4.0" updateAvailable={false} enabled />
-      <PluginRow name="stub-auth" kind="npm" updateAvailable enabled={false} catalogKind="provider" description={LOREM} />
+      <PluginRow name="provider-stub" kind="npm" updateAvailable enabled={false} catalogKind="provider" description={LOREM} />
       <PluginRow name={LONG_NAME} kind="git" installedVersion="0.1.0" updateAvailable={false} enabled deprecated onUninstall={noop} />
       <PluginRow name="config-ledger" kind="git" updateAvailable={false} enabled onUninstall={noop} uninstallState="confirm" />
     </Card>

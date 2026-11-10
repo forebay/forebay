@@ -5,7 +5,7 @@ import { rows, resetDownloadsForTest, seedJobsForTest } from "../downloads.js";
 
 const engines = [
   { id: "plugin-updater", capability: "plugin-management", url: "https://example/plugin-updater", homes: {} },
-  { id: "custom-auth", capability: "custom-endpoints", url: "https://example/custom-auth", homes: {} },
+  { id: "custom-provider", capability: "custom-endpoints", url: "https://example/custom-provider", homes: {} },
 ];
 const homes = [
   { id: "claude", label: "Claude", dir: "/c", present: true, managesPlugins: false },
@@ -31,7 +31,7 @@ describe("prerequisiteInstalls", () => {
 
   it("returns nothing when the plugin being installed is itself an engine", () => {
     expect(prerequisiteInstalls("plugin-updater", ["claude"], homes, engines)).toEqual([]);
-    expect(prerequisiteInstalls("custom-auth", ["claude"], homes, engines)).toEqual([]);
+    expect(prerequisiteInstalls("custom-provider", ["claude"], homes, engines)).toEqual([]);
   });
 
   it("returns nothing when no engine declares the capability", () => {

@@ -15,8 +15,8 @@ describe("buildUnifiedLibraries", () => {
   // libraries rather than one installed in two places.
   it("lists a library installed in two homes once, naming both homes", () => {
     const rows = buildUnifiedLibraries([
-      { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/basekit", "1.2.0", ["antigravity-auth"])], plugins: [] },
-      { home: home("beta", "Beta"), shared: [lib("@intisy-ai/basekit", "1.1.0", ["claude-code-auth"])], plugins: [] },
+      { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/basekit", "1.2.0", ["antigravity-provider"])], plugins: [] },
+      { home: home("beta", "Beta"), shared: [lib("@intisy-ai/basekit", "1.1.0", ["claude-code-provider"])], plugins: [] },
     ]);
 
     expect(rows).toHaveLength(1);
@@ -37,10 +37,10 @@ describe("buildUnifiedLibraries", () => {
 
   it("merges the plugins that use it across homes, without repeating one", () => {
     const rows = buildUnifiedLibraries([
-      { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/basekit/auth", "1.0.0", ["antigravity-auth", "claude-code-auth"])], plugins: [] },
-      { home: home("beta", "Beta"), shared: [lib("@intisy-ai/basekit/auth", "1.0.0", ["claude-code-auth"])], plugins: [] },
+      { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/basekit/auth", "1.0.0", ["antigravity-provider", "claude-code-provider"])], plugins: [] },
+      { home: home("beta", "Beta"), shared: [lib("@intisy-ai/basekit/auth", "1.0.0", ["claude-code-provider"])], plugins: [] },
     ]);
-    expect(rows[0].usedBy).toEqual(["antigravity-auth", "claude-code-auth"]);
+    expect(rows[0].usedBy).toEqual(["antigravity-provider", "claude-code-provider"]);
   });
 
   // A plugin's declared dependency that never reached the shared store still deserves a row,
@@ -50,12 +50,12 @@ describe("buildUnifiedLibraries", () => {
       {
         home: home("alpha", "Alpha"),
         shared: [],
-        plugins: [{ plugin: "custom-auth", dependencies: [lib("@openauthjs/openauth", "")] }],
+        plugins: [{ plugin: "custom-provider", dependencies: [lib("@openauthjs/openauth", "")] }],
       },
     ]);
 
     expect(rows[0].specifier).toBe("@openauthjs/openauth");
-    expect(rows[0].declaredBy).toEqual(["custom-auth"]);
+    expect(rows[0].declaredBy).toEqual(["custom-provider"]);
     expect(rows[0].homes.alpha.installed).toBe(false);
   });
 
@@ -76,7 +76,7 @@ describe("isOrphan", () => {
     const rows = buildUnifiedLibraries([
       {
         home: home("alpha", "Alpha"),
-        shared: [lib("@intisy-ai/left-behind", "1.0.0"), lib("@intisy-ai/basekit", "1.0.0", ["antigravity-auth"])],
+        shared: [lib("@intisy-ai/left-behind", "1.0.0"), lib("@intisy-ai/basekit", "1.0.0", ["antigravity-provider"])],
         plugins: [],
       },
     ]);
@@ -92,13 +92,13 @@ describe("isOrphan", () => {
 // unremovable, because the row claimed a user it only had elsewhere.
 describe("orphanHomeIds", () => {
   const rows = () => buildUnifiedLibraries([
-    { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/openai-translator", "0.1.1", ["custom-auth"])], plugins: [] },
+    { home: home("alpha", "Alpha"), shared: [lib("@intisy-ai/openai-translator", "0.1.1", ["custom-provider"])], plugins: [] },
     { home: home("beta", "Beta"), shared: [lib("@intisy-ai/openai-translator", "0.1.1")], plugins: [] },
   ]);
 
   it("keeps each home's own answer to who uses it", () => {
     const [library] = rows();
-    expect(library.homes.alpha.usedBy).toEqual(["custom-auth"]);
+    expect(library.homes.alpha.usedBy).toEqual(["custom-provider"]);
     expect(library.homes.beta.usedBy).toEqual([]);
   });
 
@@ -112,7 +112,7 @@ describe("orphanHomeIds", () => {
 
   it("ignores a home that does not hold it, so a declared-but-uninstalled row is not removable", () => {
     const [library] = buildUnifiedLibraries([
-      { home: home("alpha", "Alpha"), shared: [], plugins: [{ plugin: "custom-auth", dependencies: [lib("@openauthjs/openauth", "0.4.3")] }] },
+      { home: home("alpha", "Alpha"), shared: [], plugins: [{ plugin: "custom-provider", dependencies: [lib("@openauthjs/openauth", "0.4.3")] }] },
     ]);
     expect(orphanHomeIds(library)).toEqual([]);
   });

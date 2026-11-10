@@ -24,7 +24,7 @@ describe("scanOrg", () => {
   it("lists only repos carrying an installable category topic, mapping the topic to a kind", async () => {
     const result = await scanOrg({
       fetchFn: okFetch([
-        repo("stub-auth", ["forebay", "ai-provider"]),
+        repo("provider-stub", ["forebay", "ai-provider"]),
         repo("core-ir", ["forebay", "core-library"]),
         repo("agentbox", []),
         repo("opencode-proxy", ["forebay", "app-proxy"]),
@@ -34,7 +34,7 @@ describe("scanOrg", () => {
     });
     expect(result.source).toBe("env");
     expect(result.entries.map((e) => [e.name, e.kind])).toEqual([
-      ["stub-auth", "provider"],
+      ["provider-stub", "provider"],
       ["opencode-proxy", "proxy"],
     ]);
   });
@@ -42,7 +42,7 @@ describe("scanOrg", () => {
   it("serves the TTL cache within 60s and never clobbers a good result with a failure", async () => {
     let t = 0;
     const now = () => t;
-    const good = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["ai-provider"])]), env: {}, execFn: async () => "", now });
+    const good = await scanOrg({ fetchFn: okFetch([repo("provider-stub", ["ai-provider"])]), env: {}, execFn: async () => "", now });
     expect(good.entries).toHaveLength(1);
     t = 61_000;
     const afterFail = await scanOrg({ fetchFn: (async () => { throw new Error("net down"); }) as unknown as typeof fetch, env: {}, execFn: async () => "", now });
@@ -69,8 +69,8 @@ describe("scanOrg", () => {
   });
 
   it("carries repo topics onto the catalog entry", async () => {
-    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["forebay", "ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
-    expect(result.entries.find((e) => e.name === "stub-auth")?.topics).toEqual(["forebay", "ai-provider"]);
+    const result = await scanOrg({ fetchFn: okFetch([repo("provider-stub", ["forebay", "ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    expect(result.entries.find((e) => e.name === "provider-stub")?.topics).toEqual(["forebay", "ai-provider"]);
   });
 
   it("enriches an entry with displayName + icon from its manifest", async () => {
@@ -98,7 +98,7 @@ describe("scanOrg", () => {
   });
 
   it("gives an entry with no declared methods the marketplace method", async () => {
-    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["ai-provider"])]), env: {}, execFn: async () => "" });
+    const result = await scanOrg({ fetchFn: okFetch([repo("provider-stub", ["ai-provider"])]), env: {}, execFn: async () => "" });
     expect(result.entries[0].methods).toEqual(["marketplace"]);
   });
 
@@ -122,12 +122,12 @@ describe("scanOrg", () => {
 
   it("maps an archived installable repo to a deprecated entry instead of skipping it", async () => {
     const result = await scanOrg({
-      fetchFn: okFetch([repo("stub-auth", ["ai-provider"]), repo("old-plugin", ["plugin"], true)]),
+      fetchFn: okFetch([repo("provider-stub", ["ai-provider"]), repo("old-plugin", ["plugin"], true)]),
       env: { GITHUB_TOKEN: "t" },
       execFn: async () => "",
     });
     expect(result.entries.find((e) => e.name === "old-plugin")?.deprecated).toBe(true);
-    expect(result.entries.find((e) => e.name === "stub-auth")?.deprecated).toBe(false);
+    expect(result.entries.find((e) => e.name === "provider-stub")?.deprecated).toBe(false);
   });
 
   it("flags rateLimited on a 403 with x-ratelimit-remaining 0, falling back to the empty catalog", async () => {
@@ -165,7 +165,7 @@ describe("scanOrg", () => {
   });
 
   it("reports rateLimited false on a normal successful scan", async () => {
-    const result = await scanOrg({ fetchFn: okFetch([repo("stub-auth", ["ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
+    const result = await scanOrg({ fetchFn: okFetch([repo("provider-stub", ["ai-provider"])]), env: { GITHUB_TOKEN: "t" }, execFn: async () => "" });
     expect(result.rateLimited).toBe(false);
   });
 

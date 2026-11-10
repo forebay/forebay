@@ -8,7 +8,7 @@ const ROOT = new URL("../../..", import.meta.url).pathname.replace(/^\/([A-Za-z]
 // unbounded number of plugins may not name one.
 const PLUGIN_NAMES = [
   "plugin-updater", "config-ledger", "sync-bridge", "wakatime-sync",
-  "antigravity-auth", "claude-code-auth", "custom-auth", "stub-auth",
+  "antigravity-provider", "claude-code-provider", "custom-provider", "provider-stub",
   "claude-code-proxy", "opencode-proxy", "claude-code-loader", "opencode-loader",
 ];
 
@@ -57,7 +57,7 @@ describe("Forebay names no plugin", () => {
       const rel = relative(ROOT, file).replace(/\\/g, "/");
       if (NAME_HEURISTIC.includes(rel)) continue;
       const body = code(readFileSync(file, "utf8"));
-      if (/endsWith\(\s*["'`]-(proxy|auth|loader|sync|translator)["'`]\s*\)/.test(body)) offenders.push(rel);
+      if (/endsWith\(\s*["'`]-(proxy|provider|loader|sync|translator)["'`]\s*\)/.test(body)) offenders.push(rel);
     }
     expect(offenders).toEqual([]);
   });
@@ -66,7 +66,7 @@ describe("Forebay names no plugin", () => {
     const inert: string[] = [];
     for (const rel of NAME_HEURISTIC) {
       const body = code(readFileSync(join(ROOT, rel), "utf8"));
-      if (!/endsWith\(\s*["'`]-(proxy|auth|loader|sync|translator)["'`]\s*\)/.test(body)) inert.push(rel);
+      if (!/endsWith\(\s*["'`]-(proxy|provider|loader|sync|translator)["'`]\s*\)/.test(body)) inert.push(rel);
     }
     expect(inert).toEqual([]);
   });

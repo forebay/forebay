@@ -25,8 +25,8 @@ function fakePlugin(overrides: Partial<EndpointsApi> = {}): { api: EndpointsApi;
 // ownerPlugin stands in for the real deployed-manifest lookup, which has nothing to find for a
 // fixture home that was never deployed. Without this seam, every write-path test below threw
 // "no plugin provides custom endpoints" before its injected loadPlugin was ever consulted.
-const withPlugin = (api: EndpointsApi) => ({ dir: "/home", loadPlugin: async () => api, ownerPlugin: () => "custom-auth" });
-const withoutPlugin = { dir: "/home", loadPlugin: async () => null, ownerPlugin: () => "custom-auth" };
+const withPlugin = (api: EndpointsApi) => ({ dir: "/home", loadPlugin: async () => api, ownerPlugin: () => "custom-provider" });
+const withoutPlugin = { dir: "/home", loadPlugin: async () => null, ownerPlugin: () => "custom-provider" };
 
 describe("customEndpoints module", () => {
   it("lists what the plugin reports, including whether a key is set", async () => {
@@ -45,13 +45,13 @@ describe("customEndpoints module", () => {
   it("hands an upsert to the plugin along with the clone it should re-materialise", async () => {
     const { api, calls } = fakePlugin();
     expect((await customEndpointsUpsert(EP, withPlugin(api))).ok).toBe(true);
-    expect(calls).toEqual([expect.stringMatching(/^upsert:local:.*custom-auth$/)]);
+    expect(calls).toEqual([expect.stringMatching(/^upsert:local:.*custom-provider$/)]);
   });
 
   it("hands a removal to the plugin", async () => {
     const { api, calls } = fakePlugin();
     expect((await customEndpointsRemove("local", withPlugin(api))).ok).toBe(true);
-    expect(calls).toEqual([expect.stringMatching(/^remove:local:.*custom-auth$/)]);
+    expect(calls).toEqual([expect.stringMatching(/^remove:local:.*custom-provider$/)]);
   });
 
   it("hands a key to the plugin", async () => {

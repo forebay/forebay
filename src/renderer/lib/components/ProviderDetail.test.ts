@@ -15,7 +15,7 @@ function makeProvider(overrides: Partial<ProviderRow> = {}): ProviderRow {
     exposure: { claude: true, opencode: true },
     accountPool: "stub",
     sharedWith: [],
-    pluginName: "stub-auth",
+    pluginName: "provider-stub",
     ...overrides,
   };
 }
@@ -24,14 +24,14 @@ describe("ProviderDetail", () => {
   it("fetches the forebay home's config schemas and renders controls for the matching plugin", async () => {
     const configSchemas = vi.fn(async () => ({
       ok: true,
-      data: [{ plugin: "stub-auth", defaults: { verbose: false }, current: {} }] as PluginConfigSchema[],
+      data: [{ plugin: "provider-stub", defaults: { verbose: false }, current: {} }] as PluginConfigSchema[],
     }) as const);
     stubForebay({ configSchemas, accountsList: async () => ({ ok: true, data: [] }) });
 
     render(ProviderDetail, { provider: makeProvider(), apps: [], onClose: vi.fn(), onChanged: vi.fn() });
 
     await waitFor(() => expect(configSchemas).toHaveBeenCalledWith("forebay"));
-    expect(await screen.findByRole("switch", { name: "stub-auth verbose" })).toBeInTheDocument();
+    expect(await screen.findByRole("switch", { name: "provider-stub verbose" })).toBeInTheDocument();
   });
 
   it("shows a fallback message when no schema matches the provider's plugin", async () => {

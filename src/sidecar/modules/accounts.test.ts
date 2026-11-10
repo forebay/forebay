@@ -5,14 +5,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { materializeLibraries } from "@intisy-ai/basekit";
 
-const stubHandlerPath = join(workspaceRepo("stub-auth") ?? "", "dist", "handler.js");
+const stubHandlerPath = join(workspaceRepo("provider-stub") ?? "", "dist", "handler.js");
 
 beforeEach(() => {
   process.env.HUB_CONFIG_DIR = mkdtempSync(join(tmpdir(), "dash-accounts-"));
 });
 
-const stubCloneDir = workspaceRepo("stub-auth") ?? "";
-const stubRepo = workspaceRepo("stub-auth");
+const stubCloneDir = workspaceRepo("provider-stub") ?? "";
+const stubRepo = workspaceRepo("provider-stub");
 const workspaceIsPresent = stubRepo !== undefined;
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
@@ -31,12 +31,12 @@ function localInstaller(configDir: string): void {
 
 function seedStubProvider(): void {
   const configDir = process.env.HUB_CONFIG_DIR as string;
-  const repoDir = join(configDir, "repos", "stub-auth");
+  const repoDir = join(configDir, "repos", "provider-stub");
   mkdirSync(join(repoDir, "dist"), { recursive: true });
   writeFileSync(
     join(repoDir, "package.json"),
     JSON.stringify({
-      name: "stub-auth",
+      name: "provider-stub",
       claudeHub: { authProviders: [{ name: "stub", handler: "dist/handler.js" }] },
     }),
   );

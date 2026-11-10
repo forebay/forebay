@@ -16,12 +16,14 @@ export function parseRepoRef(input: string): RepoRef | null {
   return { owner, repo, url: `https://github.com/${owner}/${repo}` };
 }
 
+/** @implNote A reference repo is named `<role>-stub`, so its role is the word before that suffix. */
 export function classifyRepoName(name: string): CatalogKind | null {
   if (name.startsWith("core-")) return null;
-  if (name.endsWith("-translator")) return "translator";
-  if (name.endsWith("-loader")) return "host";
-  if (name.endsWith("-proxy")) return "proxy";
-  if (name.endsWith("-auth")) return "provider";
+  const subject = `-${name.replace(/-stub$/, "")}`;
+  if (subject.endsWith("-translator")) return "translator";
+  if (subject.endsWith("-loader")) return "host";
+  if (subject.endsWith("-proxy")) return "proxy";
+  if (subject.endsWith("-provider")) return "provider";
   return "plugin";
 }
 

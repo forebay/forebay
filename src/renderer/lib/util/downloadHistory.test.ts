@@ -13,7 +13,7 @@ function record(overrides: Partial<ActivityRecord> & { app?: string } = {}): Act
     actor: "system",
     impact: "notice",
     source: "plugin-updater",
-    subject: { kind: "plugin", id: "antigravity-auth", label: "antigravity-auth" },
+    subject: { kind: "plugin", id: "antigravity-provider", label: "antigravity-provider" },
     details: { version: "4c011a5b1234" },
     text: "",
     origin: { app: app ?? "claude", home: "/h" },
@@ -24,7 +24,7 @@ function record(overrides: Partial<ActivityRecord> & { app?: string } = {}): Act
   } as ActivityRecord;
 }
 
-const installed = new Set(["antigravity-auth", "sync-bridge"]);
+const installed = new Set(["antigravity-provider", "sync-bridge"]);
 
 describe("groupHistory", () => {
   it("collapses one plugin at one version across homes into a single entry", () => {
@@ -34,7 +34,7 @@ describe("groupHistory", () => {
       record({ app: "opencode", ts: 1 }),
     ], { installed });
     expect(entries).toHaveLength(1);
-    expect(entries[0]).toMatchObject({ plugin: "antigravity-auth", toVersion: "4c011a5b" });
+    expect(entries[0]).toMatchObject({ plugin: "antigravity-provider", toVersion: "4c011a5b" });
     expect(entries[0].homes).toEqual(["forebay", "claude", "opencode"]);
   });
 
@@ -59,11 +59,11 @@ describe("groupHistory", () => {
 
   it("reports the newest outcome, so a fresh failure is what the row shows", () => {
     const entries = groupHistory([
-      record({ ts: 2, outcome: "failed", details: { message: "update failed for antigravity-auth" } }),
+      record({ ts: 2, outcome: "failed", details: { message: "update failed for antigravity-provider" } }),
       record({ ts: 1 }),
     ], { installed });
     expect(entries).toHaveLength(1);
-    expect(entries[0]).toMatchObject({ failed: true, error: "update failed for antigravity-auth" });
+    expect(entries[0]).toMatchObject({ failed: true, error: "update failed for antigravity-provider" });
   });
 
   it("reports an update as a version change", () => {
@@ -76,7 +76,7 @@ describe("groupHistory", () => {
       record({ subject: { kind: "plugin", id: "removed-thing", label: "removed-thing" } } as Partial<ActivityRecord>),
       record(),
     ], { installed });
-    expect(entries.map((e) => e.plugin)).toEqual(["antigravity-auth"]);
+    expect(entries.map((e) => e.plugin)).toEqual(["antigravity-provider"]);
   });
 
   it("leaves out records with no plugin at all, like an updates-available notice", () => {

@@ -5,9 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { AppDescriptor } from "@intisy-ai/basekit";
 
-const stubCloneDir = workspaceRepo("stub-auth") ?? "";
+const stubCloneDir = workspaceRepo("provider-stub") ?? "";
 const stubHandlerPath = join(stubCloneDir, "dist", "handler.js");
-const stubRepo = workspaceRepo("stub-auth");
+const stubRepo = workspaceRepo("provider-stub");
 const workspaceIsPresent = stubRepo !== undefined;
 const stubIsCheckedOut = existsSync(stubHandlerPath);
 
@@ -82,12 +82,12 @@ afterEach(() => {
 
 function seedStubProvider(): void {
   const configDir = process.env.HUB_CONFIG_DIR as string;
-  const repoDir = join(configDir, "repos", "stub-auth");
+  const repoDir = join(configDir, "repos", "provider-stub");
   mkdirSync(join(repoDir, "dist"), { recursive: true });
   writeFileSync(
     join(repoDir, "package.json"),
     JSON.stringify({
-      name: "stub-auth",
+      name: "provider-stub",
       claudeHub: { authProviders: [{ name: "stub", handler: "dist/handler.js" }] },
     }),
   );

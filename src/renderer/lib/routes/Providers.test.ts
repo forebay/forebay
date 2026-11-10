@@ -266,7 +266,7 @@ describe("Providers screen", () => {
       providersList: async () => ({
         ok: true,
         data: [
-          { id: "gemini-cli", label: "Gemini CLI", accountPool: "antigravity", sharedWith: [], pluginName: "antigravity-auth", authKind: "oauth", accountCount: 1, enabled: true, exposure: { claude: true, opencode: true } },
+          { id: "gemini-cli", label: "Gemini CLI", accountPool: "antigravity", sharedWith: [], pluginName: "antigravity-provider", authKind: "oauth", accountCount: 1, enabled: true, exposure: { claude: true, opencode: true } },
         ],
       }),
     });

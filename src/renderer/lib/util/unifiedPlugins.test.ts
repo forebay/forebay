@@ -55,11 +55,11 @@ describe("buildUnifiedPlugins", () => {
 
   it("routes a provider to host apps + forebay and a proxy to forebay only", () => {
     const catalog: CatalogEntry[] = [
-      { name: "antigravity-auth", url: "u", kind: "provider", description: "prov", deprecated: false },
+      { name: "antigravity-provider", url: "u", kind: "provider", description: "prov", deprecated: false },
       { name: "claude-code-proxy", url: "u", kind: "proxy", description: "px", deprecated: false },
     ];
     const out = buildUnifiedPlugins([], catalog, homes);
-    expect(Object.keys(out.find((p) => p.name === "antigravity-auth")!.homes).sort()).toEqual(["claude", "forebay", "opencode"]);
+    expect(Object.keys(out.find((p) => p.name === "antigravity-provider")!.homes).sort()).toEqual(["claude", "forebay", "opencode"]);
     expect(Object.keys(out.find((p) => p.name === "claude-code-proxy")!.homes)).toEqual(["forebay"]);
   });
 
@@ -81,9 +81,9 @@ describe("buildUnifiedPlugins", () => {
   });
 
   it("carries catalog topics onto the unified plugin", () => {
-    const catalog: CatalogEntry[] = [{ name: "antigravity-auth", url: "u", kind: "provider", description: "d", deprecated: false, topics: ["forebay", "gemini"] }];
+    const catalog: CatalogEntry[] = [{ name: "antigravity-provider", url: "u", kind: "provider", description: "d", deprecated: false, topics: ["forebay", "gemini"] }];
     const out = buildUnifiedPlugins([], catalog, homes);
-    expect(out.find((p) => p.name === "antigravity-auth")!.topics).toEqual(["forebay", "gemini"]);
+    expect(out.find((p) => p.name === "antigravity-provider")!.topics).toEqual(["forebay", "gemini"]);
   });
 
   it("includes every installed plugin, like any other, and marks updateAvailable if any home has an update", () => {
@@ -226,7 +226,7 @@ describe("a loader's applicable homes", () => {
 
   it("leaves every other kind on the generic rule", () => {
     expect(applicableHomeIds("plugin", withLoaders, "wakatime-sync")).toEqual(["claude", "opencode"]);
-    expect(applicableHomeIds("provider", withLoaders, "stub-auth")).toEqual(["forebay", "claude", "opencode"]);
+    expect(applicableHomeIds("provider", withLoaders, "provider-stub")).toEqual(["forebay", "claude", "opencode"]);
     expect(applicableHomeIds("proxy", withLoaders, "claude-code-proxy")).toEqual(["forebay"]);
   });
 

@@ -26,13 +26,13 @@ afterEach(() => { rmSync(home, { recursive: true, force: true }); });
 
 describe("readPluginManifest", () => {
   it("resolves the plugin mark and each provider mark to a data URI", () => {
-    writeManifest("antigravity-auth", {
+    writeManifest("antigravity-provider", {
       displayName: "Antigravity",
       icon: "icon.svg",
       icons: { antigravity: "icon.svg", "gemini-cli": "icons/gemini-cli.svg" },
     }, { "icon.svg": SVG, "icons/gemini-cli.svg": SVG });
 
-    const manifest = readPluginManifest("antigravity-auth", home);
+    const manifest = readPluginManifest("antigravity-provider", home);
     expect(manifest.displayName).toBe("Antigravity");
     expect(manifest.icon).toMatch(/^data:image\/svg\+xml;base64,/);
     expect(Object.keys(manifest.providers ?? {}).sort()).toEqual(["antigravity", "gemini-cli"]);

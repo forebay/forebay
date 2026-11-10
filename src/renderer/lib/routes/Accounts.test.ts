@@ -288,8 +288,8 @@ describe("Accounts screen", () => {
   // antigravity and gemini-cli are two provider lanes over one account store, so a section
   // per provider listed the same account twice and offered to add it to each.
   const SHARED_POOL = [
-    { id: "antigravity", label: "Antigravity", accountPool: "antigravity", sharedWith: ["gemini-cli"], pluginName: "antigravity-auth", authKind: "oauth" as const, accountCount: 2, enabled: true, exposure: { claude: true, opencode: true } },
-    { id: "gemini-cli", label: "Gemini CLI", accountPool: "antigravity", sharedWith: ["antigravity"], pluginName: "antigravity-auth", authKind: "oauth" as const, accountCount: 2, enabled: true, exposure: { claude: true, opencode: true } },
+    { id: "antigravity", label: "Antigravity", accountPool: "antigravity", sharedWith: ["gemini-cli"], pluginName: "antigravity-provider", authKind: "oauth" as const, accountCount: 2, enabled: true, exposure: { claude: true, opencode: true } },
+    { id: "gemini-cli", label: "Gemini CLI", accountPool: "antigravity", sharedWith: ["antigravity"], pluginName: "antigravity-provider", authKind: "oauth" as const, accountCount: 2, enabled: true, exposure: { claude: true, opencode: true } },
   ];
 
   it("gives providers sharing one account pool a single section naming both", async () => {
@@ -345,12 +345,12 @@ describe("Accounts screen", () => {
   // Holding the failed read meant the error outlived the fix until Forebay restarted.
   it("re-reads a pool whose accounts failed to load rather than holding the error", async () => {
     let fail = true;
-    const accountsList = vi.fn(async () => (fail ? { ok: false, error: "stub-auth failed to load" } : { ok: true, data: ACCOUNTS }) as const);
+    const accountsList = vi.fn(async () => (fail ? { ok: false, error: "provider-stub failed to load" } : { ok: true, data: ACCOUNTS }) as const);
     stubForebay({ providersList: async () => ({ ok: true, data: PROVIDERS }), accountsList });
 
     const { container, findByText, findByRole } = render(Accounts);
     await openGroup(container, "Stub");
-    expect(await findByText(/stub-auth failed to load/)).toBeTruthy();
+    expect(await findByText(/provider-stub failed to load/)).toBeTruthy();
 
     fail = false;
     await fireEvent.click(await findByRole("button", { name: "Try again" }));
@@ -370,6 +370,6 @@ describe("Accounts screen", () => {
 
     const { container, findByText } = render(Accounts);
     await openGroup(container, "Antigravity");
-    expect(await findByText(/antigravity-auth failed to load/)).toBeTruthy();
+    expect(await findByText(/antigravity-provider failed to load/)).toBeTruthy();
   });
 });

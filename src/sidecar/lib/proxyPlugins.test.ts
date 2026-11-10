@@ -66,12 +66,12 @@ describe("loadInstalledProxyDefs", () => {
 
   it("loads duck-typed proxyDef from plugins declaring the front-door capability only", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "proxy-plugins-"));
-    seedStore(tempDir, ["fake-proxy", "stub-auth"]);
+    seedStore(tempDir, ["fake-proxy", "provider-stub"]);
     const defs = await loadInstalledProxyDefs(tempDir, {
       importFn: async (url) =>
         url.includes("fake-proxy") ? { proxyDef: { app: "claude", label: "Claude Code", profile: () => ({}) } } : {},
       providesFrontDoor: (_dir, name) => name === "fake-proxy",
-      listPlugins: listed(["fake-proxy", "stub-auth"]),
+      listPlugins: listed(["fake-proxy", "provider-stub"]),
     });
     expect(defs).toHaveLength(1);
     expect(defs[0].app).toBe("claude");

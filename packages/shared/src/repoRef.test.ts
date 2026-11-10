@@ -3,10 +3,10 @@ import { parseRepoRef, classifyRepoName, classifyRepoTopics, withMarketplaceMeth
 
 describe("parseRepoRef", () => {
   it("parses a full github url", () => {
-    expect(parseRepoRef("https://github.com/forebay/claude-code-auth")).toEqual({
+    expect(parseRepoRef("https://github.com/forebay/claude-code-provider")).toEqual({
       owner: "forebay",
-      repo: "claude-code-auth",
-      url: "https://github.com/forebay/claude-code-auth",
+      repo: "claude-code-provider",
+      url: "https://github.com/forebay/claude-code-provider",
     });
   });
   it("parses an owner/repo short ref", () => {
@@ -32,9 +32,18 @@ describe("parseRepoRef", () => {
 describe("classifyRepoName", () => {
   it("classifies by suffix", () => {
     expect(classifyRepoName("foo-proxy")).toBe("proxy");
-    expect(classifyRepoName("foo-auth")).toBe("provider");
+    expect(classifyRepoName("foo-provider")).toBe("provider");
     expect(classifyRepoName("claude-code-loader")).toBe("host");
     expect(classifyRepoName("some-plugin")).toBe("plugin");
+  });
+  it("reads a reference repo's kind from the word before -stub", () => {
+    expect(classifyRepoName("provider-stub")).toBe("provider");
+    expect(classifyRepoName("proxy-stub")).toBe("proxy");
+    expect(classifyRepoName("translator-stub")).toBe("translator");
+    expect(classifyRepoName("plugin-stub")).toBe("plugin");
+  });
+  it("treats an unknown role word as a plugin, even one naming an object member", () => {
+    expect(classifyRepoName("foo-constructor")).toBe("plugin");
   });
   it("returns null for core libraries, which are never installed on their own", () => {
     expect(classifyRepoName("core-proxy")).toBeNull();

@@ -18,14 +18,14 @@ function data(): HomeLibraries[] {
     {
       home: home("forebay", "Forebay"),
       shared: [
-        { specifier: "@intisy-ai/basekit", version: "2.1.0", usedBy: ["stub-auth"] },
+        { specifier: "@intisy-ai/basekit", version: "2.1.0", usedBy: ["provider-stub"] },
         { specifier: "@intisy-ai/left-behind", version: "1.0.0", usedBy: [] },
       ],
-      plugins: [{ plugin: "stub-auth", dependencies: [{ specifier: "undici", version: "6.19.2", usedBy: [] }] }],
+      plugins: [{ plugin: "provider-stub", dependencies: [{ specifier: "undici", version: "6.19.2", usedBy: [] }] }],
     },
     {
       home: home("claude", "Claude Code"),
-      shared: [{ specifier: "@intisy-ai/basekit", version: "2.1.0", usedBy: ["stub-auth"] }],
+      shared: [{ specifier: "@intisy-ai/basekit", version: "2.1.0", usedBy: ["provider-stub"] }],
       plugins: [],
     },
   ];
@@ -59,7 +59,7 @@ describe("Libraries screen", () => {
     stubForebay({ librariesList: async () => ({ ok: true, data: data() }) });
     render(Libraries);
 
-    expect(within(await waitFor(() => row("@intisy-ai/basekit"))).getByText("stub-auth")).toBeInTheDocument();
+    expect(within(await waitFor(() => row("@intisy-ai/basekit"))).getByText("provider-stub")).toBeInTheDocument();
     expect(within(row("@intisy-ai/left-behind")).getByText("used by nothing installed")).toBeInTheDocument();
   });
 
@@ -85,7 +85,7 @@ describe("Libraries screen", () => {
     const { container } = render(Libraries);
     await screen.findByText("@intisy-ai/basekit");
 
-    await fireEvent.input(container.querySelector("input")!, { target: { value: "stub-auth" } });
+    await fireEvent.input(container.querySelector("input")!, { target: { value: "provider-stub" } });
 
     await waitFor(() => expect(screen.queryByText("@intisy-ai/left-behind")).toBeNull());
     expect(screen.getByText("@intisy-ai/basekit")).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe("Libraries screen", () => {
     const dialog = within(await screen.findByRole("dialog"));
     await fireEvent.click(dialog.getByRole("button", { name: "Uninstall" }));
 
-    await waitFor(() => expect(pluginsRemoveEverywhere).toHaveBeenCalledWith("stub-auth"));
+    await waitFor(() => expect(pluginsRemoveEverywhere).toHaveBeenCalledWith("provider-stub"));
   });
 
   it("shows an inline error when the read fails", async () => {
@@ -136,7 +136,7 @@ describe("a library left over in one home", () => {
   function split(): HomeLibraries[] {
     return [
       { home: home("forebay", "Forebay"), shared: [{ specifier: "@intisy-ai/openai-translator", version: "0.1.1", usedBy: [] }], plugins: [] },
-      { home: home("claude", "Claude Code"), shared: [{ specifier: "@intisy-ai/openai-translator", version: "0.1.1", usedBy: ["custom-auth"] }], plugins: [] },
+      { home: home("claude", "Claude Code"), shared: [{ specifier: "@intisy-ai/openai-translator", version: "0.1.1", usedBy: ["custom-provider"] }], plugins: [] },
     ];
   }
 
@@ -174,7 +174,7 @@ describe("navigating from a library to what uses it", () => {
     render(Libraries);
 
     const core = await waitFor(() => row("@intisy-ai/basekit"));
-    await fireEvent.click(within(core).getByRole("button", { name: "stub-auth" }));
+    await fireEvent.click(within(core).getByRole("button", { name: "provider-stub" }));
 
     await waitFor(() => expect(get(router).screen).toBe("plugins"));
   });
@@ -227,7 +227,7 @@ describe("progress for a removal started from a library", () => {
     await fireEvent.click(within(await waitFor(() => row("@intisy-ai/basekit"))).getByRole("button", { name: "Uninstall users" }));
     await fireEvent.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Uninstall" }));
 
-    await waitFor(() => expect(get(downloadRows).some((task) => task.label === "Remove stub-auth everywhere")).toBe(true));
+    await waitFor(() => expect(get(downloadRows).some((task) => task.label === "Remove provider-stub everywhere")).toBe(true));
   });
 
   it("reports removing the library itself", async () => {

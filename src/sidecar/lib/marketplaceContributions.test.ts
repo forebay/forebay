@@ -25,9 +25,9 @@ const translatorCategory = {
 
 describe("readMarketplaceContributions", () => {
   it("reads the categories an installed plugin declares", () => {
-    const contributions = readMarketplaceContributions(manifests({ "custom-auth": translatorCategory }));
+    const contributions = readMarketplaceContributions(manifests({ "custom-provider": translatorCategory }));
     expect(contributions).toEqual([
-      { id: "translators", label: "Translators", match: { topics: ["vendor-translator"], kind: undefined }, contributedBy: "custom-auth" },
+      { id: "translators", label: "Translators", match: { topics: ["vendor-translator"], kind: undefined }, contributedBy: "custom-provider" },
     ]);
   });
 
@@ -39,7 +39,7 @@ describe("readMarketplaceContributions", () => {
   });
 
   it("ignores a plugin with no marketplace block, and one whose manifest is unreadable", () => {
-    const deps = manifests({ plain: { displayName: "Plain" }, "custom-auth": translatorCategory });
+    const deps = manifests({ plain: { displayName: "Plain" }, "custom-provider": translatorCategory });
     const contributions = readMarketplaceContributions({
       ...deps,
       readManifest: (path) => (path.includes("broken") ? "{ not json" : deps.readManifest(path)),

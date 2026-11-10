@@ -1032,7 +1032,7 @@ describe("Plugins screen", () => {
         { name: "wakatime-sync", url: "uw", kind: "plugin" as const, description: "", deprecated: false, topics: ["plugin"] },
         { name: "openai-translator", url: "uo", kind: "translator" as const, description: "", deprecated: false, topics: ["vendor-translator"] },
       ],
-      contributions: [{ id: "translators", label: "Translators", match: { topics: ["vendor-translator"] }, contributedBy: "custom-auth" }],
+      contributions: [{ id: "translators", label: "Translators", match: { topics: ["vendor-translator"] }, contributedBy: "custom-provider" }],
     };
     stubForebay({ pluginsList: async () => ({ ok: true, data: baseSections() }), catalogList: async () => ({ ok: true, data: withTranslators }) });
     render(Plugins);

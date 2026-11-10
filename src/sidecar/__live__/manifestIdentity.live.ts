@@ -47,7 +47,7 @@ describe("identity against the real homes", () => {
 
   it("resolves a mark per contributed id where a plugin ships more than one", async () => {
     for (const home of await pluginHomes()) {
-      const manifest = readPluginManifest("antigravity-auth", home.dir);
+      const manifest = readPluginManifest("antigravity-provider", home.dir);
       if (!manifest.displayName) continue;
       expect(providerIcon(manifest, "antigravity")).toBeDefined();
       expect(providerIcon(manifest, "gemini-cli")).toBeDefined();

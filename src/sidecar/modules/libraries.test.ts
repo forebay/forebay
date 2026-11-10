@@ -11,8 +11,8 @@ const HOMES = [home("forebay", "/forebay"), home("claude", "/claude")];
 describe("librariesList", () => {
   it("reports each home's shared store and per-plugin dependencies", async () => {
     const read = vi.fn(async (dir: string) => ({
-      shared: [{ specifier: "@intisy-ai/basekit", version: dir === "/forebay" ? "2.1.0" : "2.0.0", usedBy: ["stub-auth"] }],
-      plugins: [{ plugin: "stub-auth", dependencies: [{ specifier: "undici", version: "6.19.2", usedBy: [] }] }],
+      shared: [{ specifier: "@intisy-ai/basekit", version: dir === "/forebay" ? "2.1.0" : "2.0.0", usedBy: ["provider-stub"] }],
+      plugins: [{ plugin: "provider-stub", dependencies: [{ specifier: "undici", version: "6.19.2", usedBy: [] }] }],
     }));
 
     const result = await librariesList({ homes: async () => HOMES, read });
@@ -22,7 +22,7 @@ describe("librariesList", () => {
     expect(result.data.map((h) => h.home.id)).toEqual(["forebay", "claude"]);
     expect(result.data[0].shared[0]).toMatchObject({ specifier: "@intisy-ai/basekit", version: "2.1.0" });
     expect(result.data[1].shared[0]).toMatchObject({ version: "2.0.0" });
-    expect(result.data[0].plugins[0].plugin).toBe("stub-auth");
+    expect(result.data[0].plugins[0].plugin).toBe("provider-stub");
   });
 
   it("reads every home rather than stopping at the first", async () => {
