@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "importName": "forebay",
+  "description": "The Electron desktop app for managing AI providers, accounts and routing; it holds no provider logic.",
+  "topics": [
+    "ai",
+    "ai-proxy",
+    "dashboard",
+    "desktop-app",
+    "electron",
+    "forebay",
+    "llm",
+    "svelte",
+    "typescript"
+  ]
+}
